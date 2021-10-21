@@ -29,7 +29,6 @@ printf "DATABASEUSER=fmeserver\n" >> install_engine.cfg
 printf "DATABASEPASSWORD=fmeserver" >> install_engine.cfg
 sleep 600
 chmod +x ./fme-server-2021.1.3-b21631-linux~ubuntu.20.04.run
-ls
 chown fmeserver /mnt/efs/fs1/fmeserver
 mkdir /usr/share/desktop-directories/
 mkdir /opt/fmeserver/

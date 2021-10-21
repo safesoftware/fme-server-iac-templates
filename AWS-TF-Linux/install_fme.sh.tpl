@@ -34,5 +34,16 @@ cd /opt/fmeserver/Server/database/postgresql
 export PGPASSWORD='postgres'; psql -U postgres -d postgres -h ${rdsAddress} -p ${rdsPort} -c "CREATE USER fmeserver WITH PASSWORD 'fmeserver';" &> createUserLog.txt
 export PGPASSWORD='postgres'; psql -U postgres -d postgres -h ${rdsAddress} -p ${rdsPort} -f postgresql_createDB.sql &> createDBLog.txt
 export PGPASSWORD='fmeserver'; psql -U fmeserver -d fmeserver -h ${rdsAddress} -p ${rdsPort} -f postgresql_createSchema.sql &> createSchemaLog.txt
+cd /opt/fmeserver/Utilities/tomcat/webapps/fmerest/WEB-INF/conf
+sed -i 's/FME_SERVER_PORT_POOL=0/FME_SERVER_PORT_POOL=7100-7200/' propertiesFile.properties
+cd /opt/fmeserver/Utilities/tomcat/webapps/fmedatadownload/WEB-INF/conf
+sed -i 's/FME_SERVER_PORT_POOL=0/FME_SERVER_PORT_POOL=7100-7200/' propertiesFile.properties
+cd /opt/fmeserver/Utilities/tomcat/webapps/fmedatastreaming/WEB-INF/conf
+sed -i 's/FME_SERVER_PORT_POOL=0/FME_SERVER_PORT_POOL=7100-7200/' propertiesFile.properties
+cd /opt/fmeserver/Utilities/tomcat/webapps/fmejobsubmitter/WEB-INF/conf
+sed -i 's/FME_SERVER_PORT_POOL=0/FME_SERVER_PORT_POOL=7100-7200/' propertiesFile.properties
+cd /opt/fmeserver/Utilities/tomcat/webapps/fmenotification/WEB-INF/conf
+sed -i 's/FME_SERVER_PORT_POOL=0/FME_SERVER_PORT_POOL=7100-7200/' propertiesFile.properties
 cd /opt/fmeserver/Server
+sed -i 's/FME_SERVER_PORT_POOL=0/FME_SERVER_PORT_POOL=7100-7200/' fmeServerConfig.txt
 ./startServer.sh
