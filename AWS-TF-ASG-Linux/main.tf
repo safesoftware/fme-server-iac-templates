@@ -42,10 +42,9 @@ data "template_file" "mainScript" {
 data "template_file" "engineScript" {
   template = file("./install_engine.sh.tpl")
   vars = {
-    efs        = aws_efs_file_system.FMEServerSystemShareEFS.id
-    eip        = aws_eip.FMECoreEIP.public_ip
-    rdsAddress = aws_db_instance.FMEDatabase.address
-    rdsPort    = aws_db_instance.FMEDatabase.port
+    efs = aws_efs_file_system.FMEServerSystemShareEFS.id
+    eip = aws_eip.FMECoreEIP.public_ip
+    rds = aws_db_instance.FMEDatabase.endpoint
   }
 }
 
@@ -67,14 +66,14 @@ resource "aws_db_instance" "FMEDatabase" {
   vpc_security_group_ids = [module.network.securityGroupID]
   skip_final_snapshot    = true
   tags = {
-    "Name"    = "FMEDatabase"
+    "Name" = "FMEDatabase"
   }
 }
 
 resource "aws_efs_file_system" "FMEServerSystemShareEFS" {
   availability_zone_name = "ca-central-1a"
   tags = {
-    "Name"    = "FMEServerSystemShareEFS"
+    "Name" = "FMEServerSystemShareEFS"
   }
 }
 
@@ -97,7 +96,7 @@ resource "aws_eip_association" "associateEIP" {
 }
 
 resource "aws_instance" "coreServer" {
-  ami                    = "ami-0801628222e2e96d6"
+  ami                    = "ami-00b1682826a83e6c7"
   availability_zone      = "ca-central-1a"
   instance_type          = "t3.medium"
   key_name               = var.key_name
@@ -117,23 +116,30 @@ resource "aws_instance" "coreServer" {
   }
 }
 
-resource "aws_instance" "engineServer" {
-  ami                         = "ami-0801628222e2e96d6"
-  availability_zone           = "ca-central-1a"
+resource "aws_launch_configuration" "engineConfig" {
+  name                        = "FME engine config"
+  image_id                    = "ami-09c63381267f423f7"
   instance_type               = "t3.medium"
   key_name                    = var.key_name
+  security_groups             = [module.network.securityGroupID]
   associate_public_ip_address = true
-  vpc_security_group_ids      = [module.network.securityGroupID]
-  subnet_id                   = module.network.subnet
   root_block_device {
     volume_size = 20
   }
   user_data = data.template_file.engineScript.rendered
-  depends_on = [
-    aws_instance.coreServer
-  ]
-  tags = {
-    Name = "Engine Instance"
+}
+
+resource "aws_autoscaling_group" "engineScaling" {
+  name                 = "FME engine scaling group"
+  max_size             = 2
+  desired_capacity     = 0
+  min_size             = 0
+  vpc_zone_identifier  = [module.network.subnet]
+  launch_configuration = aws_launch_configuration.engineConfig.id
+  tag {
+    key                 = "Name"
+    value               = "Engine scaling instance"
+    propagate_at_launch = true
   }
 }
 

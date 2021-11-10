@@ -28,12 +28,13 @@ printf "DATABASEPORT=${rdsPort}\n" >> install_engine.cfg
 printf "DATABASEUSER=fmeserver\n" >> install_engine.cfg
 printf "DATABASEPASSWORD=fmeserver" >> install_engine.cfg
 sleep 600
-chmod +x ./fme-server-2021.1.3-b21631-linux~ubuntu.20.04.run
+chmod +x ./fme-server-2021.2-b21784-linux~ubuntu.20.04.run
 chown fmeserver /mnt/efs/fs1/fmeserver
 mkdir /usr/share/desktop-directories/
 mkdir /opt/fmeserver/
 chmod 777 /opt/fmeserver/
-./fme-server-2021.1.3-b21631-linux~ubuntu.20.04.run -- --file install_engine.cfg
+./fme-server-2021.2-b21784-linux~ubuntu.20.04.run -- --file install_engine.cfg
 cd /opt/fmeserver/Server
-sed -i '/^TEMPLATE_START_ENGINE=/ s/$/ -ENGINE_TYPE DYNAMIC/' processMonitorConfigEngines.txt
+sed -i '/^START_ENGINE_.*Engine1/ s/STANDARD$/DYNAMIC/' processMonitorConfigEngines.txt
+sed -i '/^START_ENGINE_.*Engine2/ s/STANDARD$/DYNAMIC/' processMonitorConfigEngines.txt
 ./startEngines.sh
