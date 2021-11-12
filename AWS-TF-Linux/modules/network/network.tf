@@ -39,6 +39,7 @@ resource "aws_subnet" "dbSubnet" {
 }
 
 resource "aws_db_subnet_group" "rdsSubnetGroup" {
+  name = "fmedbsubnetgroup"
   subnet_ids = [aws_subnet.mainSubnet.id, aws_subnet.dbSubnet.id]
   tags = {
     "Name"    = "FMEDBSubnetGroup"
@@ -206,10 +207,10 @@ output "vpcID" {
   value = aws_vpc.FMEVPC.id
 }
 
-output "subnet" {
+output "subnetID" {
   value = aws_subnet.mainSubnet.id
 }
 
-output "dbSubnet" {
+output "rdsSubnetGroupID" {
   value = aws_db_subnet_group.rdsSubnetGroup.id
 }

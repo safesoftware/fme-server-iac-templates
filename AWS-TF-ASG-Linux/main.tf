@@ -32,55 +32,31 @@ variable "purpose" {
 data "template_file" "mainScript" {
   template = file("./install_fme.sh.tpl")
   vars = {
-    efs        = aws_efs_file_system.FMEServerSystemShareEFS.id
+    efs        = module.storage.FMEEFSID
     eip        = aws_eip.FMECoreEIP.public_ip
-    rdsAddress = aws_db_instance.FMEDatabase.address
-    rdsPort    = aws_db_instance.FMEDatabase.port
+    rdsAddress = module.storage.FMEDatabase.address
+    rdsPort    = module.storage.FMEDatabase.port
   }
 }
 
 data "template_file" "engineScript" {
   template = file("./install_engine.sh.tpl")
   vars = {
-    efs = aws_efs_file_system.FMEServerSystemShareEFS.id
+    efs = module.storage.FMEEFSID
     eip = aws_eip.FMECoreEIP.public_ip
-    rds = aws_db_instance.FMEDatabase.endpoint
+    rds = module.storage.FMEDatabase.endpoint
   }
 }
 
 module "network" {
-  source = "./modules"
+  source = "./modules/network"
 }
 
-resource "aws_db_instance" "FMEDatabase" {
-  allocated_storage      = 20
-  availability_zone      = "ca-central-1a"
-  instance_class         = "db.t3.micro"
-  engine                 = "postgres"
-  username               = "postgres"
-  password               = "postgres"
-  db_subnet_group_name   = module.network.dbSubnet
-  license_model          = "postgresql-license"
-  port                   = 5432
-  multi_az               = false
-  vpc_security_group_ids = [module.network.securityGroupID]
-  skip_final_snapshot    = true
-  tags = {
-    "Name" = "FMEDatabase"
-  }
-}
-
-resource "aws_efs_file_system" "FMEServerSystemShareEFS" {
-  availability_zone_name = "ca-central-1a"
-  tags = {
-    "Name" = "FMEServerSystemShareEFS"
-  }
-}
-
-resource "aws_efs_mount_target" "mountTarget" {
-  file_system_id  = aws_efs_file_system.FMEServerSystemShareEFS.id
-  subnet_id       = module.network.subnet
-  security_groups = [module.network.securityGroupID]
+module "storage" {
+  source             = "./modules/storage"
+  subnetID           = module.network.subnetID
+  rdsSubnetGroupID   = module.network.rdsSubnetGroupID
+  FMESecurityGroupID = module.network.securityGroupID
 }
 
 resource "aws_eip" "FMECoreEIP" {
@@ -101,14 +77,14 @@ resource "aws_instance" "coreServer" {
   instance_type          = "t3.medium"
   key_name               = var.key_name
   vpc_security_group_ids = [module.network.securityGroupID]
-  subnet_id              = module.network.subnet
+  subnet_id              = module.network.subnetID
   root_block_device {
     volume_size = 20
   }
   user_data = data.template_file.mainScript.rendered
   depends_on = [
-    aws_db_instance.FMEDatabase,
-    aws_efs_mount_target.mountTarget,
+    module.storage.FMEDatabase,
+    module.storage.mountTarget,
     aws_eip.FMECoreEIP
   ]
   tags = {
@@ -134,7 +110,7 @@ resource "aws_autoscaling_group" "engineScaling" {
   max_size             = 2
   desired_capacity     = 0
   min_size             = 0
-  vpc_zone_identifier  = [module.network.subnet]
+  vpc_zone_identifier  = [module.network.subnetID]
   launch_configuration = aws_launch_configuration.engineConfig.id
   tag {
     key                 = "Name"
