@@ -73,7 +73,7 @@ resource "aws_eip_association" "associateEIP" {
 }
 
 resource "aws_instance" "coreServer" {
-  ami                    = "ami-0801628222e2e96d6"
+  ami                    = "ami-0bb84e7329f4fa1f7"
   availability_zone      = "ca-central-1a"
   instance_type          = "t3.medium"
   key_name               = var.key_name
@@ -94,7 +94,7 @@ resource "aws_instance" "coreServer" {
 }
 
 resource "aws_instance" "engineServer" {
-  ami                         = "ami-0801628222e2e96d6"
+  ami                         = "ami-0bb84e7329f4fa1f7"
   availability_zone           = "ca-central-1a"
   instance_type               = "t3.medium"
   key_name                    = var.key_name
