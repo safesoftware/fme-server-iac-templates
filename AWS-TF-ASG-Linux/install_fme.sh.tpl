@@ -1,4 +1,7 @@
+#!/bin/bash
 cd /
+apt-get update
+sleep 60
 apt-get install -y git binutils make
 apt-get install -y postgresql-client
 git clone https://github.com/aws/efs-utils
@@ -25,7 +28,7 @@ sed -i "/^nodename/ s/\".*\"/\"$dns\"/" ./values.yml
 sed -i "/^hostname/ s/\".*\"/\"$dns\"/" ./values.yml
 sed -i "/^redishosts/ s/\".*\"/\"$dns\"/" ./values.yml
 sed -i "/^fmeserverhostnamelocal/ s/\".*\"/\"$dns\"/" ./values.yml
-sed -i "/^webserverhostname/ s/\".*\"/\"${webUI}\"/" ./values.yml
+sed -i "/^webserverhostname/ s/\".*\"/\"$dns\"/" ./values.yml
 sed -i '\|^pgsqlconnectionstring| s|".*"|"jdbc:postgresql://${rds}/fmeserver"|' ./values.yml
 cd confd
 ./confd -onetime -backend file -file ../values.yml -confdir .

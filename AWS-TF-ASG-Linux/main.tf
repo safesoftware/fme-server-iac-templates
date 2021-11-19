@@ -36,6 +36,7 @@ data "template_file" "mainScript" {
     eip        = aws_eip.FMECoreEIP.public_ip
     rdsAddress = module.storage.FMEDatabase.address
     rdsPort    = module.storage.FMEDatabase.port
+    rds        = module.storage.FMEDatabase.endpoint
   }
 }
 
