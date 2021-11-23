@@ -1,9 +1,8 @@
 #!/bin/bash
 cd /
 apt-get update
-apt-get install -y zip unzip
-apt-get install -y git binutils make
-apt-get install -y postgresql-client
+sleep 10
+apt-get install -y zip unzip git binutils make postgresql-client
 git clone https://github.com/aws/efs-utils
 cd efs-utils
 make deb

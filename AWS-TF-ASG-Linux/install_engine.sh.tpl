@@ -1,4 +1,6 @@
 #!/bin/bash
+apt-get update
+sleep 10
 apt-get install -y git binutils make
 git clone https://github.com/aws/efs-utils
 cd efs-utils
