@@ -39,7 +39,7 @@ resource "aws_subnet" "dbSubnet" {
 }
 
 resource "aws_db_subnet_group" "rdsSubnetGroup" {
-  name = "fmedbsubnetgroup"
+  name_prefix = "fmedbsubnetgroup"
   subnet_ids = [aws_subnet.mainSubnet.id, aws_subnet.dbSubnet.id]
   tags = {
     "Name"    = "FMEDBSubnetGroup"

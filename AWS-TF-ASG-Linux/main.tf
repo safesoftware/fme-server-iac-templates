@@ -94,7 +94,7 @@ resource "aws_instance" "coreServer" {
 }
 
 resource "aws_launch_configuration" "engineConfig" {
-  name                        = "FME engine config"
+  name_prefix                 = "FME engine config"
   image_id                    = "ami-09c63381267f423f7"
   instance_type               = "t3.medium"
   key_name                    = var.key_name
@@ -107,7 +107,7 @@ resource "aws_launch_configuration" "engineConfig" {
 }
 
 resource "aws_autoscaling_group" "engineScaling" {
-  name                 = "FME engine scaling group"
+  name_prefix          = "FME engine scaling group"
   max_size             = 2
   desired_capacity     = 0
   min_size             = 0
