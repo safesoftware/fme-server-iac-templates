@@ -73,7 +73,7 @@ resource "aws_eip_association" "associateEIP" {
 }
 
 resource "aws_instance" "coreServer" {
-  ami                    = "ami-00b1682826a83e6c7"
+  ami                    = "ami-0f587c2101c606e85"
   availability_zone      = "ca-central-1a"
   instance_type          = "t3.medium"
   key_name               = var.key_name
@@ -95,7 +95,7 @@ resource "aws_instance" "coreServer" {
 
 resource "aws_launch_configuration" "engineConfig" {
   name_prefix                 = "FME engine config"
-  image_id                    = "ami-09c63381267f423f7"
+  image_id                    = "ami-0d5376f0c70ed0237"
   instance_type               = "t3.medium"
   key_name                    = var.key_name
   security_groups             = [module.network.securityGroupID]
