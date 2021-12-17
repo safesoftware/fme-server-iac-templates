@@ -52,9 +52,9 @@ data "template_file" "engineScriptStandard" {
 data "template_file" "engineScriptDynamic" {
   template = file("./install_dynamic_engine.sh.tpl")
   vars = {
-    efs                = module.storage.FMEEFSID
-    rds                = module.storage.FMEDatabase.endpoint
-    webUI              = aws_lb.FMEWebUILoadBalancer.dns_name
+    efs   = module.storage.FMEEFSID
+    rds   = module.storage.FMEDatabase.endpoint
+    webUI = aws_lb.FMEWebUILoadBalancer.dns_name
   }
 }
 
@@ -70,7 +70,7 @@ module "storage" {
 }
 
 resource "aws_launch_configuration" "coreConfig" {
-  name                        = "FME core config"
+  name_prefix                 = "FME core config"
   image_id                    = "ami-0f587c2101c606e85"
   instance_type               = "t3.medium"
   key_name                    = var.key_name
@@ -87,7 +87,7 @@ resource "aws_launch_configuration" "coreConfig" {
 }
 
 resource "aws_autoscaling_group" "coreScaling" {
-  name                 = "FME core scaling group"
+  name_prefix          = "FME core scaling group"
   max_size             = 3
   desired_capacity     = 1
   min_size             = 1
@@ -102,7 +102,7 @@ resource "aws_autoscaling_group" "coreScaling" {
 }
 
 resource "aws_launch_configuration" "engineConfigStandard" {
-  name                        = "FME standard engine config"
+  name_prefix                 = "FME standard engine config"
   image_id                    = "ami-0d5376f0c70ed0237"
   instance_type               = "t3.medium"
   key_name                    = var.key_name
@@ -115,7 +115,7 @@ resource "aws_launch_configuration" "engineConfigStandard" {
 }
 
 resource "aws_autoscaling_group" "engineScalingStandard" {
-  name                 = "FME standard engine scaling group"
+  name_prefix          = "FME standard engine scaling group"
   max_size             = 2
   desired_capacity     = 0
   min_size             = 0
@@ -129,7 +129,7 @@ resource "aws_autoscaling_group" "engineScalingStandard" {
 }
 
 resource "aws_launch_configuration" "engineConfigDynamic" {
-  name                        = "FME dynamic engine config"
+  name_prefix                 = "FME dynamic engine config"
   image_id                    = "ami-0d5376f0c70ed0237"
   instance_type               = "t3.medium"
   key_name                    = var.key_name
@@ -142,7 +142,7 @@ resource "aws_launch_configuration" "engineConfigDynamic" {
 }
 
 resource "aws_autoscaling_group" "engineScalingDynamic" {
-  name                 = "FME dynamic engine scaling group"
+  name_prefix          = "FME dynamic engine scaling group"
   max_size             = 2
   desired_capacity     = 0
   min_size             = 0
@@ -156,10 +156,10 @@ resource "aws_autoscaling_group" "engineScalingDynamic" {
 }
 
 resource "aws_lb_target_group" "FMEWebUITargetGroup" {
-  name     = "FMEWebUITargetGroup"
-  vpc_id   = module.network.vpcID
-  protocol = "HTTP"
-  port     = 8080
+  name_prefix = "FME-UI"
+  vpc_id      = module.network.vpcID
+  protocol    = "HTTP"
+  port        = 8080
   health_check {
     interval = 300
     timeout  = 120
@@ -172,10 +172,10 @@ resource "aws_lb_target_group" "FMEWebUITargetGroup" {
 }
 
 resource "aws_lb_target_group" "FMEWebSocketTargetGroup" {
-  name     = "FMEWebSocketTargetGroup"
-  vpc_id   = module.network.vpcID
-  protocol = "TCP"
-  port     = 7078
+  name_prefix = "FMESKT"
+  vpc_id      = module.network.vpcID
+  protocol    = "TCP"
+  port        = 7078
   health_check {
     protocol = "TCP"
     interval = 30
@@ -186,7 +186,7 @@ resource "aws_lb_target_group" "FMEWebSocketTargetGroup" {
 }
 
 resource "aws_lb" "FMEWebUILoadBalancer" {
-  name            = "FMEWebUILoadBalancer"
+  name_prefix     = "FME-UI"
   security_groups = [module.network.securityGroupID]
   subnets         = [module.network.subnetID, module.network.backupSubnetID]
   internal        = false
@@ -221,7 +221,7 @@ resource "aws_lb_listener" "FMEWebSocketListener" {
 }
 
 resource "aws_lb" "FMEBackendLoadBalancer" {
-  name               = "FMEBackendLoadBalancer"
+  name_prefix        = "FMEBLB"
   subnets            = [module.network.subnetID]
   load_balancer_type = "network"
   internal           = true
