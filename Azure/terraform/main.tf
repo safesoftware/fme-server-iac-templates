@@ -205,29 +205,38 @@ resource "azurerm_application_gateway" "fme_server_dist" {
   tags = local.default_tags
 }
 
-resource "azurerm_storage_account" "fme_server_dist" {
-  name                     = var.st_name
-  resource_group_name      = azurerm_resource_group.fme_server_dist.name
-  location                 = azurerm_resource_group.fme_server_dist.location
-  account_kind             = "FileStorage"
-  account_tier             = "Premium"
-  account_replication_type = "LRS"
-
-  network_rules {
-    default_action             = "Deny"
-    bypass                     = ["AzureServices"]
-    virtual_network_subnet_ids = [azurerm_subnet.fme_server_dist_be.id]
-    ip_rules                   = ["50.68.182.79"]
-  }
-
-  tags = local.default_tags
+module storage {
+  source = "./modules/storage"
+  owner         = var.owner 
+  rg_name       = azurerm_resource_group.fme_server_dist.name
+  location      = azurerm_resource_group.fme_server_dist.location
+  be_snet_id    = azurerm_subnet.fme_server_dist_be.id
 }
 
-resource "azurerm_storage_share" "fme_server_dist" {
-  name                 = "fmeserverdata"
-  storage_account_name = azurerm_storage_account.fme_server_dist.name
-  quota                = 100
-}
+
+# resource "azurerm_storage_account" "fme_server_dist" {
+#   name                     = var.st_name
+#   resource_group_name      = azurerm_resource_group.fme_server_dist.name
+#   location                 = azurerm_resource_group.fme_server_dist.location
+#   account_kind             = "FileStorage"
+#   account_tier             = "Premium"
+#   account_replication_type = "LRS"
+
+#   network_rules {
+#     default_action             = "Deny"
+#     bypass                     = ["AzureServices"]
+#     virtual_network_subnet_ids = [azurerm_subnet.fme_server_dist_be.id]
+#     ip_rules                   = ["50.68.182.79"]
+#   }
+
+#   tags = local.default_tags
+# }
+
+# resource "azurerm_storage_share" "fme_server_dist" {
+#   name                 = "fmeserverdata"
+#   storage_account_name = azurerm_storage_account.fme_server_dist.name
+#   quota                = 100
+# }
 
 module database {
   source        = "./modules/database"
@@ -308,7 +317,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_core" {
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8"
     settings = jsonencode({
-      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, var.db_admin_pw, var.db_admin_user, azurerm_public_ip.fme_server_dist.fqdn, azurerm_storage_account.fme_server_dist.name, azurerm_storage_account.fme_server_dist.primary_access_key)
+      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, var.db_admin_pw, var.db_admin_user, azurerm_public_ip.fme_server_dist.fqdn, module.storage.name, module.storage.primary_access_key)
     })
   }
 
@@ -359,7 +368,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_engine" {
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8"
     settings = jsonencode({
-      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, azurerm_lb.fme_server_dist.private_ip_address, azurerm_storage_account.fme_server_dist.name, azurerm_storage_account.fme_server_dist.primary_access_key)
+      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, azurerm_lb.fme_server_dist.private_ip_address, module.storage.name, module.storage.primary_access_key)
     })
   }
 

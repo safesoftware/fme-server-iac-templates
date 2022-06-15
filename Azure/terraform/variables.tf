@@ -64,11 +64,11 @@ variable "agw_name" {
   description = "description"
 }
 
-variable "st_name" {
-  type        = string
-  default     = "fmeserver010622"
-  description = "Name for Azure storage account used for FME Server"
-}
+# variable "st_name" {
+#   type        = string
+#   default     = "fmeserver010622"
+#   description = "Name for Azure storage account used for FME Server"
+# }
 
 variable "vm_admin_user" {
   type        = string
