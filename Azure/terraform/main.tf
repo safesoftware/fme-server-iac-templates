@@ -47,41 +47,23 @@ module network {
   domain_name_label = var.domain_name_label
 }
 
-# resource "azurerm_virtual_network" "fme_server_dist" {
-#   name                = var.vnet_name
-#   address_space       = ["10.0.0.0/16"]
-#   location            = azurerm_resource_group.fme_server_dist.location
-#   resource_group_name = azurerm_resource_group.fme_server_dist.name
+module storage {
+  source = "./modules/storage"
+  owner         = var.owner 
+  rg_name       = azurerm_resource_group.fme_server_dist.name
+  location      = azurerm_resource_group.fme_server_dist.location
+  be_snet_id    = module.network.be_snet_id
+}
 
-#   tags = local.default_tags
-# }
-
-# resource "azurerm_subnet" "fme_server_dist_be" {
-#   name                 = var.be_snet_name
-#   resource_group_name  = azurerm_resource_group.fme_server_dist.name
-#   virtual_network_name = azurerm_virtual_network.fme_server_dist.name
-#   address_prefixes     = ["10.0.0.0/24"]
-#   service_endpoints    = ["Microsoft.Storage", "Microsoft.Sql"]
-# }
-
-# resource "azurerm_subnet" "fme_server_dist_agw" {
-#   name                 = var.agw_snet_name
-#   resource_group_name  = azurerm_resource_group.fme_server_dist.name
-#   virtual_network_name = azurerm_virtual_network.fme_server_dist.name
-#   address_prefixes     = ["10.0.1.0/24"]
-# }
-
-# resource "azurerm_public_ip" "fme_server_dist" {
-#   name                    = var.pip_name
-#   resource_group_name     = azurerm_resource_group.fme_server_dist.name
-#   location                = azurerm_resource_group.fme_server_dist.location
-#   allocation_method       = "Dynamic"
-#   sku                     = "Basic"
-#   domain_name_label       = "gf-fmeserver-dist"
-#   idle_timeout_in_minutes = 30
-
-#   tags = local.default_tags
-# }
+module database {
+  source        = "./modules/database"
+  owner         = var.owner 
+  rg_name       = azurerm_resource_group.fme_server_dist.name
+  location      = azurerm_resource_group.fme_server_dist.location
+  be_snet_id    = module.network.be_snet_id
+  db_admin_user = var.db_admin_user
+  db_admin_pw   = var.db_admin_pw
+}
 
 resource "azurerm_lb" "fme_server_dist" {
   name                = var.lb_name
@@ -216,72 +198,6 @@ resource "azurerm_application_gateway" "fme_server_dist" {
 
   tags = local.default_tags
 }
-
-module storage {
-  source = "./modules/storage"
-  owner         = var.owner 
-  rg_name       = azurerm_resource_group.fme_server_dist.name
-  location      = azurerm_resource_group.fme_server_dist.location
-  be_snet_id    = module.network.be_snet_id
-}
-
-
-# resource "azurerm_storage_account" "fme_server_dist" {
-#   name                     = var.st_name
-#   resource_group_name      = azurerm_resource_group.fme_server_dist.name
-#   location                 = azurerm_resource_group.fme_server_dist.location
-#   account_kind             = "FileStorage"
-#   account_tier             = "Premium"
-#   account_replication_type = "LRS"
-
-#   network_rules {
-#     default_action             = "Deny"
-#     bypass                     = ["AzureServices"]
-#     virtual_network_subnet_ids = [azurerm_subnet.fme_server_dist_be.id]
-#     ip_rules                   = ["50.68.182.79"]
-#   }
-
-#   tags = local.default_tags
-# }
-
-# resource "azurerm_storage_share" "fme_server_dist" {
-#   name                 = "fmeserverdata"
-#   storage_account_name = azurerm_storage_account.fme_server_dist.name
-#   quota                = 100
-# }
-
-module database {
-  source        = "./modules/database"
-  owner         = var.owner 
-  rg_name       = azurerm_resource_group.fme_server_dist.name
-  location      = azurerm_resource_group.fme_server_dist.location
-  be_snet_id    = module.network.be_snet_id
-  db_admin_user = var.db_admin_user
-  db_admin_pw   = var.db_admin_pw
-}
-
-
-# resource "azurerm_postgresql_server" "fme_server_dist" {
-#   name                         = var.db_name
-#   location                     = azurerm_resource_group.fme_server_dist.location
-#   resource_group_name          = azurerm_resource_group.fme_server_dist.name
-#   administrator_login          = var.db_admin_user
-#   administrator_login_password = var.db_admin_pw
-#   sku_name                     = "GP_Gen5_2"
-#   version                      = "10"
-#   storage_mb                   = 51200
-#   ssl_enforcement_enabled      = true
-
-#   tags = local.default_tags
-# }
-
-# resource "azurerm_postgresql_virtual_network_rule" "fme_server_dist" {
-#   name                                 = "postgresql-vnet-rule"
-#   resource_group_name                  = azurerm_resource_group.fme_server_dist.name
-#   server_name                          = azurerm_postgresql_server.fme_server_dist.name
-#   subnet_id                            = azurerm_subnet.fme_server_dist_be.id
-#   ignore_missing_vnet_service_endpoint = true
-# }
 
 resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_core" {
   name                = "core"

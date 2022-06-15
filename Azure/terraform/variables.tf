@@ -61,7 +61,7 @@ variable "engine_registration_lb_frontend_name" {
 variable "engine_registration_lb_backend_name" {
   type        = string
   default     = "engineRegistrationBackend"
-  description = "Engine registration load balancer frontend IP configuration name"
+  description = "Engine registration load balancer backend IP configuration name"
 }
 
 variable "agw_name" {
@@ -69,12 +69,6 @@ variable "agw_name" {
   default     = "fme-server-agw"
   description = "description"
 }
-
-# variable "st_name" {
-#   type        = string
-#   default     = "fmeserver010622"
-#   description = "Name for Azure storage account used for FME Server"
-# }
 
 variable "vm_admin_user" {
   type        = string
@@ -87,12 +81,6 @@ variable "vm_admin_pw" {
   description = "Windows virual machine admin pw"
   sensitive   = true
 }
-
-# variable "db_name" {
-#   type        = string
-#   default     = "fmeserver-postgresql010622"
-#   description = "Name for database server used for FME Server"
-# }
 
 variable "db_admin_user" {
   type        = string

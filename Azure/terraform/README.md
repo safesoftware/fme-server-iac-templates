@@ -28,7 +28,51 @@ Once the depl0yment is complete it is time to test FME Server. The public URL fo
 
 To remove the FME Server deployment run `terrform destroy` in your console and confirm the prompt with `yes`.
 
+## Variables
+
+`owner` - Specifies the default value for onwer tag.
+
+`rg_name` - Specifies the resource group name.
+
+`location` - Specifies the location of resources.
+
+`vnet_name` - Specifies the virtual network name.
+
+`be_snet_name` - Specifies the backend virtual network subnet name.
+
+`agw_snet_name` - Specifies the application gateway virtual network subnet name.
+
+`pip_name` - Specifies the public ip name.
+
+`domain_name_label` - Specifies the label for the Domain Name. Will be used to make up the FQDN.
+
+`lb_name` - Specifies the load balancer name.
+
+`engine_registration_lb_frontend_name` - Specifies the engine registration load balancer frontend IP configuration name.
+
+`engine_registration_lb_backend_name` - Specifies the engine registration load balancer backend IP configuration name.
+
+`agw_name` - Specifies the application gateway name.
+
+`vm_admin_user` - Specifies the windows virual machine admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.
+
+`vm_admin_pw` - Specifies the windows virual machine admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.
+
+`db_admin_user` - Specifies the backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.
+
+`db_admin_pw` - Specifies the backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.
+
+## Output
+
 ## Modifying resources
 The terraform scripts provide an easy way to read and modify the configuration.
 ### Changing Resource configurations
 ### Changing backend DB configuration
+
+## Todos
+- clean up resource names and follow naming best practice
+- remove uneccesary variables ()
+- add output variable with FQDN of deployed server to root module
+- create lb module
+- create agw module
+- create azure sql server module and confd script to support azure sql server 
