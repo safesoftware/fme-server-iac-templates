@@ -229,27 +229,38 @@ resource "azurerm_storage_share" "fme_server_dist" {
   quota                = 100
 }
 
-resource "azurerm_postgresql_server" "fme_server_dist" {
-  name                         = var.db_name
-  location                     = azurerm_resource_group.fme_server_dist.location
-  resource_group_name          = azurerm_resource_group.fme_server_dist.name
-  administrator_login          = var.db_admin_user
-  administrator_login_password = var.db_admin_pw
-  sku_name                     = "GP_Gen5_2"
-  version                      = "10"
-  storage_mb                   = 51200
-  ssl_enforcement_enabled      = true
-
-  tags = local.default_tags
+module database {
+  source        = "./modules/database"
+  owner         = var.owner 
+  rg_name       = azurerm_resource_group.fme_server_dist.name
+  location      = azurerm_resource_group.fme_server_dist.location
+  be_snet_id    = azurerm_subnet.fme_server_dist_be.id
+  db_admin_user = var.db_admin_user
+  db_admin_pw   = var.db_admin_pw
 }
 
-resource "azurerm_postgresql_virtual_network_rule" "fme_server_dist" {
-  name                                 = "postgresql-vnet-rule"
-  resource_group_name                  = azurerm_resource_group.fme_server_dist.name
-  server_name                          = azurerm_postgresql_server.fme_server_dist.name
-  subnet_id                            = azurerm_subnet.fme_server_dist_be.id
-  ignore_missing_vnet_service_endpoint = true
-}
+
+# resource "azurerm_postgresql_server" "fme_server_dist" {
+#   name                         = var.db_name
+#   location                     = azurerm_resource_group.fme_server_dist.location
+#   resource_group_name          = azurerm_resource_group.fme_server_dist.name
+#   administrator_login          = var.db_admin_user
+#   administrator_login_password = var.db_admin_pw
+#   sku_name                     = "GP_Gen5_2"
+#   version                      = "10"
+#   storage_mb                   = 51200
+#   ssl_enforcement_enabled      = true
+
+#   tags = local.default_tags
+# }
+
+# resource "azurerm_postgresql_virtual_network_rule" "fme_server_dist" {
+#   name                                 = "postgresql-vnet-rule"
+#   resource_group_name                  = azurerm_resource_group.fme_server_dist.name
+#   server_name                          = azurerm_postgresql_server.fme_server_dist.name
+#   subnet_id                            = azurerm_subnet.fme_server_dist_be.id
+#   ignore_missing_vnet_service_endpoint = true
+# }
 
 resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_core" {
   name                = "core"
@@ -297,7 +308,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_core" {
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8"
     settings = jsonencode({
-      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", azurerm_postgresql_server.fme_server_dist.fqdn, var.db_admin_pw, var.db_admin_user, azurerm_public_ip.fme_server_dist.fqdn, azurerm_storage_account.fme_server_dist.name, azurerm_storage_account.fme_server_dist.primary_access_key)
+      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, var.db_admin_pw, var.db_admin_user, azurerm_public_ip.fme_server_dist.fqdn, azurerm_storage_account.fme_server_dist.name, azurerm_storage_account.fme_server_dist.primary_access_key)
     })
   }
 
@@ -348,7 +359,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_engine" {
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8"
     settings = jsonencode({
-      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", azurerm_postgresql_server.fme_server_dist.fqdn, azurerm_lb.fme_server_dist.private_ip_address, azurerm_storage_account.fme_server_dist.name, azurerm_storage_account.fme_server_dist.primary_access_key)
+      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, azurerm_lb.fme_server_dist.private_ip_address, azurerm_storage_account.fme_server_dist.name, azurerm_storage_account.fme_server_dist.primary_access_key)
     })
   }
 

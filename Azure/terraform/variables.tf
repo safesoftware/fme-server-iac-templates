@@ -70,12 +70,6 @@ variable "st_name" {
   description = "Name for Azure storage account used for FME Server"
 }
 
-variable "db_name" {
-  type        = string
-  default     = "fmeserver-postgresql010622"
-  description = "Name for database server used for FME Server"
-}
-
 variable "vm_admin_user" {
   type        = string
   description = "Windows virual machine admin username"
@@ -87,6 +81,12 @@ variable "vm_admin_pw" {
   description = "Windows virual machine admin pw"
   sensitive   = true
 }
+
+# variable "db_name" {
+#   type        = string
+#   default     = "fmeserver-postgresql010622"
+#   description = "Name for database server used for FME Server"
+# }
 
 variable "db_admin_user" {
   type        = string
