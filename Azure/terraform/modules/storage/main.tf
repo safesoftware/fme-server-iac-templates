@@ -3,13 +3,14 @@ locals {
 }
 
 resource random_string st_name {
-  length  = 8 
-  lower   = true
-  numeric  = true
+  length  = 8
+  lower = false 
+  upper  = false
+  special = false
 }
 
 resource "azurerm_storage_account" "fme_server_dist" {
-  name                     = format("fmeserver-%s", random_string.st_name.result)
+  name                     = format("fmeserver%s", random_string.st_name.result)
   resource_group_name      = var.rg_name
   location                 = var.location
   account_kind             = "FileStorage"

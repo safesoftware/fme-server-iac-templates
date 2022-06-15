@@ -13,12 +13,6 @@ variable "location" {
   description = "Location of resources"
 }
 
-variable "db_name" {
-  type        = string
-  default     = "fmeserver-postgresql010622"
-  description = "Name for database server used for FME Server"
-}
-
 variable "db_admin_user" {
   type        = string
   description = "Backend database admin username"

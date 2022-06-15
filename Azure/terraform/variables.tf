@@ -6,7 +6,7 @@ variable "owner" {
 
 variable "rg_name" {
   type        = string
-  default     = "fme-server-dist-rg"
+  default     = "fme-server-rg"
   description = "Resource group name"
 }
 
@@ -18,31 +18,37 @@ variable "location" {
 
 variable "vnet_name" {
   type        = string
-  default     = "fme-server-dist-vnet"
+  default     = "fme-server-vnet"
   description = "Virtual network name"
 }
 
 variable "be_snet_name" {
   type        = string
-  default     = "fme-server-dist-be-snet"
+  default     = "fme-server-be-snet"
   description = "Backend virtual network subnet name"
 }
 
 variable "agw_snet_name" {
   type        = string
-  default     = "fme-server-dist-agw-snet"
+  default     = "fme-server-agw-snet"
   description = "Application gateway virtual network subnet name"
 }
 
 variable "pip_name" {
   type        = string
-  default     = "fme-server-dist-pip"
-  description = "Vnet name"
+  default     = "fme-server-pip"
+  description = "Public ip name"
+}
+
+variable "domain_name_label" {
+  type        = string
+  default     = "fmeserver"
+  description = "Label for the Domain Name. Will be used to make up the FQDN"
 }
 
 variable "lb_name" {
   type        = string
-  default     = "fme-server-dist-lb"
+  default     = "fme-server-lb"
   description = "Load balancer name"
 }
 
@@ -60,7 +66,7 @@ variable "engine_registration_lb_backend_name" {
 
 variable "agw_name" {
   type        = string
-  default     = "fme-server-dist-agw"
+  default     = "fme-server-agw"
   description = "description"
 }
 

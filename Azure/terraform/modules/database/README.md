@@ -9,8 +9,6 @@ This module creates the backend database and its virtual network rule for a dist
 
 `location` - Specifies the supported Azure location where the resource exists.
 
-`db_name` - Specifies the name of the PostgreSQL Server. 
-
 `admin_db_user` - The Administrator login for the PostgreSQL Server. Required when create_mode is Default. 
 
 `admin_db_pw` - The Password associated with the administrator_login for the PostgreSQL Server.

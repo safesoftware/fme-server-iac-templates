@@ -2,8 +2,14 @@ locals {
     default_tags                   = { owner = var.owner }
 }
 
+resource random_string db_name {
+  length  = 8 
+  upper  = false
+  special = false
+}
+
 resource "azurerm_postgresql_server" "fme_server_dist" {
-  name                         = var.db_name
+  name                         = format("fmeserver-psql-%s", random_string.db_name.result)
   resource_group_name          = var.rg_name
   location                     = var.location
   administrator_login          = var.db_admin_user
