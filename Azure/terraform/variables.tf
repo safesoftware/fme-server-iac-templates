@@ -52,18 +52,6 @@ variable "lb_name" {
   description = "Load balancer name"
 }
 
-variable "engine_registration_lb_frontend_name" {
-  type        = string
-  default     = "engineRegistrationFrontend"
-  description = "Engine registration load balancer frontend IP configuration name"
-}
-
-variable "engine_registration_lb_backend_name" {
-  type        = string
-  default     = "engineRegistrationBackend"
-  description = "Engine registration load balancer backend IP configuration name"
-}
-
 variable "agw_name" {
   type        = string
   default     = "fme-server-agw"
@@ -96,13 +84,12 @@ variable "db_admin_pw" {
 
 variable "db_user" {
   type        = string
-  description = "Backend fmeserver database username"
+  description = "Backend fmeserver database username (Only used for Azure SQL Server)"
   sensitive   = true
 }
 
 variable "db_pw" {
   type        = string
-  description = "Backend fmeserver database pw"
+  description = "Backend fmeserver database pw (Only used for Azure SQL Server)"
   sensitive   = true
 }
-

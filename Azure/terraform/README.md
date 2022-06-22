@@ -66,7 +66,4 @@ The most important prerquisite to use an existing database with the distributed 
 
 ## Todos
 - clean up resource names and follow naming best practice
-- remove uneccesary variables ()
 - add output variable with FQDN of deployed server to root module
-- create lb module
-- create agw module
