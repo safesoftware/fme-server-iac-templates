@@ -17,7 +17,7 @@ locals {
     default_tags                   = { owner = var.owner }
 }
 
-resource "azurerm_resource_group" "fme_server_dist" {
+resource "azurerm_resource_group" "fme_server" {
   name     = var.rg_name
   location = var.location
 
@@ -27,8 +27,8 @@ resource "azurerm_resource_group" "fme_server_dist" {
 module network {
   source = "./modules/network"
   owner             = var.owner 
-  rg_name           = azurerm_resource_group.fme_server_dist.name
-  location          = azurerm_resource_group.fme_server_dist.location
+  rg_name           = azurerm_resource_group.fme_server.name
+  location          = azurerm_resource_group.fme_server.location
   vnet_name         = var.vnet_name
   be_snet_name      = var.be_snet_name
   agw_snet_name     = var.agw_snet_name
@@ -39,8 +39,8 @@ module network {
 module storage {
   source = "./modules/storage"
   owner         = var.owner 
-  rg_name       = azurerm_resource_group.fme_server_dist.name
-  location      = azurerm_resource_group.fme_server_dist.location
+  rg_name       = azurerm_resource_group.fme_server.name
+  location      = azurerm_resource_group.fme_server.location
   be_snet_id    = module.network.be_snet_id
 }
 
@@ -48,36 +48,36 @@ module database {
 # source        = "./modules/database/pgsql"
   source        = "./modules/database/sql_server"
   owner         = var.owner 
-  rg_name       = azurerm_resource_group.fme_server_dist.name
-  location      = azurerm_resource_group.fme_server_dist.location
+  rg_name       = azurerm_resource_group.fme_server.name
+  location      = azurerm_resource_group.fme_server.location
   be_snet_id    = module.network.be_snet_id
   db_admin_user = var.db_admin_user
   db_admin_pw   = var.db_admin_pw
 }
 
-module loadBalancer {
+module load_balancer {
   source = "./modules/lb-services/lb"
   owner         = var.owner 
-  rg_name       = azurerm_resource_group.fme_server_dist.name
-  location      = azurerm_resource_group.fme_server_dist.location
+  rg_name       = azurerm_resource_group.fme_server.name
+  location      = azurerm_resource_group.fme_server.location
   lb_name       = var.lb_name
   be_snet_id    = module.network.be_snet_id
 }
 
-module applicationGateway {
+module application_gateway {
   source = "./modules/lb-services/agw"
   owner         = var.owner 
-  rg_name       = azurerm_resource_group.fme_server_dist.name
-  location      = azurerm_resource_group.fme_server_dist.location
+  rg_name       = azurerm_resource_group.fme_server.name
+  location      = azurerm_resource_group.fme_server.location
   agw_name      = var.agw_name
   agw_snet_id   = module.network.agw_snet_id
   pip_id        = module.network.pip_id
 }
 
-resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_core" {
+resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
   name                = "core"
-  resource_group_name = azurerm_resource_group.fme_server_dist.name
-  location            = azurerm_resource_group.fme_server_dist.location
+  resource_group_name = azurerm_resource_group.fme_server.name
+  location            = azurerm_resource_group.fme_server.location
   sku                 = "Standard_D2s_v3"
   instances           = 1
   admin_password      = var.vm_admin_pw
@@ -96,8 +96,8 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_core" {
       name                                         = "ipconfig"
       primary                                      = true
       subnet_id                                    = module.network.be_snet_id
-      load_balancer_backend_address_pool_ids       = [module.loadBalancer.be_address_pool_id]
-      application_gateway_backend_address_pool_ids = module.applicationGateway.backend_address_pool_id
+      load_balancer_backend_address_pool_ids       = [module.load_balancer.be_address_pool_id]
+      application_gateway_backend_address_pool_ids = module.application_gateway.backend_address_pool_ids
     }
   }
 
@@ -143,10 +143,10 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_core" {
   tags = local.default_tags
 }
 
-resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_engine" {
+resource "azurerm_windows_virtual_machine_scale_set" "fme_server_engine" {
   name                = "engine"
-  resource_group_name = azurerm_resource_group.fme_server_dist.name
-  location            = azurerm_resource_group.fme_server_dist.location
+  resource_group_name = azurerm_resource_group.fme_server.name
+  location            = azurerm_resource_group.fme_server.location
   sku                 = "Standard_D2s_v3"
   instances           = 1
   admin_password      = var.vm_admin_pw
@@ -189,7 +189,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_engine" {
   #   type                 = "CustomScriptExtension"
   #   type_handler_version = "1.8"
   #   settings = jsonencode({
-  #     "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, module.loadBalancer.private_ip_address, module.storage.name, module.storage.primary_access_key)
+  #     "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, module.load_balancer.private_ip_address, module.storage.name, module.storage.primary_access_key)
   #   })
   # }
 
@@ -203,7 +203,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_engine" {
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8"
     settings = jsonencode({
-      "commandToExecute" = format("powershell Copy-Item -Path C:\\AzureData\\CustomData.bin -Destination C:\\config_fmeserver_sql_confd_engine.ps1; powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_sql_confd_engine.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, var.db_pw, var.db_user, module.loadBalancer.private_ip_address, module.storage.name, module.storage.primary_access_key)
+      "commandToExecute" = format("powershell Copy-Item -Path C:\\AzureData\\CustomData.bin -Destination C:\\config_fmeserver_sql_confd_engine.ps1; powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_sql_confd_engine.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, var.db_pw, var.db_user, module.load_balancer.private_ip_address, module.storage.name, module.storage.primary_access_key)
     })
   }
 

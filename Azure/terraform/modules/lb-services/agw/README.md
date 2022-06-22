@@ -1,4 +1,4 @@
-# FME Server storage module
+# FME Server application gateway module
 This module creates the application gateway for a distributed FME Server deployment in Azure. This application gateway acts as a frontent load balancer to make sure any requests are routed to an available core in case a core becomes unavailable.
 ## Variables
 |Variable|Description|

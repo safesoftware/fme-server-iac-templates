@@ -1,4 +1,4 @@
-# FME Server storage module
+# FME Server load balancer module
 This module creates load balancer for a distributed FME Server deployment in Azure. The load balancer makes sure the available engines will connect to an available core in case a core that has engines registered is becoming unavailable. 
 ## Variables
 |Variable|Description|

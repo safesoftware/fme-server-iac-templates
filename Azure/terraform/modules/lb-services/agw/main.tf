@@ -13,7 +13,7 @@ locals {
   default_tags                   = { owner = var.owner }
 }
 
-resource "azurerm_application_gateway" "fme_server_dist" {
+resource "azurerm_application_gateway" "fme_server" {
   name                = var.agw_name
   resource_group_name = var.rg_name
   location            = var.location
