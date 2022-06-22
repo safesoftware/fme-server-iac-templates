@@ -56,7 +56,8 @@ module storage {
 }
 
 module database {
-  source        = "./modules/database"
+# source        = "./modules/database/pgsql"
+  source        = "./modules/database/sql_server"
   owner         = var.owner 
   rg_name       = azurerm_resource_group.fme_server_dist.name
   location      = azurerm_resource_group.fme_server_dist.location
@@ -84,7 +85,7 @@ resource "azurerm_lb_backend_address_pool" "fme_server_dist" {
   name            = var.engine_registration_lb_backend_name
 }
 
-resource "azurerm_lb_rule" "example" {
+resource "azurerm_lb_rule" "fme_server_dist" {
   loadbalancer_id                = azurerm_lb.fme_server_dist.id
   name                           = "roundRobinEngineRegistrationRule"
   protocol                       = "Tcp"
@@ -239,13 +240,29 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_core" {
     product   = "fme-core"
   }
 
+  #Extension to use a default PostgreSQL database. This is only supported if the source of the module 'database' is set to ./modules/database/pgsql. 
+
+  # extension {
+  #   name                 = "core-script"
+  #   publisher            = "Microsoft.Compute"
+  #   type                 = "CustomScriptExtension"
+  #   type_handler_version = "1.8"
+  #   settings = jsonencode({
+  #     "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, var.db_admin_pw, var.db_admin_user, module.network.fqdn, module.storage.name, module.storage.primary_access_key)
+  #   })
+  # }
+  
+  #Custom script and extension to use a Azure SQL Server database. This is only supported if the source of the module 'database' is set to ./modules/database/sql_server. 
+  
+  custom_data = filebase64("./modules/database/sql_server/scripts/config_fmeserver_sql_confd.ps1")
+
   extension {
     name                 = "core-script"
     publisher            = "Microsoft.Compute"
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8"
     settings = jsonencode({
-      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, var.db_admin_pw, var.db_admin_user, module.network.fqdn, module.storage.name, module.storage.primary_access_key)
+      "commandToExecute" = format("powershell Copy-Item -Path C:\\AzureData\\CustomData.bin -Destination C:\\config_fmeserver_sql_confd.ps1; powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_sql_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -adminPassword %s -adminUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, var.db_pw, var.db_user, var.db_admin_pw, var.db_admin_user, module.network.fqdn, module.storage.name, module.storage.primary_access_key)
     })
   }
 
@@ -290,13 +307,29 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_dist_engine" {
     product   = "fme-engine"
   }
 
+  #Extension to use a default PostgreSQL database. This is only supported if the source of the module 'database' is set to ./modules/database/pgsql. 
+
+  # extension {
+  #   name                 = "engine-script"
+  #   publisher            = "Microsoft.Compute"
+  #   type                 = "CustomScriptExtension"
+  #   type_handler_version = "1.8"
+  #   settings = jsonencode({
+  #     "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, azurerm_lb.fme_server_dist.private_ip_address, module.storage.name, module.storage.primary_access_key)
+  #   })
+  # }
+
+  #Custom script and extension to use a Azure SQL Server database. This is only supported if the source of the module 'database' is set to ./modules/database/sql_server. 
+  
+  custom_data = filebase64("./modules/database/sql_server/scripts/config_fmeserver_sql_confd_engine.ps1")
+
   extension {
     name                 = "engine-script"
     publisher            = "Microsoft.Compute"
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8"
     settings = jsonencode({
-      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, azurerm_lb.fme_server_dist.private_ip_address, module.storage.name, module.storage.primary_access_key)
+      "commandToExecute" = format("powershell Copy-Item -Path C:\\AzureData\\CustomData.bin -Destination C:\\config_fmeserver_sql_confd_engine.ps1; powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_sql_confd_engine.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", module.database.fqdn, var.db_pw, var.db_user, azurerm_lb.fme_server_dist.private_ip_address, module.storage.name, module.storage.primary_access_key)
     })
   }
 

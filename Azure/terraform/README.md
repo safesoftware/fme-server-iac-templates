@@ -47,6 +47,8 @@ To remove the FME Server deployment run `terrform destroy` in your console and c
 |`vm_admin_pw` | Specifies the windows virual machine admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
 |`db_admin_user` | Specifies the backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
 |`db_admin_pw` | Specifies the backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
+|`db_user` | The login for the fmeserver database (Only used for Azure SQL Server). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
+|`db_pw` | The password for the fmeserver database (Only used for Azure SQL Server. Please review the [SQL Server Password Policy](https://docs.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=azuresqldb-current)). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
 
 ## Output
 |Output|Description|
@@ -55,7 +57,12 @@ To remove the FME Server deployment run `terrform destroy` in your console and c
 ## Modifying resources
 The terraform scripts provide an easy way to read and modify the configuration.
 ### Changing Resource configurations
+Most of the default resource configurations follow the minimum of the recommeneded machine specifications for FME Server. However for demanding workflows it is recommended to scale the the resources accordingly. With terraform it is easy to scale the resources by just updating the configuration (e.g. for the virtual machine scale sets of the core and engine) and rerun the `terraform apply` command.
 ### Changing backend DB configuration
+## Use Azure SQL
+A Azure SQL Server database as the FME Sever backend database can be used by changing the the module source of the database module to `./modules/database/sql_server` in the `main.tf` file. Additionally the default PowerShell script on the core virtual machine scale set (VMSS) needs to be overridden with the script provided in `./modules/database/sql_server/script`. To do this the `custom_data` property of the core VMSS can be used to upload the file and a new extension property of the core VMSS that runs the new script instead of the default script can be added. This change is already prepared in the `main.tf` file and only requires uncommneting/commenting of the respective sections in the database module and the core VMSS.
+## Use exising database
+The most important prerquisite to use an existing database with the distributed FME Server deployment is network connectivity between the database and the backend VNet that is created for the FME Server deployment. There are different ways to accomplish this. In the default configuration a network rule is added to the database server that is used. To use an exising Azure SQL or PostgreSQL database the exising resources can be [imported](https://www.terraform.io/cli/import) into the terraform configuration. This way the existing resources and any changes to them can also be managed be by terraform. Another option is to only provide the necessary variables in the `variables.tf` to make sure the FME core and engines can connect to the database.
 
 ## Todos
 - clean up resource names and follow naming best practice
@@ -63,4 +70,3 @@ The terraform scripts provide an easy way to read and modify the configuration.
 - add output variable with FQDN of deployed server to root module
 - create lb module
 - create agw module
-- create azure sql server module and confd script to support azure sql server 

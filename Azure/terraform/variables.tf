@@ -94,3 +94,15 @@ variable "db_admin_pw" {
   sensitive   = true
 }
 
+variable "db_user" {
+  type        = string
+  description = "Backend fmeserver database username"
+  sensitive   = true
+}
+
+variable "db_pw" {
+  type        = string
+  description = "Backend fmeserver database pw"
+  sensitive   = true
+}
+
