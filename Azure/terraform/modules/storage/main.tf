@@ -9,7 +9,7 @@ resource random_string st_name {
   special = false
 }
 
-resource "azurerm_storage_account" "fme_server_dist" {
+resource "azurerm_storage_account" "fme_server" {
   name                     = format("fmeserver%s", random_string.st_name.result)
   resource_group_name      = var.rg_name
   location                 = var.location
@@ -27,8 +27,8 @@ resource "azurerm_storage_account" "fme_server_dist" {
   tags = local.default_tags
 }
 
-resource "azurerm_storage_share" "fme_server_dist" {
+resource "azurerm_storage_share" "fme_server" {
   name                 = "fmeserverdata"
-  storage_account_name = azurerm_storage_account.fme_server_dist.name
+  storage_account_name = azurerm_storage_account.fme_server.name
   quota                = 100
 }

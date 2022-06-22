@@ -2,7 +2,7 @@ locals {
     default_tags                   = { owner = var.owner }
 }
 
-resource "azurerm_lb" "fme_server_dist" {
+resource "azurerm_lb" "fme_server" {
   name                = var.lb_name
   location            = var.location
   resource_group_name = var.rg_name
@@ -16,18 +16,18 @@ resource "azurerm_lb" "fme_server_dist" {
   tags = local.default_tags
 }
 
-resource "azurerm_lb_backend_address_pool" "fme_server_dist" {
-  loadbalancer_id = azurerm_lb.fme_server_dist.id
+resource "azurerm_lb_backend_address_pool" "fme_server" {
+  loadbalancer_id = azurerm_lb.fme_server.id
   name            = "engineRegistrationBackend"
 }
 
-resource "azurerm_lb_rule" "fme_server_dist" {
-  loadbalancer_id                = azurerm_lb.fme_server_dist.id
+resource "azurerm_lb_rule" "fme_server" {
+  loadbalancer_id                = azurerm_lb.fme_server.id
   name                           = "roundRobinEngineRegistrationRule"
   protocol                       = "Tcp"
   frontend_port                  = 7070
   backend_port                   = 7070
   frontend_ip_configuration_name = "engineRegistrationFrontend"
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.fme_server_dist.id]
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.fme_server.id]
   idle_timeout_in_minutes        = 30
 }
