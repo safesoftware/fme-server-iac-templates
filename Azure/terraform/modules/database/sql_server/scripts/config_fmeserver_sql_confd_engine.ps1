@@ -71,6 +71,9 @@ $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount
 $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Mount Azure files at startup"
 Register-ScheduledTask -TaskName "AzureMountFiles" -InputObject $definition
 
+#Start only one engine per host
+Set-Content -Path "C:\Program Files\FMEServer\Server\processMonitorConfigEngines.txt" -Value (get-content -Path "C:\Program Files\FMEServer\Server\processMonitorConfigEngines.txt" | Select-String -Pattern '_Engine2=!' -NotMatch)
+
 Set-Service -Name "FME Server Engines" -StartupType "Automatic"
 Start-Service -Name "FME Server Engines"
 
