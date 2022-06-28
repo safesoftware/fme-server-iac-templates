@@ -111,7 +111,7 @@ var postgresqlAdministratorLogin = 'postgres'
 var postgresqlAdministratorLoginPassword = 'P${uniqueString(resourceGroup().id, deployment().name, 'ad909260-dc63-4102-983f-4f82af7a6840')}x!'
 var filesharename = 'fmeserverdata'
 var vnetId = {
-  new: virtualNetworkName_resource.id
+  new: network.outputs.virtualNetworkId
   existing: resourceId(virtualNetworkResourceGroup, 'Microsoft.Network/virtualNetworks', virtualNetworkName)
 }
 var storageAccountId = {
@@ -119,7 +119,7 @@ var storageAccountId = {
   existing: resourceId(storageAccountResourceGroup, 'Microsoft.Storage/storageAccounts', storageAccountName)
 }
 var publicIpId = {
-  new: publicIpName_resource.id
+  new: network.outputs.publicIpId
   existing: resourceId(publicIpResourceGroup, 'Microsoft.Network/publicIPAddresses', publicIpName)
 }
 var storageAccountIdString = storageAccountId[storageNewOrExisting]
@@ -211,6 +211,7 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
     }
   }
   tags: tags
+  dependsOn: [network]
 }
 
 resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-03-01' = {
@@ -289,58 +290,78 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
   tags: tags
 }
 
-resource virtualNetworkName_resource 'Microsoft.Network/virtualNetworks@2021-03-01' = if (virtualNetworkNewOrExisting == 'new') {
-  name: virtualNetworkName
-  location: location
-  properties: {
-    addressSpace: {
-      addressPrefixes: addressPrefixes
-    }
-    subnets: [
-      {
-        name: subnetName
-        properties: {
-          addressPrefix: subnetPrefix
-          serviceEndpoints: [
-            {
-              service: 'Microsoft.Storage'
-            }
-            {
-              service: 'Microsoft.Sql'
-            }
-          ]
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
-      {
-        name: subnetAGName
-        properties: {
-          addressPrefix: subnetAGPrefix
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
-    ]
+module network 'modules/network/network.bicep' = {
+  name: 'fme-server-network'
+  params: {
+    addressPrefixes: addressPrefixes
+    location: location
+    publicIpAllocationMethod: publicIpAllocationMethod
+    publicIpDns: publicIpDns
+    publicIpName: publicIpName
+    publicIpNewOrExisting: publicIpNewOrExisting
+    publicIpSku: publicIpSku
+    subnetAGName: subnetAGName
+    subnetAGPrefix: subnetAGPrefix
+    subnetName: subnetName
+    subnetPrefix: subnetPrefix
+    tags: tags
+    virtualNetworkName: virtualNetworkName
+    virtualNetworkNewOrExisting: virtualNetworkNewOrExisting
   }
-  tags: tags
 }
 
-resource publicIpName_resource 'Microsoft.Network/publicIPAddresses@2021-03-01' = if (publicIpNewOrExisting == 'new') {
-  name: publicIpName
-  location: location
-  sku: {
-    name: publicIpSku
-  }
-  properties: {
-    publicIPAllocationMethod: publicIpAllocationMethod
-    dnsSettings: {
-      domainNameLabel: toLower(publicIpDns)
-    }
-    idleTimeoutInMinutes: 30
-  }
-  tags: tags
-}
+// resource virtualNetworkName_resource 'Microsoft.Network/virtualNetworks@2021-03-01' = if (virtualNetworkNewOrExisting == 'new') {
+//   name: virtualNetworkName
+//   location: location
+//   properties: {
+//     addressSpace: {
+//       addressPrefixes: addressPrefixes
+//     }
+//     subnets: [
+//       {
+//         name: subnetName
+//         properties: {
+//           addressPrefix: subnetPrefix
+//           serviceEndpoints: [
+//             {
+//               service: 'Microsoft.Storage'
+//             }
+//             {
+//               service: 'Microsoft.Sql'
+//             }
+//           ]
+//           privateEndpointNetworkPolicies: 'Enabled'
+//           privateLinkServiceNetworkPolicies: 'Enabled'
+//         }
+//       }
+//       {
+//         name: subnetAGName
+//         properties: {
+//           addressPrefix: subnetAGPrefix
+//           privateEndpointNetworkPolicies: 'Enabled'
+//           privateLinkServiceNetworkPolicies: 'Enabled'
+//         }
+//       }
+//     ]
+//   }
+//   tags: tags
+// }
+
+// resource publicIpName_resource 'Microsoft.Network/publicIPAddresses@2021-03-01' = if (publicIpNewOrExisting == 'new') {
+//   name: publicIpName
+//   location: location
+//   sku: {
+//     name: publicIpSku
+//   }
+//   properties: {
+//     publicIPAllocationMethod: publicIpAllocationMethod
+//     dnsSettings: {
+//       domainNameLabel: toLower(publicIpDns)
+//     }
+//     idleTimeoutInMinutes: 30
+//   }
+//   tags: tags
+// }
 
 resource engineRegistrationLoadBalancerName_resource 'Microsoft.Network/loadBalancers@2021-03-01' = {
   name: engineRegistrationLoadBalancerName

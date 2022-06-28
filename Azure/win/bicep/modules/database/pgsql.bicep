@@ -54,4 +54,4 @@ resource postgresDatabase 'Microsoft.DBforPostgreSQL/servers/databases@2017-12-0
 }
 
 @description('Fully qualified domain name of the PostgreSQL Server.')
-param postgresFqdn string = postgresServer.properties.fullyQualifiedDomainName
+output postgresFqdn string = postgresServer.properties.fullyQualifiedDomainName
