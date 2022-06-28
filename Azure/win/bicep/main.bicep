@@ -105,13 +105,13 @@ var tags = {
   'owner': ownerValue 
 }
 var applicationGatewayBackEndName = 'applicationGatewayBackEnd'
-var engineRegistrationloadBalancerFrontEndName = 'engineRegistrationFrontend'
-var engineRegistrationloadBalancerBackEndName = 'engineRegistrationBackend'
+// var engineRegistrationloadBalancerFrontEndName = 'engineRegistrationFrontend'
+// var engineRegistrationloadBalancerBackEndName = 'engineRegistrationBackend'
 var postgresqlAdministratorLogin = 'postgres'
 var postgresqlAdministratorLoginPassword = 'P${uniqueString(resourceGroup().id, deployment().name, 'ad909260-dc63-4102-983f-4f82af7a6840')}x!'
 var filesharename = 'fmeserverdata'
 var vnetId = {
-  new: network.outputs.virtualNetworkId
+  new: virtualNetworkName_resource.id
   existing: resourceId(virtualNetworkResourceGroup, 'Microsoft.Network/virtualNetworks', virtualNetworkName)
 }
 var storageAccountId = {
@@ -119,7 +119,7 @@ var storageAccountId = {
   existing: resourceId(storageAccountResourceGroup, 'Microsoft.Storage/storageAccounts', storageAccountName)
 }
 var publicIpId = {
-  new: network.outputs.publicIpId
+  new: publicIpName_resource.id
   existing: resourceId(publicIpResourceGroup, 'Microsoft.Network/publicIPAddresses', publicIpName)
 }
 var storageAccountIdString = storageAccountId[storageNewOrExisting]
@@ -177,7 +177,7 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
                     }
                     loadBalancerBackendAddressPools: [
                       {
-                        id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', engineRegistrationLoadBalancerName, engineRegistrationloadBalancerBackEndName)
+                        id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', engineRegistrationLoadBalancerName, loadBalancer.outputs.engineRegistrationloadBalancerBackEndName)
                       }
                     ]
                     applicationGatewayBackendAddressPools: [
@@ -211,7 +211,6 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
     }
   }
   tags: tags
-  dependsOn: [network]
 }
 
 resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-03-01' = {
@@ -276,7 +275,7 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
             properties: {
               publisher: 'Microsoft.Compute'
               protectedSettings: {
-                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname ${pgsql.outputs.postgresFqdn} -engineregistrationhost ${engineRegistrationLoadBalancerName_resource.properties.frontendIPConfigurations[0].properties.privateIPAddress} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccountIdString, '2019-04-01').keys[0].value} >C:\\confd-log.txt 2>&1'
+                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname ${pgsql.outputs.postgresFqdn} -engineregistrationhost ${loadBalancer.outputs.engineRegistrationHost} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccountIdString, '2019-04-01').keys[0].value} >C:\\confd-log.txt 2>&1'
               }
               typeHandlerVersion: '1.8'
               autoUpgradeMinorVersion: true
@@ -290,120 +289,130 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
   tags: tags
 }
 
-module network 'modules/network/network.bicep' = {
-  name: 'fme-server-network'
-  params: {
-    addressPrefixes: addressPrefixes
-    location: location
-    publicIpAllocationMethod: publicIpAllocationMethod
-    publicIpDns: publicIpDns
-    publicIpName: publicIpName
-    publicIpNewOrExisting: publicIpNewOrExisting
-    publicIpSku: publicIpSku
-    subnetAGName: subnetAGName
-    subnetAGPrefix: subnetAGPrefix
-    subnetName: subnetName
-    subnetPrefix: subnetPrefix
-    tags: tags
-    virtualNetworkName: virtualNetworkName
-    virtualNetworkNewOrExisting: virtualNetworkNewOrExisting
-  }
-}
-
-// resource virtualNetworkName_resource 'Microsoft.Network/virtualNetworks@2021-03-01' = if (virtualNetworkNewOrExisting == 'new') {
-//   name: virtualNetworkName
-//   location: location
-//   properties: {
-//     addressSpace: {
-//       addressPrefixes: addressPrefixes
-//     }
-//     subnets: [
-//       {
-//         name: subnetName
-//         properties: {
-//           addressPrefix: subnetPrefix
-//           serviceEndpoints: [
-//             {
-//               service: 'Microsoft.Storage'
-//             }
-//             {
-//               service: 'Microsoft.Sql'
-//             }
-//           ]
-//           privateEndpointNetworkPolicies: 'Enabled'
-//           privateLinkServiceNetworkPolicies: 'Enabled'
-//         }
-//       }
-//       {
-//         name: subnetAGName
-//         properties: {
-//           addressPrefix: subnetAGPrefix
-//           privateEndpointNetworkPolicies: 'Enabled'
-//           privateLinkServiceNetworkPolicies: 'Enabled'
-//         }
-//       }
-//     ]
+// module network 'modules/network/network.bicep' = {
+//   name: 'fme-server-network'
+//   params: {
+//     addressPrefixes: addressPrefixes
+//     location: location
+//     publicIpAllocationMethod: publicIpAllocationMethod
+//     publicIpDns: publicIpDns
+//     publicIpName: publicIpName
+//     publicIpNewOrExisting: publicIpNewOrExisting
+//     publicIpSku: publicIpSku
+//     subnetAGName: subnetAGName
+//     subnetAGPrefix: subnetAGPrefix
+//     subnetName: subnetName
+//     subnetPrefix: subnetPrefix
+//     tags: tags
+//     virtualNetworkName: virtualNetworkName
+//     virtualNetworkNewOrExisting: virtualNetworkNewOrExisting
 //   }
-//   tags: tags
 // }
 
-// resource publicIpName_resource 'Microsoft.Network/publicIPAddresses@2021-03-01' = if (publicIpNewOrExisting == 'new') {
-//   name: publicIpName
-//   location: location
-//   sku: {
-//     name: publicIpSku
-//   }
-//   properties: {
-//     publicIPAllocationMethod: publicIpAllocationMethod
-//     dnsSettings: {
-//       domainNameLabel: toLower(publicIpDns)
-//     }
-//     idleTimeoutInMinutes: 30
-//   }
-//   tags: tags
-// }
-
-resource engineRegistrationLoadBalancerName_resource 'Microsoft.Network/loadBalancers@2021-03-01' = {
-  name: engineRegistrationLoadBalancerName
+resource virtualNetworkName_resource 'Microsoft.Network/virtualNetworks@2021-03-01' = if (virtualNetworkNewOrExisting == 'new') {
+  name: virtualNetworkName
   location: location
   properties: {
-    frontendIPConfigurations: [
+    addressSpace: {
+      addressPrefixes: addressPrefixes
+    }
+    subnets: [
       {
-        name: engineRegistrationloadBalancerFrontEndName
+        name: subnetName
         properties: {
-          subnet: {
-            id: subnetId
-          }
-          privateIPAllocationMethod: 'Dynamic'
+          addressPrefix: subnetPrefix
+          serviceEndpoints: [
+            {
+              service: 'Microsoft.Storage'
+            }
+            {
+              service: 'Microsoft.Sql'
+            }
+          ]
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
         }
       }
-    ]
-    backendAddressPools: [
       {
-        name: engineRegistrationloadBalancerBackEndName
-      }
-    ]
-    loadBalancingRules: [
-      {
-        name: 'roundRobinEngineRegistrationRule'
+        name: subnetAGName
         properties: {
-          frontendIPConfiguration: {
-            id: resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', engineRegistrationLoadBalancerName, engineRegistrationloadBalancerFrontEndName)
-          }
-          backendAddressPool: {
-            id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', engineRegistrationLoadBalancerName, engineRegistrationloadBalancerBackEndName)
-          }
-          protocol: 'Tcp'
-          frontendPort: 7070
-          backendPort: 7070
-          enableFloatingIP: false
-          idleTimeoutInMinutes: 30
+          addressPrefix: subnetAGPrefix
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
         }
       }
     ]
   }
   tags: tags
 }
+
+resource publicIpName_resource 'Microsoft.Network/publicIPAddresses@2021-03-01' = if (publicIpNewOrExisting == 'new') {
+  name: publicIpName
+  location: location
+  sku: {
+    name: publicIpSku
+  }
+  properties: {
+    publicIPAllocationMethod: publicIpAllocationMethod
+    dnsSettings: {
+      domainNameLabel: toLower(publicIpDns)
+    }
+    idleTimeoutInMinutes: 30
+  }
+  tags: tags
+}
+
+module loadBalancer 'modules/lb-services/lb.bicep' = {
+  name: 'fme-server-loadBalancer'
+  params: {
+    engineRegistrationLoadBalancerName: engineRegistrationLoadBalancerName
+    location: location
+    subnetId: subnetId
+    tags: tags
+  }
+}
+
+// resource engineRegistrationLoadBalancerName_resource 'Microsoft.Network/loadBalancers@2021-03-01' = {
+//   name: engineRegistrationLoadBalancerName
+//   location: location
+//   properties: {
+//     frontendIPConfigurations: [
+//       {
+//         name: engineRegistrationloadBalancerFrontEndName
+//         properties: {
+//           subnet: {
+//             id: subnetId
+//           }
+//           privateIPAllocationMethod: 'Dynamic'
+//         }
+//       }
+//     ]
+//     backendAddressPools: [
+//       {
+//         name: engineRegistrationloadBalancerBackEndName
+//       }
+//     ]
+//     loadBalancingRules: [
+//       {
+//         name: 'roundRobinEngineRegistrationRule'
+//         properties: {
+//           frontendIPConfiguration: {
+//             id: resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', engineRegistrationLoadBalancerName, engineRegistrationloadBalancerFrontEndName)
+//           }
+//           backendAddressPool: {
+//             id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', engineRegistrationLoadBalancerName, engineRegistrationloadBalancerBackEndName)
+//           }
+//           protocol: 'Tcp'
+//           frontendPort: 7070
+//           backendPort: 7070
+//           enableFloatingIP: false
+//           idleTimeoutInMinutes: 30
+//         }
+//       }
+//     ]
+//   }
+//   tags: tags
+// }
 
 resource applicationGatewayName_resource 'Microsoft.Network/applicationGateways@2021-08-01' = {
   name: applicationGatewayName
