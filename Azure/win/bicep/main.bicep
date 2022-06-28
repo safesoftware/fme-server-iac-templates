@@ -199,7 +199,7 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
             properties: {
               publisher: 'Microsoft.Compute'
               protectedSettings: {
-                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname ${postgresServerName_resource.properties.fullyQualifiedDomainName} -databasePassword ${postgresqlAdministratorLoginPassword} -databaseUsername ${postgresqlAdministratorLogin} -externalhostname ${reference(publicIpIdString).dnsSettings.fqdn} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccountIdString, '2019-04-01').keys[0].value} >C:\\confd-log.txt 2>&1'
+                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname ${pgsql.outputs.postgresFqdn} -databasePassword ${postgresqlAdministratorLoginPassword} -databaseUsername ${postgresqlAdministratorLogin} -externalhostname ${reference(publicIpIdString).dnsSettings.fqdn} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccountIdString, '2019-04-01').keys[0].value} >C:\\confd-log.txt 2>&1'
               }
               typeHandlerVersion: '1.8'
               autoUpgradeMinorVersion: true
@@ -275,7 +275,7 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
             properties: {
               publisher: 'Microsoft.Compute'
               protectedSettings: {
-                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname ${postgresServerName_resource.properties.fullyQualifiedDomainName} -engineregistrationhost ${engineRegistrationLoadBalancerName_resource.properties.frontendIPConfigurations[0].properties.privateIPAddress} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccountIdString, '2019-04-01').keys[0].value} >C:\\confd-log.txt 2>&1'
+                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname ${pgsql.outputs.postgresFqdn} -engineregistrationhost ${engineRegistrationLoadBalancerName_resource.properties.frontendIPConfigurations[0].properties.privateIPAddress} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccountIdString, '2019-04-01').keys[0].value} >C:\\confd-log.txt 2>&1'
               }
               typeHandlerVersion: '1.8'
               autoUpgradeMinorVersion: true
@@ -541,44 +541,57 @@ resource applicationGatewayName_resource 'Microsoft.Network/applicationGateways@
   tags: tags
 }
 
-resource postgresServerName_resource 'Microsoft.DBforPostgreSQL/servers@2017-12-01' = {
-  location: location
-  name: postgresServerName
-  sku: {
-    name: 'GP_Gen5_2'
-    tier: 'GeneralPurpose'
-    capacity: 2
-    size: '51200'
-    family: 'Gen5'
-  }
-  properties: {
-    version: '10'
-    createMode: 'Default'
-    administratorLogin: postgresqlAdministratorLogin
-    administratorLoginPassword: postgresqlAdministratorLoginPassword
-  }
-  tags: tags
-}
-
-resource postgresServerName_postgres_vnet_rule 'Microsoft.DBforPostgreSQL/servers/virtualNetworkRules@2017-12-01' = {
-  parent: postgresServerName_resource
-  name: 'postgres-vnet-rule'
-  properties: {
-    virtualNetworkSubnetId: subnetId
-    ignoreMissingVnetServiceEndpoint: true
+module pgsql 'modules/database/pgsql.bicep' = {
+  name: 'fme-server-pgsql'
+  params: {
+    location: location
+    postgresqlAdministratorLogin: postgresqlAdministratorLogin
+    postgresqlAdministratorLoginPassword: postgresqlAdministratorLoginPassword 
+    postgresServerName: postgresServerName 
+    subnetId:subnetId 
+    tags: tags
   }
 }
 
-resource postgresServerName_postgres 'Microsoft.DBforPostgreSQL/servers/databases@2017-12-01' = {
-  parent: postgresServerName_resource
-  name: 'postgres'
-  properties: {
-    charset: 'utf8'
-    collation: 'English_United States.1252'
-  }
-}
+// resource postgresServerName_resource 'Microsoft.DBforPostgreSQL/servers@2017-12-01' = {
+//   location: location
+//   name: postgresServerName
+//   sku: {
+//     name: 'GP_Gen5_2'
+//     tier: 'GeneralPurpose'
+//     capacity: 2
+//     size: '51200'
+//     family: 'Gen5'
+//   }
+//   properties: {
+//     version: '10'
+//     createMode: 'Default'
+//     administratorLogin: postgresqlAdministratorLogin
+//     administratorLoginPassword: postgresqlAdministratorLoginPassword
+//   }
+//   tags: tags
+// }
+
+// resource postgresServerName_postgres_vnet_rule 'Microsoft.DBforPostgreSQL/servers/virtualNetworkRules@2017-12-01' = {
+//   parent: postgresServerName_resource
+//   name: 'postgres-vnet-rule'
+//   properties: {
+//     virtualNetworkSubnetId: subnetId
+//     ignoreMissingVnetServiceEndpoint: true
+//   }
+// }
+
+// resource postgresServerName_postgres 'Microsoft.DBforPostgreSQL/servers/databases@2017-12-01' = {
+//   parent: postgresServerName_resource
+//   name: 'postgres'
+//   properties: {
+//     charset: 'utf8'
+//     collation: 'English_United States.1252'
+//   }
+// }
 
 // Storage module is currently not supported because of limitation to pass on secrets from modules
+//
 // module storage 'modules/storage/storage.bicep' = if (storageNewOrExisting == 'new') {
 //   name: 'fme-server-storage'
 //   params: {
