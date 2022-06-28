@@ -578,6 +578,18 @@ resource postgresServerName_postgres 'Microsoft.DBforPostgreSQL/servers/database
   }
 }
 
+// Storage module is currently not supported because of limitation to pass on secrets from modules
+// module storage 'modules/storage/storage.bicep' = if (storageNewOrExisting == 'new') {
+//   name: 'fme-server-storage'
+//   params: {
+//     fileShareName: '${storageAccountName}/default/${filesharename}'
+//     location: location
+//     storageAccountName: storageAccountName 
+//     subnetId: subnetId
+//     tags: tags
+//   }
+// }
+
 resource storageAccountName_resource 'Microsoft.Storage/storageAccounts@2021-02-01' = if (storageNewOrExisting == 'new') {
   name: storageAccountName
   location: location
