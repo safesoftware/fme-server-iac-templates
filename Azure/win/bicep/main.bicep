@@ -124,6 +124,74 @@ var publicIpIdString = '${publicIpId[storageNewOrExisting]}'
 var subnetId = '${vnetId[virtualNetworkNewOrExisting]}/subnets/${subnetName}'
 var subnetAGId = '${vnetId[virtualNetworkNewOrExisting]}/subnets/${subnetAGName}'
 
+// Network module is currently not supported because of limitation to pass on resource IDs from modules
+//
+// module network 'modules/network/network.bicep' = {
+//   name: 'fme-server-network'
+//   params: {
+//     addressPrefixes: addressPrefixes
+//     location: location
+//     publicIpAllocationMethod: publicIpAllocationMethod
+//     publicIpDns: publicIpDns
+//     publicIpName: publicIpName
+//     publicIpNewOrExisting: publicIpNewOrExisting
+//     publicIpSku: publicIpSku
+//     subnetAGName: subnetAGName
+//     subnetAGPrefix: subnetAGPrefix
+//     subnetName: subnetName
+//     subnetPrefix: subnetPrefix
+//     tags: tags
+//     virtualNetworkName: virtualNetworkName
+//     virtualNetworkNewOrExisting: virtualNetworkNewOrExisting
+//   }
+// }
+
+module loadBalancer 'modules/lb-services/lb.bicep' = {
+  name: 'fme-server-loadBalancer'
+  params: {
+    engineRegistrationLoadBalancerName: engineRegistrationLoadBalancerName
+    location: location
+    subnetId: subnetId
+    tags: tags
+  }
+}
+
+module applicationGateway 'modules/lb-services/agw.bicep' = {
+  name: 'fme-server-agw'
+  params: {
+    applicationGatewayName: applicationGatewayName
+    location: location
+    publicIpIdString: publicIpIdString
+    subnetAGId: subnetAGId
+    tags: tags
+  }
+}
+
+module pgsql 'modules/database/pgsql.bicep' = {
+  name: 'fme-server-pgsql'
+  params: {
+    location: location
+    postgresqlAdministratorLogin: postgresqlAdministratorLogin
+    postgresqlAdministratorLoginPassword: postgresqlAdministratorLoginPassword 
+    postgresServerName: postgresServerName 
+    subnetId:subnetId 
+    tags: tags
+  }
+}
+
+// Storage module is currently not supported because of limitation to pass on secrets from modules
+//
+// module storage 'modules/storage/storage.bicep' = if (storageNewOrExisting == 'new') {
+//   name: 'fme-server-storage'
+//   params: {
+//     fileShareName: '${storageAccountName}/default/${filesharename}'
+//     location: location
+//     storageAccountName: storageAccountName 
+//     subnetId: subnetId
+//     tags: tags
+//   }
+// }
+
 resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-03-01' = {
   name: vmssNameCore
   location: location
@@ -286,26 +354,6 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
   tags: tags
 }
 
-// module network 'modules/network/network.bicep' = {
-//   name: 'fme-server-network'
-//   params: {
-//     addressPrefixes: addressPrefixes
-//     location: location
-//     publicIpAllocationMethod: publicIpAllocationMethod
-//     publicIpDns: publicIpDns
-//     publicIpName: publicIpName
-//     publicIpNewOrExisting: publicIpNewOrExisting
-//     publicIpSku: publicIpSku
-//     subnetAGName: subnetAGName
-//     subnetAGPrefix: subnetAGPrefix
-//     subnetName: subnetName
-//     subnetPrefix: subnetPrefix
-//     tags: tags
-//     virtualNetworkName: virtualNetworkName
-//     virtualNetworkNewOrExisting: virtualNetworkNewOrExisting
-//   }
-// }
-
 resource virtualNetworkName_resource 'Microsoft.Network/virtualNetworks@2021-03-01' = if (virtualNetworkNewOrExisting == 'new') {
   name: virtualNetworkName
   location: location
@@ -359,52 +407,6 @@ resource publicIpName_resource 'Microsoft.Network/publicIPAddresses@2021-03-01' 
   tags: tags
 }
 
-module loadBalancer 'modules/lb-services/lb.bicep' = {
-  name: 'fme-server-loadBalancer'
-  params: {
-    engineRegistrationLoadBalancerName: engineRegistrationLoadBalancerName
-    location: location
-    subnetId: subnetId
-    tags: tags
-  }
-}
-
-module applicationGateway 'modules/lb-services/agw.bicep' = {
-  name: 'fme-server-agw'
-  params: {
-    applicationGatewayName: applicationGatewayName
-    location: location
-    publicIpIdString: publicIpIdString
-    subnetAGId: subnetAGId
-    tags: tags
-  }
-}
-
-module pgsql 'modules/database/pgsql.bicep' = {
-  name: 'fme-server-pgsql'
-  params: {
-    location: location
-    postgresqlAdministratorLogin: postgresqlAdministratorLogin
-    postgresqlAdministratorLoginPassword: postgresqlAdministratorLoginPassword 
-    postgresServerName: postgresServerName 
-    subnetId:subnetId 
-    tags: tags
-  }
-}
-
-// Storage module is currently not supported because of limitation to pass on secrets from modules
-//
-// module storage 'modules/storage/storage.bicep' = if (storageNewOrExisting == 'new') {
-//   name: 'fme-server-storage'
-//   params: {
-//     fileShareName: '${storageAccountName}/default/${filesharename}'
-//     location: location
-//     storageAccountName: storageAccountName 
-//     subnetId: subnetId
-//     tags: tags
-//   }
-// }
-
 resource storageAccountName_resource 'Microsoft.Storage/storageAccounts@2021-02-01' = if (storageNewOrExisting == 'new') {
   name: storageAccountName
   location: location
@@ -423,11 +425,14 @@ resource storageAccountName_resource 'Microsoft.Storage/storageAccounts@2021-02-
       ]
     }
   }
-  tags: tags
-}
+  resource service 'fileServices' = {
+    name: 'default'
 
-resource storageAccountName_default_filesharename 'Microsoft.Storage/storageAccounts/fileServices/shares@2021-09-01' = {
-  name: '${storageAccountName}/default/${filesharename}'
+    resource share 'shares' = {
+      name: filesharename
+    }
+  }
+  tags: tags
 }
 
 output fqdn string = reference(publicIpIdString).dnsSettings.fqdn
