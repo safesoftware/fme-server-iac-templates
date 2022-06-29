@@ -104,7 +104,7 @@ param adminPassword string
 var tags = {
   'owner': ownerValue 
 }
-var applicationGatewayBackEndName = 'applicationGatewayBackEnd'
+// var applicationGatewayBackEndName = 'applicationGatewayBackEnd'
 // var engineRegistrationloadBalancerFrontEndName = 'engineRegistrationFrontend'
 // var engineRegistrationloadBalancerBackEndName = 'engineRegistrationBackend'
 var postgresqlAdministratorLogin = 'postgres'
@@ -182,7 +182,7 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
                     ]
                     applicationGatewayBackendAddressPools: [
                       {
-                        id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGatewayName, applicationGatewayBackEndName)
+                        id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGatewayName, applicationGateway.outputs.applicationGatewayBackEndName)
                       }
                     ]
                   }
@@ -414,162 +414,173 @@ module loadBalancer 'modules/lb-services/lb.bicep' = {
 //   tags: tags
 // }
 
-resource applicationGatewayName_resource 'Microsoft.Network/applicationGateways@2021-08-01' = {
-  name: applicationGatewayName
-  location: location
-  properties: {
-    sku: {
-      name: 'Standard_Medium'
-      tier: 'Standard'
-      capacity: 1
-    }
-    gatewayIPConfigurations: [
-      {
-        name: 'appGatewayIpConfig'
-        properties: {
-          subnet: {
-            id: subnetAGId
-          }
-        }
-      }
-    ]
-    frontendIPConfigurations: [
-      {
-        name: 'appGwPublicFrontendIp'
-        properties: {
-          privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: publicIpIdString
-          }
-        }
-      }
-    ]
-    frontendPorts: [
-      {
-        name: 'port_80'
-        properties: {
-          port: 80
-        }
-      }
-      {
-        name: 'port_7078'
-        properties: {
-          port: 7078
-        }
-      }
-    ]
-    probes: [
-      {
-        properties: {
-          protocol: 'Http'
-          path: '/'
-          interval: 30
-          timeout: 30
-          unhealthyThreshold: 3
-          pickHostNameFromBackendHttpSettings: true
-          match: {
-            statusCodes: [
-              '200-400'
-            ]
-          }
-        }
-        name: 'websocketProbe'
-      }
-    ]
-    backendAddressPools: [
-      {
-        name: applicationGatewayBackEndName
-      }
-    ]
-    backendHttpSettingsCollection: [
-      {
-        name: 'httpSetting'
-        properties: {
-          port: 8080
-          protocol: 'Http'
-          cookieBasedAffinity: 'Disabled'
-          pickHostNameFromBackendAddress: false
-          requestTimeout: 86400
-        }
-      }
-      {
-        name: 'websocketSetting'
-        properties: {
-          port: 7078
-          protocol: 'Http'
-          cookieBasedAffinity: 'Disabled'
-          pickHostNameFromBackendAddress: true
-          requestTimeout: 86400
-          probe: {
-            id: resourceId('Microsoft.Network/applicationGateways/probes', applicationGatewayName, 'websocketProbe')
-          }
-        }
-      }
-    ]
-    httpListeners: [
-      {
-        name: 'httpListener'
-        properties: {
-          frontendIPConfiguration: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', applicationGatewayName, 'appGwPublicFrontendIp')
-          }
-          frontendPort: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', applicationGatewayName, 'port_80')
-          }
-          protocol: 'Http'
-          requireServerNameIndication: false
-        }
-      }
-      {
-        name: 'websocketListener'
-        properties: {
-          frontendIPConfiguration: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', applicationGatewayName, 'appGwPublicFrontendIp')
-          }
-          frontendPort: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', applicationGatewayName, 'port_7078')
-          }
-          protocol: 'Http'
-          requireServerNameIndication: false
-        }
-      }
-    ]
-    requestRoutingRules: [
-      {
-        name: 'httpRoutingRule'
-        properties: {
-          ruleType: 'Basic'
-          httpListener: {
-            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, 'httpListener')
-          }
-          backendAddressPool: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGatewayName, applicationGatewayBackEndName)
-          }
-          backendHttpSettings: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', applicationGatewayName, 'httpSetting')
-          }
-        }
-      }
-      {
-        name: 'websocketRoutingRule'
-        properties: {
-          ruleType: 'Basic'
-          httpListener: {
-            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, 'websocketListener')
-          }
-          backendAddressPool: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGatewayName, applicationGatewayBackEndName)
-          }
-          backendHttpSettings: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', applicationGatewayName, 'websocketSetting')
-          }
-        }
-      }
-    ]
-    enableHttp2: false
+module applicationGateway 'modules/lb-services/agw.bicep' = {
+  name: 'fme-server-agw'
+  params: {
+    applicationGatewayName: applicationGatewayName
+    location: location
+    publicIpIdString: publicIpIdString
+    subnetAGId: subnetAGId
+    tags: tags
   }
-  tags: tags
 }
+
+// resource applicationGatewayName_resource 'Microsoft.Network/applicationGateways@2021-08-01' = {
+//   name: applicationGatewayName
+//   location: location
+//   properties: {
+//     sku: {
+//       name: 'Standard_Medium'
+//       tier: 'Standard'
+//       capacity: 1
+//     }
+//     gatewayIPConfigurations: [
+//       {
+//         name: 'appGatewayIpConfig'
+//         properties: {
+//           subnet: {
+//             id: subnetAGId
+//           }
+//         }
+//       }
+//     ]
+//     frontendIPConfigurations: [
+//       {
+//         name: 'appGwPublicFrontendIp'
+//         properties: {
+//           privateIPAllocationMethod: 'Dynamic'
+//           publicIPAddress: {
+//             id: publicIpIdString
+//           }
+//         }
+//       }
+//     ]
+//     frontendPorts: [
+//       {
+//         name: 'port_80'
+//         properties: {
+//           port: 80
+//         }
+//       }
+//       {
+//         name: 'port_7078'
+//         properties: {
+//           port: 7078
+//         }
+//       }
+//     ]
+//     probes: [
+//       {
+//         properties: {
+//           protocol: 'Http'
+//           path: '/'
+//           interval: 30
+//           timeout: 30
+//           unhealthyThreshold: 3
+//           pickHostNameFromBackendHttpSettings: true
+//           match: {
+//             statusCodes: [
+//               '200-400'
+//             ]
+//           }
+//         }
+//         name: 'websocketProbe'
+//       }
+//     ]
+//     backendAddressPools: [
+//       {
+//         name: applicationGatewayBackEndName
+//       }
+//     ]
+//     backendHttpSettingsCollection: [
+//       {
+//         name: 'httpSetting'
+//         properties: {
+//           port: 8080
+//           protocol: 'Http'
+//           cookieBasedAffinity: 'Disabled'
+//           pickHostNameFromBackendAddress: false
+//           requestTimeout: 86400
+//         }
+//       }
+//       {
+//         name: 'websocketSetting'
+//         properties: {
+//           port: 7078
+//           protocol: 'Http'
+//           cookieBasedAffinity: 'Disabled'
+//           pickHostNameFromBackendAddress: true
+//           requestTimeout: 86400
+//           probe: {
+//             id: resourceId('Microsoft.Network/applicationGateways/probes', applicationGatewayName, 'websocketProbe')
+//           }
+//         }
+//       }
+//     ]
+//     httpListeners: [
+//       {
+//         name: 'httpListener'
+//         properties: {
+//           frontendIPConfiguration: {
+//             id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', applicationGatewayName, 'appGwPublicFrontendIp')
+//           }
+//           frontendPort: {
+//             id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', applicationGatewayName, 'port_80')
+//           }
+//           protocol: 'Http'
+//           requireServerNameIndication: false
+//         }
+//       }
+//       {
+//         name: 'websocketListener'
+//         properties: {
+//           frontendIPConfiguration: {
+//             id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', applicationGatewayName, 'appGwPublicFrontendIp')
+//           }
+//           frontendPort: {
+//             id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', applicationGatewayName, 'port_7078')
+//           }
+//           protocol: 'Http'
+//           requireServerNameIndication: false
+//         }
+//       }
+//     ]
+//     requestRoutingRules: [
+//       {
+//         name: 'httpRoutingRule'
+//         properties: {
+//           ruleType: 'Basic'
+//           httpListener: {
+//             id: resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, 'httpListener')
+//           }
+//           backendAddressPool: {
+//             id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGatewayName, applicationGatewayBackEndName)
+//           }
+//           backendHttpSettings: {
+//             id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', applicationGatewayName, 'httpSetting')
+//           }
+//         }
+//       }
+//       {
+//         name: 'websocketRoutingRule'
+//         properties: {
+//           ruleType: 'Basic'
+//           httpListener: {
+//             id: resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, 'websocketListener')
+//           }
+//           backendAddressPool: {
+//             id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGatewayName, applicationGatewayBackEndName)
+//           }
+//           backendHttpSettings: {
+//             id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', applicationGatewayName, 'websocketSetting')
+//           }
+//         }
+//       }
+//     ]
+//     enableHttp2: false
+//   }
+//   tags: tags
+// }
 
 module pgsql 'modules/database/pgsql.bicep' = {
   name: 'fme-server-pgsql'
