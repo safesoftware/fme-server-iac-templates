@@ -104,9 +104,6 @@ param adminPassword string
 var tags = {
   'owner': ownerValue 
 }
-// var applicationGatewayBackEndName = 'applicationGatewayBackEnd'
-// var engineRegistrationloadBalancerFrontEndName = 'engineRegistrationFrontend'
-// var engineRegistrationloadBalancerBackEndName = 'engineRegistrationBackend'
 var postgresqlAdministratorLogin = 'postgres'
 var postgresqlAdministratorLoginPassword = 'P${uniqueString(resourceGroup().id, deployment().name, 'ad909260-dc63-4102-983f-4f82af7a6840')}x!'
 var filesharename = 'fmeserverdata'
@@ -372,48 +369,6 @@ module loadBalancer 'modules/lb-services/lb.bicep' = {
   }
 }
 
-// resource engineRegistrationLoadBalancerName_resource 'Microsoft.Network/loadBalancers@2021-03-01' = {
-//   name: engineRegistrationLoadBalancerName
-//   location: location
-//   properties: {
-//     frontendIPConfigurations: [
-//       {
-//         name: engineRegistrationloadBalancerFrontEndName
-//         properties: {
-//           subnet: {
-//             id: subnetId
-//           }
-//           privateIPAllocationMethod: 'Dynamic'
-//         }
-//       }
-//     ]
-//     backendAddressPools: [
-//       {
-//         name: engineRegistrationloadBalancerBackEndName
-//       }
-//     ]
-//     loadBalancingRules: [
-//       {
-//         name: 'roundRobinEngineRegistrationRule'
-//         properties: {
-//           frontendIPConfiguration: {
-//             id: resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', engineRegistrationLoadBalancerName, engineRegistrationloadBalancerFrontEndName)
-//           }
-//           backendAddressPool: {
-//             id: resourceId('Microsoft.Network/loadBalancers/backendAddressPools', engineRegistrationLoadBalancerName, engineRegistrationloadBalancerBackEndName)
-//           }
-//           protocol: 'Tcp'
-//           frontendPort: 7070
-//           backendPort: 7070
-//           enableFloatingIP: false
-//           idleTimeoutInMinutes: 30
-//         }
-//       }
-//     ]
-//   }
-//   tags: tags
-// }
-
 module applicationGateway 'modules/lb-services/agw.bicep' = {
   name: 'fme-server-agw'
   params: {
@@ -424,163 +379,6 @@ module applicationGateway 'modules/lb-services/agw.bicep' = {
     tags: tags
   }
 }
-
-// resource applicationGatewayName_resource 'Microsoft.Network/applicationGateways@2021-08-01' = {
-//   name: applicationGatewayName
-//   location: location
-//   properties: {
-//     sku: {
-//       name: 'Standard_Medium'
-//       tier: 'Standard'
-//       capacity: 1
-//     }
-//     gatewayIPConfigurations: [
-//       {
-//         name: 'appGatewayIpConfig'
-//         properties: {
-//           subnet: {
-//             id: subnetAGId
-//           }
-//         }
-//       }
-//     ]
-//     frontendIPConfigurations: [
-//       {
-//         name: 'appGwPublicFrontendIp'
-//         properties: {
-//           privateIPAllocationMethod: 'Dynamic'
-//           publicIPAddress: {
-//             id: publicIpIdString
-//           }
-//         }
-//       }
-//     ]
-//     frontendPorts: [
-//       {
-//         name: 'port_80'
-//         properties: {
-//           port: 80
-//         }
-//       }
-//       {
-//         name: 'port_7078'
-//         properties: {
-//           port: 7078
-//         }
-//       }
-//     ]
-//     probes: [
-//       {
-//         properties: {
-//           protocol: 'Http'
-//           path: '/'
-//           interval: 30
-//           timeout: 30
-//           unhealthyThreshold: 3
-//           pickHostNameFromBackendHttpSettings: true
-//           match: {
-//             statusCodes: [
-//               '200-400'
-//             ]
-//           }
-//         }
-//         name: 'websocketProbe'
-//       }
-//     ]
-//     backendAddressPools: [
-//       {
-//         name: applicationGatewayBackEndName
-//       }
-//     ]
-//     backendHttpSettingsCollection: [
-//       {
-//         name: 'httpSetting'
-//         properties: {
-//           port: 8080
-//           protocol: 'Http'
-//           cookieBasedAffinity: 'Disabled'
-//           pickHostNameFromBackendAddress: false
-//           requestTimeout: 86400
-//         }
-//       }
-//       {
-//         name: 'websocketSetting'
-//         properties: {
-//           port: 7078
-//           protocol: 'Http'
-//           cookieBasedAffinity: 'Disabled'
-//           pickHostNameFromBackendAddress: true
-//           requestTimeout: 86400
-//           probe: {
-//             id: resourceId('Microsoft.Network/applicationGateways/probes', applicationGatewayName, 'websocketProbe')
-//           }
-//         }
-//       }
-//     ]
-//     httpListeners: [
-//       {
-//         name: 'httpListener'
-//         properties: {
-//           frontendIPConfiguration: {
-//             id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', applicationGatewayName, 'appGwPublicFrontendIp')
-//           }
-//           frontendPort: {
-//             id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', applicationGatewayName, 'port_80')
-//           }
-//           protocol: 'Http'
-//           requireServerNameIndication: false
-//         }
-//       }
-//       {
-//         name: 'websocketListener'
-//         properties: {
-//           frontendIPConfiguration: {
-//             id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', applicationGatewayName, 'appGwPublicFrontendIp')
-//           }
-//           frontendPort: {
-//             id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', applicationGatewayName, 'port_7078')
-//           }
-//           protocol: 'Http'
-//           requireServerNameIndication: false
-//         }
-//       }
-//     ]
-//     requestRoutingRules: [
-//       {
-//         name: 'httpRoutingRule'
-//         properties: {
-//           ruleType: 'Basic'
-//           httpListener: {
-//             id: resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, 'httpListener')
-//           }
-//           backendAddressPool: {
-//             id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGatewayName, applicationGatewayBackEndName)
-//           }
-//           backendHttpSettings: {
-//             id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', applicationGatewayName, 'httpSetting')
-//           }
-//         }
-//       }
-//       {
-//         name: 'websocketRoutingRule'
-//         properties: {
-//           ruleType: 'Basic'
-//           httpListener: {
-//             id: resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, 'websocketListener')
-//           }
-//           backendAddressPool: {
-//             id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGatewayName, applicationGatewayBackEndName)
-//           }
-//           backendHttpSettings: {
-//             id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', applicationGatewayName, 'websocketSetting')
-//           }
-//         }
-//       }
-//     ]
-//     enableHttp2: false
-//   }
-//   tags: tags
-// }
 
 module pgsql 'modules/database/pgsql.bicep' = {
   name: 'fme-server-pgsql'
@@ -593,43 +391,6 @@ module pgsql 'modules/database/pgsql.bicep' = {
     tags: tags
   }
 }
-
-// resource postgresServerName_resource 'Microsoft.DBforPostgreSQL/servers@2017-12-01' = {
-//   location: location
-//   name: postgresServerName
-//   sku: {
-//     name: 'GP_Gen5_2'
-//     tier: 'GeneralPurpose'
-//     capacity: 2
-//     size: '51200'
-//     family: 'Gen5'
-//   }
-//   properties: {
-//     version: '10'
-//     createMode: 'Default'
-//     administratorLogin: postgresqlAdministratorLogin
-//     administratorLoginPassword: postgresqlAdministratorLoginPassword
-//   }
-//   tags: tags
-// }
-
-// resource postgresServerName_postgres_vnet_rule 'Microsoft.DBforPostgreSQL/servers/virtualNetworkRules@2017-12-01' = {
-//   parent: postgresServerName_resource
-//   name: 'postgres-vnet-rule'
-//   properties: {
-//     virtualNetworkSubnetId: subnetId
-//     ignoreMissingVnetServiceEndpoint: true
-//   }
-// }
-
-// resource postgresServerName_postgres 'Microsoft.DBforPostgreSQL/servers/databases@2017-12-01' = {
-//   parent: postgresServerName_resource
-//   name: 'postgres'
-//   properties: {
-//     charset: 'utf8'
-//     collation: 'English_United States.1252'
-//   }
-// }
 
 // Storage module is currently not supported because of limitation to pass on secrets from modules
 //
