@@ -33,12 +33,17 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
       ]
     }
   }
-  tags: tags
-}
+  resource service 'fileServices' = {
+    name: 'default'
 
-resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2021-09-01' = {
-  name: '${storageAccountName}/default/${fileShareName}'
+    resource share 'shares' = {
+      name: fileShareName
+    }
+  }
+  tags: tags
 }
 
 @description('Storage account ID.')
 output storageAccountId string = storageAccount.id
+@description('Storage account name.')
+output storageAccountName string = storageAccount.name

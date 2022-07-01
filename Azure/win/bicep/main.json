@@ -1,0 +1,1533 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.7.4.23292",
+      "templateHash": "17638149295506349928"
+    }
+  },
+  "parameters": {
+    "ownerValue": {
+      "type": "string",
+      "metadata": {
+        "description": "Value for owner tag."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for the resources."
+      }
+    },
+    "vmSizeCore": {
+      "type": "string",
+      "defaultValue": "Standard_D2s_v3",
+      "metadata": {
+        "description": "Size of VMs in the Core VM Scale Set."
+      }
+    },
+    "vmSizeEngine": {
+      "type": "string",
+      "defaultValue": "Standard_D2s_v3",
+      "metadata": {
+        "description": "Size of VMs in the Engine VM Scale Set."
+      }
+    },
+    "instanceCountCore": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of Core VM instances."
+      }
+    },
+    "instanceCountEngine": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of Engine VM instances."
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "[format('fmeserver{0}', uniqueString(resourceGroup().id))]",
+      "metadata": {
+        "description": "Name of the storage account"
+      }
+    },
+    "postgresServerName": {
+      "type": "string",
+      "defaultValue": "[format('fmeserver-postgresql-{0}', uniqueString(resourceGroup().id))]",
+      "metadata": {
+        "description": "Name of the Postgresql server"
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "fmeserver-vnet",
+      "metadata": {
+        "description": "Name of the virtual network"
+      }
+    },
+    "addressPrefixes": {
+      "type": "array",
+      "defaultValue": [
+        "10.0.0.0/16"
+      ],
+      "metadata": {
+        "description": "Address prefix of the virtual network"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "default",
+      "metadata": {
+        "description": "Name of the subnet"
+      }
+    },
+    "subnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/24",
+      "metadata": {
+        "description": "Subnet prefix of the virtual network"
+      }
+    },
+    "subnetAGName": {
+      "type": "string",
+      "defaultValue": "AGSubnet",
+      "metadata": {
+        "description": "Name of the subnet for the Application Gateway"
+      }
+    },
+    "subnetAGPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.1.0/24",
+      "metadata": {
+        "description": "Subnet prefix of the Application Gateway subnet"
+      }
+    },
+    "publicIpName": {
+      "type": "string",
+      "defaultValue": "fmeserver-pip",
+      "metadata": {
+        "description": "Name of the public ip address"
+      }
+    },
+    "publicIpDns": {
+      "type": "string",
+      "defaultValue": "[format('fmeserver-{0}', uniqueString(resourceGroup().id))]",
+      "metadata": {
+        "description": "DNS of the public ip address for the VM"
+      }
+    },
+    "publicIpAllocationMethod": {
+      "type": "string",
+      "defaultValue": "Dynamic",
+      "allowedValues": [
+        "Dynamic",
+        "Static"
+      ],
+      "metadata": {
+        "description": "Allocation method for the public ip address"
+      }
+    },
+    "publicIpSku": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard"
+      ],
+      "metadata": {
+        "description": "Name of the resource group for the public ip address"
+      }
+    },
+    "applicationGatewayName": {
+      "type": "string",
+      "defaultValue": "fmeserver-appgateway",
+      "metadata": {
+        "description": "Name of the resource group for the existing virtual network"
+      }
+    },
+    "engineRegistrationLoadBalancerName": {
+      "type": "string",
+      "defaultValue": "fmeserver-engineregistration",
+      "metadata": {
+        "description": "Name of the resource group for the existing virtual network"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username on all VMs."
+      }
+    },
+    "adminPassword": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Admin password on all VMs."
+      }
+    }
+  },
+  "variables": {
+    "vmssNameCore": "fmeserver-core",
+    "vmssNameEngine": "fmeserver-engine",
+    "tags": {
+      "owner": "[parameters('ownerValue')]"
+    },
+    "postgresqlAdministratorLogin": "postgres",
+    "postgresqlAdministratorLoginPassword": "[format('P{0}x!', uniqueString(resourceGroup().id, deployment().name, 'ad909260-dc63-4102-983f-4f82af7a6840'))]",
+    "fileShareName": "fmeserverdata"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "fme-server-network",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "addressPrefixes": {
+            "value": "[parameters('addressPrefixes')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "publicIpAllocationMethod": {
+            "value": "[parameters('publicIpAllocationMethod')]"
+          },
+          "publicIpDns": {
+            "value": "[parameters('publicIpDns')]"
+          },
+          "publicIpName": {
+            "value": "[parameters('publicIpName')]"
+          },
+          "publicIpSku": {
+            "value": "[parameters('publicIpSku')]"
+          },
+          "subnetAGName": {
+            "value": "[parameters('subnetAGName')]"
+          },
+          "subnetAGPrefix": {
+            "value": "[parameters('subnetAGPrefix')]"
+          },
+          "subnetName": {
+            "value": "[parameters('subnetName')]"
+          },
+          "subnetPrefix": {
+            "value": "[parameters('subnetPrefix')]"
+          },
+          "tags": {
+            "value": "[variables('tags')]"
+          },
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.7.4.23292",
+              "templateHash": "13922254669630522564"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Location for the resources."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "metadata": {
+                "description": "Onwer tag to be added to the resources."
+              }
+            },
+            "virtualNetworkName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the virtual network"
+              }
+            },
+            "subnetName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the backend subnet."
+              }
+            },
+            "subnetAGName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the application gateway subnet."
+              }
+            },
+            "addressPrefixes": {
+              "type": "array",
+              "metadata": {
+                "description": "Address prefix of the virtual network"
+              }
+            },
+            "subnetPrefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Subnet prefix of the virtual network"
+              }
+            },
+            "subnetAGPrefix": {
+              "type": "string",
+              "metadata": {
+                "description": "Subnet prefix of the Application Gateway subnet"
+              }
+            },
+            "publicIpName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the public ip address"
+              }
+            },
+            "publicIpDns": {
+              "type": "string",
+              "metadata": {
+                "description": "DNS of the public ip address for the VM"
+              }
+            },
+            "publicIpAllocationMethod": {
+              "type": "string",
+              "allowedValues": [
+                "Dynamic",
+                "Static"
+              ],
+              "metadata": {
+                "description": "Allocation method for the public ip address"
+              }
+            },
+            "publicIpSku": {
+              "type": "string",
+              "allowedValues": [
+                "Basic",
+                "Standard"
+              ],
+              "metadata": {
+                "description": "Name of the resource group for the public ip address"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2021-03-01",
+              "name": "[parameters('virtualNetworkName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": "[parameters('addressPrefixes')]"
+                },
+                "subnets": [
+                  {
+                    "name": "[parameters('subnetName')]",
+                    "properties": {
+                      "addressPrefix": "[parameters('subnetPrefix')]",
+                      "serviceEndpoints": [
+                        {
+                          "service": "Microsoft.Storage"
+                        },
+                        {
+                          "service": "Microsoft.Sql"
+                        }
+                      ],
+                      "privateEndpointNetworkPolicies": "Enabled",
+                      "privateLinkServiceNetworkPolicies": "Enabled"
+                    }
+                  },
+                  {
+                    "name": "[parameters('subnetAGName')]",
+                    "properties": {
+                      "addressPrefix": "[parameters('subnetAGPrefix')]",
+                      "privateEndpointNetworkPolicies": "Enabled",
+                      "privateLinkServiceNetworkPolicies": "Enabled"
+                    }
+                  }
+                ]
+              },
+              "tags": "[parameters('tags')]"
+            },
+            {
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2021-03-01",
+              "name": "[parameters('publicIpName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "[parameters('publicIpSku')]"
+              },
+              "properties": {
+                "publicIPAllocationMethod": "[parameters('publicIpAllocationMethod')]",
+                "dnsSettings": {
+                  "domainNameLabel": "[toLower(parameters('publicIpDns'))]"
+                },
+                "idleTimeoutInMinutes": 30
+              },
+              "tags": "[parameters('tags')]"
+            }
+          ],
+          "outputs": {
+            "virtualNetworkId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+              "metadata": {
+                "description": "Virtual network ID."
+              }
+            },
+            "subnetId": {
+              "type": "string",
+              "value": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('subnetName'))]",
+              "metadata": {
+                "description": "Backend subnet ID."
+              }
+            },
+            "subnetAGId": {
+              "type": "string",
+              "value": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('subnetAGName'))]",
+              "metadata": {
+                "description": "Backend subnet ID."
+              }
+            },
+            "publicIpId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))]",
+              "metadata": {
+                "description": "Public IP ID."
+              }
+            },
+            "publicIpFqdn": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIpName'))).dnsSettings.fqdn]",
+              "metadata": {
+                "description": "Fully qulified domain name of public IP."
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "fme-server-loadBalancer",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "engineRegistrationLoadBalancerName": {
+            "value": "[parameters('engineRegistrationLoadBalancerName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "subnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-network')).outputs.subnetId.value]"
+          },
+          "tags": {
+            "value": "[variables('tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.7.4.23292",
+              "templateHash": "11745329168543128501"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Location for the resources."
+              }
+            },
+            "subnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Backend Subnet ID."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "metadata": {
+                "description": "Onwer tag to be added to the resources."
+              }
+            },
+            "engineRegistrationLoadBalancerName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the resource group for the existing virtual network"
+              }
+            }
+          },
+          "variables": {
+            "engineRegistrationloadBalancerFrontEndName": "engineRegistrationFrontend",
+            "engineRegistrationloadBalancerBackEndName": "engineRegistrationBackend"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/loadBalancers",
+              "apiVersion": "2021-03-01",
+              "name": "[parameters('engineRegistrationLoadBalancerName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "frontendIPConfigurations": [
+                  {
+                    "name": "[variables('engineRegistrationloadBalancerFrontEndName')]",
+                    "properties": {
+                      "subnet": {
+                        "id": "[parameters('subnetId')]"
+                      },
+                      "privateIPAllocationMethod": "Dynamic"
+                    }
+                  }
+                ],
+                "backendAddressPools": [
+                  {
+                    "name": "[variables('engineRegistrationloadBalancerBackEndName')]"
+                  }
+                ],
+                "loadBalancingRules": [
+                  {
+                    "name": "roundRobinEngineRegistrationRule",
+                    "properties": {
+                      "frontendIPConfiguration": {
+                        "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', parameters('engineRegistrationLoadBalancerName'), variables('engineRegistrationloadBalancerFrontEndName'))]"
+                      },
+                      "backendAddressPool": {
+                        "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('engineRegistrationLoadBalancerName'), variables('engineRegistrationloadBalancerBackEndName'))]"
+                      },
+                      "protocol": "Tcp",
+                      "frontendPort": 7070,
+                      "backendPort": 7070,
+                      "enableFloatingIP": false,
+                      "idleTimeoutInMinutes": 30
+                    }
+                  }
+                ]
+              },
+              "tags": "[parameters('tags')]"
+            }
+          ],
+          "outputs": {
+            "engineRegistrationHost": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/loadBalancers', parameters('engineRegistrationLoadBalancerName'))).frontendIPConfigurations[0].properties.privateIPAddress]",
+              "metadata": {
+                "description": "Private IP address of engineregistrationhost."
+              }
+            },
+            "engineRegistrationloadBalancerBackEndName": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/loadBalancers', parameters('engineRegistrationLoadBalancerName'))).backendAddressPools[0].name]",
+              "metadata": {
+                "description": "Engineregistrationhost backend name."
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-network')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "fme-server-agw",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "applicationGatewayName": {
+            "value": "[parameters('applicationGatewayName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "publicIpIdString": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-network')).outputs.publicIpId.value]"
+          },
+          "subnetAGId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-network')).outputs.subnetAGId.value]"
+          },
+          "tags": {
+            "value": "[variables('tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.7.4.23292",
+              "templateHash": "990600591761075756"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Location for the resources."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "metadata": {
+                "description": "Onwer tag to be added to the resources."
+              }
+            },
+            "applicationGatewayName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the resource group for the existing virtual network"
+              }
+            },
+            "subnetAGId": {
+              "type": "string",
+              "metadata": {
+                "description": "Applciaiton gateway Subnet ID."
+              }
+            },
+            "publicIpIdString": {
+              "type": "string",
+              "metadata": {
+                "description": "Public IP ID string"
+              }
+            }
+          },
+          "variables": {
+            "applicationGatewayBackEndName": "applicationGatewayBackEnd"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/applicationGateways",
+              "apiVersion": "2021-08-01",
+              "name": "[parameters('applicationGatewayName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "sku": {
+                  "name": "Standard_Medium",
+                  "tier": "Standard",
+                  "capacity": 1
+                },
+                "gatewayIPConfigurations": [
+                  {
+                    "name": "appGatewayIpConfig",
+                    "properties": {
+                      "subnet": {
+                        "id": "[parameters('subnetAGId')]"
+                      }
+                    }
+                  }
+                ],
+                "frontendIPConfigurations": [
+                  {
+                    "name": "appGwPublicFrontendIp",
+                    "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "publicIPAddress": {
+                        "id": "[parameters('publicIpIdString')]"
+                      }
+                    }
+                  }
+                ],
+                "frontendPorts": [
+                  {
+                    "name": "port_80",
+                    "properties": {
+                      "port": 80
+                    }
+                  },
+                  {
+                    "name": "port_7078",
+                    "properties": {
+                      "port": 7078
+                    }
+                  }
+                ],
+                "probes": [
+                  {
+                    "properties": {
+                      "protocol": "Http",
+                      "path": "/",
+                      "interval": 30,
+                      "timeout": 30,
+                      "unhealthyThreshold": 3,
+                      "pickHostNameFromBackendHttpSettings": true,
+                      "match": {
+                        "statusCodes": [
+                          "200-400"
+                        ]
+                      }
+                    },
+                    "name": "websocketProbe"
+                  }
+                ],
+                "backendAddressPools": [
+                  {
+                    "name": "[variables('applicationGatewayBackEndName')]"
+                  }
+                ],
+                "backendHttpSettingsCollection": [
+                  {
+                    "name": "httpSetting",
+                    "properties": {
+                      "port": 8080,
+                      "protocol": "Http",
+                      "cookieBasedAffinity": "Disabled",
+                      "pickHostNameFromBackendAddress": false,
+                      "requestTimeout": 86400
+                    }
+                  },
+                  {
+                    "name": "websocketSetting",
+                    "properties": {
+                      "port": 7078,
+                      "protocol": "Http",
+                      "cookieBasedAffinity": "Disabled",
+                      "pickHostNameFromBackendAddress": true,
+                      "requestTimeout": 86400,
+                      "probe": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/probes', parameters('applicationGatewayName'), 'websocketProbe')]"
+                      }
+                    }
+                  }
+                ],
+                "httpListeners": [
+                  {
+                    "name": "httpListener",
+                    "properties": {
+                      "frontendIPConfiguration": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', parameters('applicationGatewayName'), 'appGwPublicFrontendIp')]"
+                      },
+                      "frontendPort": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/frontendPorts', parameters('applicationGatewayName'), 'port_80')]"
+                      },
+                      "protocol": "Http",
+                      "requireServerNameIndication": false
+                    }
+                  },
+                  {
+                    "name": "websocketListener",
+                    "properties": {
+                      "frontendIPConfiguration": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', parameters('applicationGatewayName'), 'appGwPublicFrontendIp')]"
+                      },
+                      "frontendPort": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/frontendPorts', parameters('applicationGatewayName'), 'port_7078')]"
+                      },
+                      "protocol": "Http",
+                      "requireServerNameIndication": false
+                    }
+                  }
+                ],
+                "requestRoutingRules": [
+                  {
+                    "name": "httpRoutingRule",
+                    "properties": {
+                      "ruleType": "Basic",
+                      "httpListener": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/httpListeners', parameters('applicationGatewayName'), 'httpListener')]"
+                      },
+                      "backendAddressPool": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/backendAddressPools', parameters('applicationGatewayName'), variables('applicationGatewayBackEndName'))]"
+                      },
+                      "backendHttpSettings": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', parameters('applicationGatewayName'), 'httpSetting')]"
+                      }
+                    }
+                  },
+                  {
+                    "name": "websocketRoutingRule",
+                    "properties": {
+                      "ruleType": "Basic",
+                      "httpListener": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/httpListeners', parameters('applicationGatewayName'), 'websocketListener')]"
+                      },
+                      "backendAddressPool": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/backendAddressPools', parameters('applicationGatewayName'), variables('applicationGatewayBackEndName'))]"
+                      },
+                      "backendHttpSettings": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', parameters('applicationGatewayName'), 'websocketSetting')]"
+                      }
+                    }
+                  }
+                ],
+                "enableHttp2": false
+              },
+              "tags": "[parameters('tags')]"
+            }
+          ],
+          "outputs": {
+            "applicationGatewayBackEndName": {
+              "type": "string",
+              "value": "[variables('applicationGatewayBackEndName')]",
+              "metadata": {
+                "description": "Application gateway backend name."
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-network')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "fme-server-pgsql",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "postgresqlAdministratorLogin": {
+            "value": "[variables('postgresqlAdministratorLogin')]"
+          },
+          "postgresqlAdministratorLoginPassword": {
+            "value": "[variables('postgresqlAdministratorLoginPassword')]"
+          },
+          "postgresServerName": {
+            "value": "[parameters('postgresServerName')]"
+          },
+          "subnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-network')).outputs.subnetId.value]"
+          },
+          "tags": {
+            "value": "[variables('tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.7.4.23292",
+              "templateHash": "13263505565971172438"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Location for the resources."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "metadata": {
+                "description": "Onwer tag to be added to the resources."
+              }
+            },
+            "subnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Backend Subnet ID."
+              }
+            },
+            "postgresServerName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the Postgresql server"
+              }
+            },
+            "postgresqlAdministratorLogin": {
+              "type": "string",
+              "metadata": {
+                "description": "Backend database admin username"
+              }
+            },
+            "postgresqlAdministratorLoginPassword": {
+              "type": "string",
+              "metadata": {
+                "description": "Backend database admin password"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DBforPostgreSQL/servers/virtualNetworkRules",
+              "apiVersion": "2017-12-01",
+              "name": "[format('{0}/{1}', parameters('postgresServerName'), 'postgres-vnet-rule')]",
+              "properties": {
+                "virtualNetworkSubnetId": "[parameters('subnetId')]",
+                "ignoreMissingVnetServiceEndpoint": true
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('postgresServerName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DBforPostgreSQL/servers/databases",
+              "apiVersion": "2017-12-01",
+              "name": "[format('{0}/{1}', parameters('postgresServerName'), 'postgres')]",
+              "properties": {
+                "charset": "utf8",
+                "collation": "English_United States.1252"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DBforPostgreSQL/servers', parameters('postgresServerName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DBforPostgreSQL/servers",
+              "apiVersion": "2017-12-01",
+              "name": "[parameters('postgresServerName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "GP_Gen5_2",
+                "tier": "GeneralPurpose",
+                "capacity": 2,
+                "size": "51200",
+                "family": "Gen5"
+              },
+              "properties": {
+                "version": "10",
+                "createMode": "Default",
+                "administratorLogin": "[parameters('postgresqlAdministratorLogin')]",
+                "administratorLoginPassword": "[parameters('postgresqlAdministratorLoginPassword')]"
+              },
+              "tags": "[parameters('tags')]"
+            }
+          ],
+          "outputs": {
+            "postgresFqdn": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.DBforPostgreSQL/servers', parameters('postgresServerName'))).fullyQualifiedDomainName]",
+              "metadata": {
+                "description": "Fully qualified domain name of the PostgreSQL Server."
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-network')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "fme-server-storage",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "fileShareName": {
+            "value": "[variables('fileShareName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('storageAccountName')]"
+          },
+          "subnetId": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-network')).outputs.subnetId.value]"
+          },
+          "tags": {
+            "value": "[variables('tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.7.4.23292",
+              "templateHash": "614936343234903897"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Location for the resources."
+              }
+            },
+            "subnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Backend Subnet ID."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "metadata": {
+                "description": "Onwer tag to be added to the resources."
+              }
+            },
+            "fileShareName": {
+              "type": "string",
+              "maxLength": 63,
+              "minLength": 3,
+              "metadata": {
+                "description": "Name of the fileshare."
+              }
+            },
+            "storageAccountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the storage account."
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+              "apiVersion": "2021-02-01",
+              "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', parameters('fileShareName'))]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccountName'), 'default')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/fileServices",
+              "apiVersion": "2021-02-01",
+              "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2021-02-01",
+              "name": "[parameters('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "kind": "FileStorage",
+              "sku": {
+                "name": "Premium_LRS"
+              },
+              "properties": {
+                "networkAcls": {
+                  "bypass": "AzureServices",
+                  "defaultAction": "Deny",
+                  "virtualNetworkRules": [
+                    {
+                      "id": "[parameters('subnetId')]"
+                    }
+                  ]
+                }
+              },
+              "tags": "[parameters('tags')]"
+            }
+          ],
+          "outputs": {
+            "storageAccountId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+              "metadata": {
+                "description": "Storage account ID."
+              }
+            },
+            "storageAccountName": {
+              "type": "string",
+              "value": "[parameters('storageAccountName')]",
+              "metadata": {
+                "description": "Storage account name."
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-network')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "fme-core-vmss",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "applicationGateway": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-agw')).outputs]"
+          },
+          "applicationGatewayName": {
+            "value": "[parameters('applicationGatewayName')]"
+          },
+          "engineRegistrationLoadBalancerName": {
+            "value": "[parameters('engineRegistrationLoadBalancerName')]"
+          },
+          "instanceCountCore": {
+            "value": "[parameters('instanceCountCore')]"
+          },
+          "loadBalancer": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-loadBalancer')).outputs]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "network": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-network')).outputs]"
+          },
+          "pgsql": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-pgsql')).outputs]"
+          },
+          "postgresqlAdministratorLogin": {
+            "value": "[variables('postgresqlAdministratorLogin')]"
+          },
+          "postgresqlAdministratorLoginPassword": {
+            "value": "[variables('postgresqlAdministratorLoginPassword')]"
+          },
+          "storageAccountName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-storage')).outputs.storageAccountName.value]"
+          },
+          "tags": {
+            "value": "[variables('tags')]"
+          },
+          "vmSizeCore": {
+            "value": "[parameters('vmSizeCore')]"
+          },
+          "vmssName": {
+            "value": "[variables('vmssNameCore')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.7.4.23292",
+              "templateHash": "6538205456862582688"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Location for the resources."
+              }
+            },
+            "vmSizeCore": {
+              "type": "string",
+              "metadata": {
+                "description": "Size of VMs in the Core VM Scale Set."
+              }
+            },
+            "vmssName": {
+              "type": "string",
+              "maxLength": 61,
+              "metadata": {
+                "description": "Name of the VM Scaleset for the engine or core machine machines"
+              }
+            },
+            "instanceCountCore": {
+              "type": "int",
+              "metadata": {
+                "description": "Number of Core VM instances."
+              }
+            },
+            "applicationGatewayName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the resource group for the existing virtual network"
+              }
+            },
+            "engineRegistrationLoadBalancerName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the resource group for the existing virtual network"
+              }
+            },
+            "adminUsername": {
+              "type": "string",
+              "metadata": {
+                "description": "Admin username on all VMs."
+              }
+            },
+            "adminPassword": {
+              "type": "secureString",
+              "metadata": {
+                "description": "Admin password on all VMs."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "metadata": {
+                "description": "Onwer tag to be added to the resources."
+              }
+            },
+            "storageAccountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the storage account."
+              }
+            },
+            "postgresqlAdministratorLogin": {
+              "type": "string",
+              "metadata": {
+                "description": "PostgreSQL admin username."
+              }
+            },
+            "postgresqlAdministratorLoginPassword": {
+              "type": "secureString",
+              "metadata": {
+                "description": "PostgreSQL admin password."
+              }
+            },
+            "network": {
+              "type": "object"
+            },
+            "pgsql": {
+              "type": "object"
+            },
+            "loadBalancer": {
+              "type": "object"
+            },
+            "applicationGateway": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[equals(parameters('vmssName'), 'fmeserver-core')]",
+              "type": "Microsoft.Compute/virtualMachineScaleSets",
+              "apiVersion": "2021-03-01",
+              "name": "[parameters('vmssName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "[parameters('vmSizeCore')]",
+                "capacity": "[parameters('instanceCountCore')]"
+              },
+              "plan": {
+                "publisher": "safesoftwareinc",
+                "name": "fme-core-2022-0-0-2-windows-byol",
+                "product": "fme-core"
+              },
+              "properties": {
+                "overprovision": false,
+                "upgradePolicy": {
+                  "mode": "Manual"
+                },
+                "virtualMachineProfile": {
+                  "storageProfile": {
+                    "osDisk": {
+                      "createOption": "FromImage",
+                      "caching": "ReadWrite"
+                    },
+                    "imageReference": {
+                      "publisher": "safesoftwareinc",
+                      "offer": "fme-core",
+                      "sku": "fme-core-2022-0-0-2-windows-byol",
+                      "version": "1.0.0"
+                    }
+                  },
+                  "osProfile": {
+                    "computerNamePrefix": "core",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                  },
+                  "networkProfile": {
+                    "networkInterfaceConfigurations": [
+                      {
+                        "name": "nic-core",
+                        "properties": {
+                          "primary": true,
+                          "ipConfigurations": [
+                            {
+                              "name": "ipconfig",
+                              "properties": {
+                                "subnet": {
+                                  "id": "[parameters('network').outputs.subnetId]"
+                                },
+                                "loadBalancerBackendAddressPools": [
+                                  {
+                                    "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('engineRegistrationLoadBalancerName'), parameters('loadBalancer').outputs.engineRegistrationloadBalancerBackEndName)]"
+                                  }
+                                ],
+                                "applicationGatewayBackendAddressPools": [
+                                  {
+                                    "id": "[resourceId('Microsoft.Network/applicationGateways/backendAddressPools', parameters('applicationGatewayName'), parameters('applicationGateway').outputs.applicationGatewayBackEndName)]"
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "extensionProfile": {
+                    "extensions": [
+                      {
+                        "name": "customScript",
+                        "properties": {
+                          "publisher": "Microsoft.Compute",
+                          "protectedSettings": {
+                            "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname {0} -databasePassword {1} -databaseUsername {2} -externalhostname {3} -storageAccountName {4} -storageAccountKey {5} >C:\\confd-log.txt 2>&1', parameters('pgsql').outputs.postgresFqdn, parameters('postgresqlAdministratorLoginPassword'), parameters('postgresqlAdministratorLogin'), parameters('network').outputs.publicIpFqdn, parameters('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-04-01').keys[0].value)]"
+                          },
+                          "typeHandlerVersion": "1.8",
+                          "autoUpgradeMinorVersion": true,
+                          "type": "CustomScriptExtension"
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "tags": "[parameters('tags')]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-agw')]",
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-loadBalancer')]",
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-network')]",
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-pgsql')]",
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-storage')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "fme-engine-vmss",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "instanceCountEngine": {
+            "value": "[parameters('instanceCountEngine')]"
+          },
+          "loadBalancer": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-loadBalancer')).outputs]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "network": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-network')).outputs]"
+          },
+          "pgsql": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-pgsql')).outputs]"
+          },
+          "storageAccountName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-storage')).outputs.storageAccountName.value]"
+          },
+          "tags": {
+            "value": "[variables('tags')]"
+          },
+          "vmSizeEngine": {
+            "value": "[parameters('vmSizeEngine')]"
+          },
+          "vmssName": {
+            "value": "[variables('vmssNameEngine')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.7.4.23292",
+              "templateHash": "2134203166480373156"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "Location for the resources."
+              }
+            },
+            "vmSizeEngine": {
+              "type": "string",
+              "metadata": {
+                "description": "Size of VMs in the Engine VM Scale Set."
+              }
+            },
+            "vmssName": {
+              "type": "string",
+              "maxLength": 61,
+              "metadata": {
+                "description": "Name of the VM Scaleset for the engine or core machine machines"
+              }
+            },
+            "instanceCountEngine": {
+              "type": "int",
+              "metadata": {
+                "description": "Number of Engine VM instances."
+              }
+            },
+            "adminUsername": {
+              "type": "string",
+              "metadata": {
+                "description": "Admin username on all VMs."
+              }
+            },
+            "adminPassword": {
+              "type": "secureString",
+              "metadata": {
+                "description": "Admin password on all VMs."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "metadata": {
+                "description": "Onwer tag to be added to the resources."
+              }
+            },
+            "storageAccountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of the storage account."
+              }
+            },
+            "network": {
+              "type": "object"
+            },
+            "pgsql": {
+              "type": "object"
+            },
+            "loadBalancer": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[equals(parameters('vmssName'), 'fmeserver-engine')]",
+              "type": "Microsoft.Compute/virtualMachineScaleSets",
+              "apiVersion": "2021-03-01",
+              "name": "[parameters('vmssName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "[parameters('vmSizeEngine')]",
+                "capacity": "[parameters('instanceCountEngine')]"
+              },
+              "plan": {
+                "publisher": "safesoftwareinc",
+                "name": "fme-engine-2022-0-0-2-windows-byol",
+                "product": "fme-engine"
+              },
+              "properties": {
+                "overprovision": false,
+                "upgradePolicy": {
+                  "mode": "Manual"
+                },
+                "virtualMachineProfile": {
+                  "storageProfile": {
+                    "osDisk": {
+                      "createOption": "FromImage",
+                      "caching": "ReadWrite"
+                    },
+                    "imageReference": {
+                      "publisher": "safesoftwareinc",
+                      "offer": "fme-engine",
+                      "sku": "fme-engine-2022-0-0-2-windows-byol",
+                      "version": "1.0.0"
+                    }
+                  },
+                  "osProfile": {
+                    "computerNamePrefix": "engine",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                  },
+                  "networkProfile": {
+                    "networkInterfaceConfigurations": [
+                      {
+                        "name": "nic-engine",
+                        "properties": {
+                          "primary": true,
+                          "ipConfigurations": [
+                            {
+                              "name": "ipconfig",
+                              "properties": {
+                                "subnet": {
+                                  "id": "[parameters('network').outputs.subnetId]"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "extensionProfile": {
+                    "extensions": [
+                      {
+                        "name": "customScript",
+                        "properties": {
+                          "publisher": "Microsoft.Compute",
+                          "protectedSettings": {
+                            "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname {0} -engineregistrationhost {1} -storageAccountName {2} -storageAccountKey {3} >C:\\confd-log.txt 2>&1', parameters('pgsql').outputs.postgresFqdn, parameters('loadBalancer').outputs.engineRegistrationHost, parameters('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-04-01').keys[0].value)]"
+                          },
+                          "typeHandlerVersion": "1.8",
+                          "autoUpgradeMinorVersion": true,
+                          "type": "CustomScriptExtension"
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "tags": "[parameters('tags')]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-loadBalancer')]",
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-network')]",
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-pgsql')]",
+        "[resourceId('Microsoft.Resources/deployments', 'fme-server-storage')]"
+      ]
+    }
+  ],
+  "outputs": {
+    "fqdn": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', 'fme-server-network')).outputs.publicIpFqdn.value]"
+    }
+  }
+}

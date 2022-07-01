@@ -22,12 +22,6 @@ param subnetPrefix string
 @description('Subnet prefix of the Application Gateway subnet')
 param subnetAGPrefix string
 
-@description('Determines whether or not a new virtual network should be provisioned.')
-param virtualNetworkNewOrExisting string
-
-@description('Determines whether or not a new public ip should be provisioned.')
-param publicIpNewOrExisting string
-
 @description('Name of the public ip address')
 param publicIpName string
 
@@ -48,9 +42,7 @@ param publicIpAllocationMethod string
 ])
 param publicIpSku string
 
-
-
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = if (virtualNetworkNewOrExisting == 'new') {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: virtualNetworkName
   location: location
   properties: {
@@ -87,7 +79,7 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = if (vir
   tags: tags
 }
 
-resource publicIp 'Microsoft.Network/publicIPAddresses@2021-03-01' = if (publicIpNewOrExisting == 'new') {
+resource publicIp 'Microsoft.Network/publicIPAddresses@2021-03-01' = {
   name: publicIpName
   location: location
   sku: {
@@ -105,7 +97,11 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2021-03-01' = if (publicI
 
 @description('Virtual network ID.')
 output virtualNetworkId string = virtualNetwork.id
-
+@description('Backend subnet ID.')
+output subnetId string = '${ virtualNetwork.id }/subnets/${ subnetName }'
+@description('Applciation gateway subnet ID.')
+output subnetAGId string = '${ virtualNetwork.id }/subnets/${ subnetAGName }'
 @description('Public IP ID.')
 output publicIpId string = publicIp.id
-
+@description('Fully qulified domain name of public IP.')
+output publicIpFqdn string = publicIp.properties.dnsSettings.fqdn

@@ -32,25 +32,22 @@ resource postgresServer 'Microsoft.DBforPostgreSQL/servers@2017-12-01' = {
     administratorLogin: postgresqlAdministratorLogin
     administratorLoginPassword: postgresqlAdministratorLoginPassword
   }
+  resource postgresServerVNetRule 'virtualNetworkRules' = {
+    name: 'postgres-vnet-rule'
+    properties: {
+      virtualNetworkSubnetId: subnetId
+      ignoreMissingVnetServiceEndpoint: true
+    }
+  }
+
+  resource postgresDatabase 'databases' = {
+    name: 'postgres'
+    properties: {
+      charset: 'utf8'
+      collation: 'English_United States.1252'
+    }
+  }
   tags: tags
-}
-
-resource postgresServerVNetRule 'Microsoft.DBforPostgreSQL/servers/virtualNetworkRules@2017-12-01' = {
-  parent: postgresServer
-  name: 'postgres-vnet-rule'
-  properties: {
-    virtualNetworkSubnetId: subnetId
-    ignoreMissingVnetServiceEndpoint: true
-  }
-}
-
-resource postgresDatabase 'Microsoft.DBforPostgreSQL/servers/databases@2017-12-01' = {
-  parent: postgresServer
-  name: 'postgres'
-  properties: {
-    charset: 'utf8'
-    collation: 'English_United States.1252'
-  }
 }
 
 @description('Fully qualified domain name of the PostgreSQL Server.')
