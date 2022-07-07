@@ -1,11 +1,9 @@
 variable "key_name" {
+  description = ""
   type = string
 }
 
 variable "owner" {
-  type = string
-}
-
-variable "purpose" {
+  description = "Tag to identify Onwer"
   type = string
 }
