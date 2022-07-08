@@ -20,6 +20,8 @@ module "network" {}
 
 module "storage" {}
 
+module "database" {}
+
 module "loadBalancer" {}
 
 resource "aws_launch_configuration" "coreConfig" {
