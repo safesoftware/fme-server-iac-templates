@@ -11,6 +11,7 @@ This module creates the requires network resources for a distributed FME Server 
 |`be_snet_name` | Specifies backend virtual network subnet name.
 |`agw_snet_name` | Specifies application gateway virtual network subnet name.
 |`pip_name` | Specifies public ip name.
+|`domain_name_label`|Label for the Domain Name. Will be used to make up the FQDN.|
 
 ## Output
 |Output|Description|
