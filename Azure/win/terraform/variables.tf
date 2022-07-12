@@ -6,7 +6,7 @@ variable "owner" {
 
 variable "rg_name" {
   type        = string
-  default     = "fme-server-rg"
+  default     = "terraform-rg"
   description = "Resource group name"
 }
 
