@@ -79,7 +79,7 @@ var postgresqlAdministratorLogin = 'postgres'
 var postgresqlAdministratorLoginPassword = 'P${uniqueString(resourceGroup().id, deployment().name, 'ad909260-dc63-4102-983f-4f82af7a6840')}x!'
 var fileShareName = 'fmeserverdata'
 var tags = {
-  'owner': ownerValue 
+  owner: ownerValue 
 }
 module network 'modules/network/network.bicep' = {
   name: 'fme-server-network'

@@ -92,7 +92,7 @@ module vmss_core {
   storage_name                 = module.storage.name
   storage_key                  = module.storage.primary_access_key
   vm_admin_pw                  = var.vm_admin_pw
-  vm_admin_user                = var.db_admin_user
+  vm_admin_user                = var.vm_admin_user
 }
 
 module vmss_engine {
@@ -109,5 +109,5 @@ module vmss_engine {
   storage_name                 = module.storage.name
   storage_key                  = module.storage.primary_access_key
   vm_admin_pw                  = var.vm_admin_pw
-  vm_admin_user                = var.db_admin_user
+  vm_admin_user                = var.vm_admin_user
 }
