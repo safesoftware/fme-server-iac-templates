@@ -11,5 +11,5 @@ This module creates load balancer for a distributed FME Server deployment in Azu
 ## Output
 |Output|Description|
 |---|---|
-|`name` | Name of the Azure storage account for the FME Sever file share.|
-|`primary_access_key` | The primary access key for the storage account.|
+|`private_ip_address` |Private IP address of the load balancer|
+|`be_address_pool_id`|Backend address poll id of the load balancer|

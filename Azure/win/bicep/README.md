@@ -27,11 +27,9 @@ To delete the FME Server deployment remove the resource group: ```az group delet
 |`vmssNameEngine`|Name of the VM Scaleset for the Engine machines|'fmeserver-engine'|
 |`instanceCountCore`|'Number of Core VM instances.|1|
 |`instanceCountEngine`|Number of Engine VM instances.|1|
-|`storageNewOrExisting`|Determines whether or not a new storage account should be provisioned.|'new'|
 |`storageAccountName`|Name of the storage account|'fmeserver{uniqueString}'|
 |`storageAccountResourceGroup`|Name of the resource group for the existing virtual network||
 |`postgresServerName`|Name of the Postgresql server|'fmeserver-postgresql-{uniqueString}'|
-|`virtualNetworkNewOrExisting`|Determines whether or not a new virtual network should be provisioned.|'new'|
 |`virtualNetworkName`|Name of the virtual network|'fmeserver-vnet'|
 |`addressPrefixes`|Address prefix of the virtual network|'10.0.0.0/16'|
 |`subnetName`|Name of the subnet|'default'|
@@ -44,8 +42,10 @@ To delete the FME Server deployment remove the resource group: ```az group delet
 |`publicIpDns`|DNS of the public ip address for the VM|'fmeserver-{uniqueString}'|
 |`publicIpAllocationMethod`|'Allocation method for the public ip address')|'Dynamic'|
 |`publicIpSku`|Name of the resource group for the public ip address|'Basic'|
-|`publicIpResourceGroup`|Name of the resource group for the existing virtual network||
 |`applicationGatewayName`|Name of the resource group for the existing virtual network|'fmeserver-appgateway'|
 |`engineRegistrationLoadBalancerName`|Name of the resource group for the existing virtual network'|'fmeserver-engineregistration'|
 |`adminUsername`|Admin username on all VMs.||
 |`adminPassword`|Admin password on all VMs.||
+# Todo
+- document how to use existing resources
+- readme files for modules
