@@ -46,7 +46,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_engine" {
     publisher            = "Microsoft.Compute"
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8"
-    settings = jsonencode({
+    protected_settings = jsonencode({
       "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", var.db_fqdn, var.lb_private_ip_address, var.storage_name, var.storage_key)
     })
   }
