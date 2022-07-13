@@ -2,10 +2,12 @@ param(
  [string] $engineregistrationhost,
  [string] $databasehostname,
  [string] $storageAccountName,
- [string] $storageAccountKey
+ [string] $storageAccountKey,
+ [string] $awsRegion,
+ [string] $domainConfig
 )
 
-$private_ip = Invoke-RestMethod -Uri "http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/privateIpAddress?api-version=2017-08-01&format=text"  -Headers @{"Metadata"="true"}
+$private_ip = Invoke-RestMethod -Uri "http://169.254.169.254/latest/meta-data/local-ipv4"  -Headers @{"Metadata"="true"}
 
 $default_values = "C:\Program Files\FMEServer\Config\values.yml"
 $modified_values = "C:\Program Files\FMEServer\Config\values-modified.yml"
@@ -51,7 +53,7 @@ if ($connectTestResult.TcpTestSucceeded) {
     $cred = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
 
     # Mount the drive
-    New-SmbGlobalMapping -RemotePath "$storageAccountName\share" -Credential $cred -LocalPath Z: -FullAccess @("NT AUTHORITY\SYSTEM", "NT AUTHORITY\NetworkService", "Administrator") -Persistent $True
+    New-SmbGlobalMapping -RemotePath "\\$storageAccountName\share" -Credential $cred -LocalPath Z: -FullAccess @("NT AUTHORITY\SYSTEM", "NT AUTHORITY\NetworkService", "Administrator") -Persistent $True
 
 } else {
     Write-Error -Message "Unable to reach the Azure storage account via port 445. Check to make sure your organization or ISP is not blocking port 445, or use Azure P2S VPN, Azure S2S VPN, or Express Route to tunnel SMB traffic over a different port."
@@ -61,7 +63,7 @@ if ($connectTestResult.TcpTestSucceeded) {
 Write-Output "`$username = `"Admin`"" | Out-File -FilePath "C:\startup.ps1"
 Write-Output "`$password = ConvertTo-SecureString `"$storageAccountKey`" -AsPlainText -Force" | Out-File -FilePath "C:\startup.ps1" -Append
 Write-Output "`$cred = New-Object System.Management.Automation.PSCredential -ArgumentList (`$username, `$password)" | Out-File -FilePath "C:\startup.ps1" -Append
-Write-Output "New-SmbGlobalMapping -RemotePath `"$storageAccountName\share`" -Credential `$cred -LocalPath Z: -FullAccess @(`"NT AUTHORITY\SYSTEM`", `"NT AUTHORITY\NetworkService`") -Persistent `$True" | Out-File -FilePath "C:\startup.ps1" -Append
+Write-Output "New-SmbGlobalMapping -RemotePath `"\\$storageAccountName\share`" -Credential `$cred -LocalPath Z: -FullAccess @(`"NT AUTHORITY\SYSTEM`", `"NT AUTHORITY\NetworkService`") -Persistent `$True" | Out-File -FilePath "C:\startup.ps1" -Append
 Write-Output "Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False" | Out-File -FilePath "C:\startup.ps1" -Append
 
 # create a scheduled task to run the above script at startup
@@ -75,3 +77,8 @@ Set-Service -Name "FME Server Engines" -StartupType "Automatic"
 Start-Service -Name "FME Server Engines"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+# Add instance to a file share domain
+Set-DefaultAWSRegion -Region $awsRegion
+Set-Variable -name instance_id -value (Invoke-Restmethod -uri http://169.254.169.254/latest/meta-data/instance-id)
+New-SSMAssociation -InstanceId $instance_id -Name $domainConfig
