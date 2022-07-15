@@ -1,0 +1,23 @@
+<powershell>
+# Add instance to a file share domain
+$awsRegion     = "us-west-2" 
+$domainConfig  = "awsconfig_Domain_d-9267627881_fmeserver.safe"
+
+Set-DefaultAWSRegion -Region $awsRegion
+Set-Variable -name instance_id -value (Invoke-Restmethod -uri http://169.254.169.254/latest/meta-data/instance-id)
+New-SSMAssociation -InstanceId $instance_id -Name $domainConfig
+
+# Create task to initialize FME Server
+$externalhostname   = "fme-core-1-1102777964.us-west-2.elb.amazonaws.com"
+$databasehostname   = "fmeserver1107.cc7icfetou03.us-west-2.rds.amazonaws.com"
+$databaseUsername   = "postgres"
+$databasePassword   = "Fmeserver13! "
+$storageAccountName = "amznfsxvm8sgc5x.fmeserver.safe"
+$storageAccountKey  = "Fmeserver13!" 
+
+$action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_aws.ps1 -databasehostname $databasehostname -databasePassword $databasePassword -databaseUsername $databaseUsername -externalhostname $externalhostname -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1'
+$trigger = New-ScheduledTaskTrigger -AtStartup
+$principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
+$definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
+Register-ScheduledTask -TaskName "coreInit" -InputObject $definition
+<\powershell>

@@ -78,7 +78,4 @@ Start-Service -Name "FME Server Engines"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-# Add instance to a file share domain
-Set-DefaultAWSRegion -Region $awsRegion
-Set-Variable -name instance_id -value (Invoke-Restmethod -uri http://169.254.169.254/latest/meta-data/instance-id)
-New-SSMAssociation -InstanceId $instance_id -Name $domainConfig
+Unregister-ScheduledTask -TaskName "engineInit"
