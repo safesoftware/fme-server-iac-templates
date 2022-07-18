@@ -11,5 +11,4 @@ This module creates load balancer for a distributed FME Server deployment in Azu
 ## Output
 |Output|Description|
 |---|---|
-|`private_ip_address` |Private IP address of the load balancer|
-|`be_address_pool_id`|Backend address poll id of the load balancer|
+|`backend_address_pool_ids` |The IDs of the Backend Address Pool.|
