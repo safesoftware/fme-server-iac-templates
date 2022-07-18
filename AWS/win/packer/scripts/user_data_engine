@@ -5,7 +5,7 @@ $domainConfig  = "awsconfig_Domain_d-9267627881_fmeserver.safe"
 
 Set-DefaultAWSRegion -Region $awsRegion
 Set-Variable -name instance_id -value (Invoke-Restmethod -uri http://169.254.169.254/latest/meta-data/instance-id)
-New-SSMAssociation -InstanceId $instance_id -Name $domainConfig
+New-SSMAssociation -InstanceId $instance_id -Name "$domainConfig"
 
 # Create task to initialize FME Server
 $engineregistrationhost = 
@@ -18,4 +18,4 @@ $trigger = New-ScheduledTaskTrigger -AtStartup
 $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
 $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
 Register-ScheduledTask -TaskName "coreInit" -InputObject $definition
-<\powershell>
+</powershell>

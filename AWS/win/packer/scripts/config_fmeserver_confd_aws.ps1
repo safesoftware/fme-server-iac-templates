@@ -121,5 +121,5 @@ Start-Service -Name "FMEServerAppServer"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
     
-Unregister-ScheduledTask -TaskName "coreInit"
+Unregister-ScheduledTask -TaskName "coreInit" -Confirm:$false
    

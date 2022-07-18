@@ -78,4 +78,4 @@ Start-Service -Name "FME Server Engines"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-Unregister-ScheduledTask -TaskName "engineInit"
+Unregister-ScheduledTask -TaskName "engineInit" -Confirm:$false
