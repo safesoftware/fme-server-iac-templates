@@ -1,7 +1,7 @@
 # FME Server storage module
 This module creates the required storage account and fileshare for a distributed FME Server deployment in Azure.
-## Variables
-|Variable|Description|
+## Parameters
+|Parameter|Description|
 |---|---|
 |`location` | Location for the resources.
 |`tags` | Onwer tag to be added to the resources.

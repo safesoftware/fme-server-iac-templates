@@ -1,8 +1,8 @@
 # FME Server database module
 This module creates a PostgreSQL backend database and its virtual network rule for a distributed FME Server deployment in Azure.
 
-## Variables
-|Variable|Description|
+## Parameters
+|Parameter|Description|
 |---|---|
 |`location` | Location for the resources.
 |`tags` | Onwer tag to be added to the resources.

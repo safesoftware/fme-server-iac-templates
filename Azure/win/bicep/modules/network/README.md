@@ -1,8 +1,8 @@
 # FME Server network module
 This module creates the requires network resources for a distributed FME Server deployment in Azure.
 
-## Variables
-|Variable|Description|
+## Parameters
+|Parameter|Description|
 |---|---|
 |`location` | Location for the resources.
 |`tags` | Onwer tag to be added to the resources.
