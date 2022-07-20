@@ -10,13 +10,13 @@ variable "db_admin_pw" {
   sensitive   = true
 }
 
-variable "be_snet_group_name" {
+variable "rds_sn_group_name" {
   type        = string
-  description = "Backend subnet group name"
+  description = "Name of subnet group for RDS"
 }
 
-variable "security_group_id" {
+variable "sg_id" {
   type = string
-  description = "ID of the FME Server security group"
+  description = "Security group id for FME Server deployment"
   
 }
