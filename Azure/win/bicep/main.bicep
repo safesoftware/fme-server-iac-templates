@@ -99,7 +99,7 @@ module network 'modules/network/network.bicep' = {
   }
 }
 
-module loadBalancer 'modules/lb-services/lb.bicep' = {
+module loadBalancer 'modules/lb-services/lb/lb.bicep' = {
   name: 'fme-server-loadBalancer'
   params: {
     engineRegistrationLoadBalancerName: engineRegistrationLoadBalancerName
@@ -109,7 +109,7 @@ module loadBalancer 'modules/lb-services/lb.bicep' = {
   }
 }
 
-module applicationGateway 'modules/lb-services/agw.bicep' = {
+module applicationGateway 'modules/lb-services/agw/agw.bicep' = {
   name: 'fme-server-agw'
   params: {
     applicationGatewayName: applicationGatewayName
@@ -142,7 +142,7 @@ module storage 'modules/storage/storage.bicep' = {
   }
 }
 
-module vmssCore 'modules/vmss/vmss_core.bicep' = {
+module vmssCore 'modules/vmss/vmss_core/vmss_core.bicep' = {
   name: 'fme-core-vmss'
   params: {
     adminPassword: adminPassword 
@@ -165,7 +165,7 @@ module vmssCore 'modules/vmss/vmss_core.bicep' = {
   }
 }
 
-module vmssEngine 'modules/vmss/vmss_engine.bicep' = {
+module vmssEngine 'modules/vmss/vmss_engine/vmss_engine.bicep' = {
   name: 'fme-engine-vmss'
   params: {
     adminPassword: adminPassword 
