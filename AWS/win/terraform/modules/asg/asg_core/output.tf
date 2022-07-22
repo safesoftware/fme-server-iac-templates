@@ -1,8 +1,3 @@
-output "sg_id" {
-  value = aws_security_group.fmeserver.id
-  description = "Security group id for FME Server deployment"
-}
-
 output "vpc_id" {
   value = aws_vpc.fme_server.id
   description = "VPC id for FME Sever deployment"

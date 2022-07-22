@@ -20,3 +20,4 @@ This module creates the requires network resources for a distributed FME Server 
 |`agw_snet_id` | Application gateway virtual network subnet id.
 |`pip_id` -|Public ip id.
 |`fqdn` | Fully qualified domain name of the A DNS record associated with the public IP.
+

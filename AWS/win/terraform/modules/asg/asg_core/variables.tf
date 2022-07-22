@@ -1,34 +1,55 @@
-variable "vnet_name" {
+variable "vpc_name" {
   type        = string
-  description = "Virtual network name"
+  description = "Virtual private cloud name"
 }
 
-variable "private_snet_name" {
-  type        = string
-  description = "Backend virtual network subnet name"
-}
-
-variable "public_snet_name" {
-  type        = string
-  description = "Application gateway virtual network subnet name"
-}
-
-variable "pip_name" {
-  type        = string
-  description = "Public ip name"
-}
-
-variable "igw_name" {
+variable "fme_core_image_id" {
   type = string
-  description = "Internet gateway name"
+  description = "Id of the FME Sever core image"
 }
 
-variable "nat_name" {
+variable "sg_id" {
   type = string
-  description = "NAT gateway name"
+  description = "Security group id for FME Server deployment"
 }
 
-variable "domain_name_label" {
-  type        = string
-  description = "Label for the Domain Name. Will be used to make up the FQDN"
+variable "iam_instance_profile" {
+  type = string
+  description = "IAM profile to be attached to the instances"
 }
+
+variable "externalhostname" {
+  type = string
+  description = "Public DNS name of the application load balancer"
+}
+
+variable "databasehostname" {
+  type = string
+  description = "DNS name of the RDS database"
+}
+
+variable "databaseUsername" {
+  type = string
+  description = "Admin username for the RDS database"
+  sensitive = true
+}
+
+variable "databasePassword" {
+  type = string
+  description = "Admin passoword for the RDS database"
+}
+
+variable "storageAccountName" {
+  type = string
+  description = "Public DNS name of the FSx file share"
+}
+
+variable "storageAccountKey" {
+  type = string
+  description = "Password for the file share user"
+}
+   
+variable "domainConfig" {
+  type = string
+  description = "Name of the domain configuration used to add new instances to the active directory domain"
+} 

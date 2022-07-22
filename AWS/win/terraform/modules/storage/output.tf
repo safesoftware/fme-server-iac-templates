@@ -3,17 +3,7 @@ output "fsx_dns_name" {
   description = "Security group id for FME Server deployment"
 }
 
-output "ad_name" {
-  value = aws_directory_service_directory.fme_server.name
-  description = "The fully qualified name for the Active Directory"
-}
-
-output "ad_id" {
-  value = aws_directory_service_directory.fme_server.id
-  description = "The id of the Active Directory"
-}
-
-output "ad_dns_ip_addresses" {
-  value = aws_directory_service_directory.fme_server.dns_ip_addresses
-  description = "The DNS ip addresses of the Active Directory"
+output "ssm_document_name" {
+  value = aws_ssm_document.fme_server_ad.name
+  description = "Name of the SSM document used to join instances to the Active Directory"
 }

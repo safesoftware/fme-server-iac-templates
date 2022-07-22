@@ -1,6 +1,6 @@
-variable "vnet_name" {
+variable "vpc_name" {
   type        = string
-  description = "Virtual network name"
+  description = "Virtual private cloud name"
 }
 
 variable "private_snet_name" {
