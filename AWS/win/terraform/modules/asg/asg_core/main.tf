@@ -3,10 +3,10 @@ locals {
     config = {
       "$externalhostname"   = "${var.alb_dns_name}"
       "$databasehostname"   = "${var.db_dns_name}"
-      "$databaseUsername"   = "${var.databaseUsername}"
-      "$databasePassword"   = "${var.databasePassword}"
+      "$databaseUsername"   = "${var.db_admin_user}"
+      "$databasePassword"   = "${var.db_admin_pw}"
       "$storageAccountName" = "${var.fsx_dns_name}"
-      "$storageAccountKey"  = "${var.storageAccountKey}"
+      "$storageAccountKey"  = "${var.ad_admin_pw}"
       "$awsRegion"          = "${aws_region.current.name}" 
       "$domainConfig"       = "${var.ssm_document_name}"  
     }
@@ -44,7 +44,7 @@ resource "aws_autoscaling_group" "fme_sever_core" {
   vpc_zone_identifier = [var.private_sn_az1_id, var.private_sn_az2_id]
   target_group_arns   = [var.core_target_group_arn, var.websocket_target_group_arn, var.engine_registration_target_group_arn]
   launch_template {
-    id      = aws_launch_template.foobar.id
+    id      = aws_launch_template.fme_server_core.id
     version = "$Latest"
   }
   
