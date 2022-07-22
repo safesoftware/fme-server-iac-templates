@@ -54,8 +54,8 @@ build {
   sources = ["source.amazon-ebs.windows"]
   
   provisioner "file" {
-    source = "scripts/config_fmeserver_confd_engine.ps1"
-    destination = "C:\\config_fmeserver_confd_engine.ps1"
+    source = "scripts/config_fmeserver_confd_engine_aws.ps1"
+    destination = "C:\\config_fmeserver_confd_engine_aws.ps1"
   }
 
   provisioner "powershell" {
