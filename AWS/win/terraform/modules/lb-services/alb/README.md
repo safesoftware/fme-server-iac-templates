@@ -1,22 +1,44 @@
 # FME Server network module
 This module creates the requires network resources for a distributed FME Server deployment in Azure.
+<!-- BEGIN_TF_DOCS -->
+## Requirements
 
-## Variables
-|Variable|Description|
-|---|---|
-|`owner` | Specifies the value for the owner tag.
-|`rg_name` | The name of the resource group in which to create the FME Server deployment.
-|`location` | Specifies the supported Azure location where the resource exists.
-|`vnet_name` | Specifies the virtual network name.
-|`be_snet_name` | Specifies backend virtual network subnet name.
-|`agw_snet_name` | Specifies application gateway virtual network subnet name.
-|`pip_name` | Specifies public ip name.
+No requirements.
 
-## Output
-|Output|Description|
-|---|---|
-|`vnet_name` | Virtual network name.
-|`be_snet_id` | Backend virtual network subnet id.
-|`agw_snet_id` | Application gateway virtual network subnet id.
-|`pip_id` -|Public ip id.
-|`fqdn` | Fully qualified domain name of the A DNS record associated with the public IP.
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_lb.fme_server_alb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
+| [aws_lb_listener.fme_server_core](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_listener.fme_server_ws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_target_group.fme_server_core](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
+| [aws_lb_target_group.fme_server_ws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_alb_name"></a> [alb\_name](#input\_alb\_name) | Name of the application load balancer | `string` | n/a | yes |
+| <a name="input_public_sn_az1_id"></a> [public\_sn\_az1\_id](#input\_public\_sn\_az1\_id) | Public subnet id in the first availability zone | `string` | n/a | yes |
+| <a name="input_public_sn_az2_id"></a> [public\_sn\_az2\_id](#input\_public\_sn\_az2\_id) | Public subnet id in the second availability zone | `string` | n/a | yes |
+| <a name="input_sg_id"></a> [sg\_id](#input\_sg\_id) | Security group id for FME Server deployment | `string` | n/a | yes |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC id for FME Sever deployment | `string` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | Public dns name of the application load balancer |
+| <a name="output_core_target_group_arn"></a> [core\_target\_group\_arn](#output\_core\_target\_group\_arn) | The ARN of the FME Server websocket target group |
+<!-- END_TF_DOCS --> 

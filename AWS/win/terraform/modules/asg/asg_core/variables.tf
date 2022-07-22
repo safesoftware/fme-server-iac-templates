@@ -30,13 +30,14 @@ variable "databasehostname" {
 
 variable "databaseUsername" {
   type = string
-  description = "Admin username for the RDS database"
+  description = "Admin username for the RDS database. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DOT NOT HARDCODE."
   sensitive = true
 }
 
 variable "databasePassword" {
   type = string
-  description = "Admin passoword for the RDS database"
+  description = "Admin passoword for the RDS database. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DOT NOT HARDCODE."
+  sensitive = true
 }
 
 variable "storageAccountName" {

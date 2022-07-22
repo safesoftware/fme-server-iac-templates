@@ -30,25 +30,25 @@ variable "agw_backend_address_pool_ids" {
 
 variable "vm_admin_user" {
   type        = string
-  description = "Windows virual machine admin username"
+  description = "Specifies the windows virual machine admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE."
   sensitive   = true
 }
 
 variable "vm_admin_pw" {
   type        = string
-  description = "Windows virual machine admin pw"
+  description = "Specifies the windows virual machine admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE."
   sensitive   = true
 }
 
 variable "db_admin_user" {
   type        = string
-  description = "Backend database admin username"
+  description = "Specifies the backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE."
   sensitive   = true
 }
 
 variable "db_admin_pw" {
   type        = string
-  description = "Backend database admin pw"
+  description = "Specifies the backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE."
   sensitive   = true
 }
 

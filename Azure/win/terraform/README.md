@@ -27,32 +27,65 @@ Once the deployment is complete it is time to test FME Server. The public URL fo
 ### Delete the deployment
 
 To remove the FME Server deployment run `terrform destroy` in your console and confirm the prompt with `yes`.
+<!-- BEGIN_TF_DOCS -->
+## Requirements
 
-## Variables
-|Variable|Description|
-|---|---|
-|`owner` | Specifies the default value for onwer tag.|
-|`rg_name` | Specifies the resource group name.|
-|`location` | Specifies the location of resources.|
-|`vnet_name` | Specifies the virtual network name.|
-|`be_snet_name` | Specifies the backend virtual network subnet name.|
-|`agw_snet_name` | Specifies the application gateway virtual network subnet name.|
-|`pip_name` | Specifies the public ip name.|
-|`domain_name_label` | Specifies the label for the Domain Name. Will be used to make up the FQDN.|
-|`lb_name` | Specifies the load balancer name.|
-|`agw_name` | Specifies the application gateway name.|
-|`vm_admin_user` | Specifies the windows virual machine admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
-|`vm_admin_pw` | Specifies the windows virual machine admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
-|`db_admin_user` | Specifies the backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
-|`db_admin_pw` | Specifies the backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
-|`db_user` | The login for the fmeserver database (Only used for Azure SQL Server). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
-|`db_pw` | The password for the fmeserver database (Only used for Azure SQL Server. Please review the [SQL Server Password Policy](https://docs.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=azuresqldb-current)). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE.|
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 3.9.0 |
 
-## Output
-|Output|Description|
-|---|---|
-|`fme_server_fqdn` | "External hostname of FME Server"|
+## Providers
 
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.9.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_application_gateway"></a> [application\_gateway](#module\_application\_gateway) | ./modules/lb-services/agw | n/a |
+| <a name="module_database"></a> [database](#module\_database) | ./modules/database/sql_server | n/a |
+| <a name="module_load_balancer"></a> [load\_balancer](#module\_load\_balancer) | ./modules/lb-services/lb | n/a |
+| <a name="module_network"></a> [network](#module\_network) | ./modules/network | n/a |
+| <a name="module_storage"></a> [storage](#module\_storage) | ./modules/storage | n/a |
+| <a name="module_vmss_core"></a> [vmss\_core](#module\_vmss\_core) | ./modules/vmss/vmss_core_sql_server | n/a |
+| <a name="module_vmss_engine"></a> [vmss\_engine](#module\_vmss\_engine) | ./modules/vmss/vmss_engine_sql_server | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_resource_group.fme_server](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_agw_name"></a> [agw\_name](#input\_agw\_name) | Application gateway name | `string` | `"fme-server-agw"` | no |
+| <a name="input_agw_snet_name"></a> [agw\_snet\_name](#input\_agw\_snet\_name) | Application gateway virtual network subnet name | `string` | `"fme-server-agw-snet"` | no |
+| <a name="input_be_snet_name"></a> [be\_snet\_name](#input\_be\_snet\_name) | Backend virtual network subnet name | `string` | `"fme-server-be-snet"` | no |
+| <a name="input_db_admin_pw"></a> [db\_admin\_pw](#input\_db\_admin\_pw) | Specifies the backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_db_admin_user"></a> [db\_admin\_user](#input\_db\_admin\_user) | Specifies the backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_db_pw"></a> [db\_pw](#input\_db\_pw) | The password for the fmeserver database (Only used for Azure SQL Server. Please review the [SQL Server Password Policy](https://docs.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=azuresqldb-current)). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_db_user"></a> [db\_user](#input\_db\_user) | The login for the fmeserver database (Only used for Azure SQL Server). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_domain_name_label"></a> [domain\_name\_label](#input\_domain\_name\_label) | Label for the Domain Name. Will be used to make up the FQDN | `string` | `"fmeserver"` | no |
+| <a name="input_lb_name"></a> [lb\_name](#input\_lb\_name) | Load balancer name | `string` | `"fme-server-lb"` | no |
+| <a name="input_location"></a> [location](#input\_location) | Location of resources | `string` | `"Canada Central"` | no |
+| <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | `"gf"` | no |
+| <a name="input_pip_name"></a> [pip\_name](#input\_pip\_name) | Public ip name | `string` | `"fme-server-pip"` | no |
+| <a name="input_rg_name"></a> [rg\_name](#input\_rg\_name) | Resource group name | `string` | `"terraform-rg"` | no |
+| <a name="input_vm_admin_pw"></a> [vm\_admin\_pw](#input\_vm\_admin\_pw) | Specifies the windows virual machine admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_vm_admin_user"></a> [vm\_admin\_user](#input\_vm\_admin\_user) | Specifies the windows virual machine admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DOT NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_vnet_name"></a> [vnet\_name](#input\_vnet\_name) | Virtual network name | `string` | `"fme-server-vnet"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_fme_server_fqdn"></a> [fme\_server\_fqdn](#output\_fme\_server\_fqdn) | External hostname of FME Server |
+<!-- END_TF_DOCS --> 
 ## Modifying resources
 The terraform scripts provide an easy way to read and modify the configuration.
 ### Changing Resource configurations
