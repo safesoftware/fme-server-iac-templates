@@ -1,5 +1,5 @@
 # FME Server network module
-This module creates the requires network resources for a distributed FME Server deployment in Azure.
+This module creates the application load balancer for a distributed FME Server deployment in AWS.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

@@ -3,12 +3,12 @@ variable "vpc_name" {
   description = "Virtual private cloud name"
 }
 
-variable "private_snet_name" {
+variable "private_sn_name" {
   type        = string
   description = "Backend virtual network subnet name"
 }
 
-variable "public_snet_name" {
+variable "public_sn_name" {
   type        = string
   description = "Application gateway virtual network subnet name"
 }

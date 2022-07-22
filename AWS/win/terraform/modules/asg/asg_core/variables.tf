@@ -18,14 +18,9 @@ variable "iam_instance_profile" {
   description = "IAM profile to be attached to the instances"
 }
 
-variable "externalhostname" {
+variable db_dns_name {
   type = string
-  description = "Public DNS name of the application load balancer"
-}
-
-variable "databasehostname" {
-  type = string
-  description = "DNS name of the RDS database"
+  description = "Fully qualified domain name of the postgresql database server"
 }
 
 variable "databaseUsername" {
@@ -40,9 +35,14 @@ variable "databasePassword" {
   sensitive = true
 }
 
-variable "storageAccountName" {
+variable "fsx_dns_name" {
   type = string
-  description = "Public DNS name of the FSx file share"
+  description = "Security group id for FME Server deployment"
+}
+
+variable "ssm_document_name" {
+  type = string
+  description = "Name of the SSM document used to join instances to the Active Directory"
 }
 
 variable "storageAccountKey" {
@@ -50,7 +50,32 @@ variable "storageAccountKey" {
   description = "Password for the file share user"
 }
    
-variable "domainConfig" {
+variable "alb_dns_name" {
   type = string
-  description = "Name of the domain configuration used to add new instances to the active directory domain"
-} 
+  description = "Public dns name of the application load balancer"
+}
+
+variable "core_target_group_arn" {
+  type = string
+  description = "The ARN of the FME Server core target group"
+}
+
+variable "websocket_target_group_arn" {
+  type = string
+  description = "The ARN of the FME Server websocket target group"
+}
+
+variable "engine_registration_target_group_arn" {
+  type = string
+  description = "The ARN of the FME Server engine registration target group"
+}
+
+variable "private_sn_az2_id" {
+  type = string
+  description = "Private subnet id in the second availability zone"
+}
+
+variable "private_sn_az1_id" {
+  type = string
+  description = "Private subnet id in the first availability zone"
+}

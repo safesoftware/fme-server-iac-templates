@@ -1,5 +1,5 @@
 # FME Server database module
-This module creates a PostgreSQL backend database and its virtual network rule for a distributed FME Server deployment in Azure.
+This module creates a PostgreSQL backend database and its virtual network rule for a distributed FME Server deployment in AWS.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

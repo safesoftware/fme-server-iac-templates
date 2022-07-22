@@ -5,11 +5,11 @@ data "aws_vpc" "fme_server" {
 }
 
 data "aws_subnet" "private_subnet_az1" {
-  id = aws_route_table_association.private_subnet_az1
+  id = aws_subnet.private_subnet_az1.id
 }
 
 data "aws_subnet" "private_subnet_az2" {
-  id = aws_route_table_association.private_subnet_az2
+  id = aws_subnet.private_subnet_az2.id
 }
 
 resource "aws_vpc" "fme_server" {
@@ -17,43 +17,43 @@ resource "aws_vpc" "fme_server" {
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
-    "Name"    = var.vnet_name
+    "Name"    = var.vpc_name
   }
 }
 
 resource "aws_subnet" "public_subnet_az1" {
   vpc_id            = aws_vpc.fme_server.id
   cidr_block        = "10.0.0.0/20"
-  availability_zone = format("%sa", aws_region.current.name)
+  availability_zone = format("%sa", data.aws_region.current.name)
   tags = {
-    "Name"    = format("%s-public1-%sa", var.public_snet_name, aws_region.current.name)
+    "Name"    = format("%s-public1-%sa", var.public_sn_name, data.aws_region.current.name)
   }
 }
 
 resource "aws_subnet" "public_subnet_az2" {
   vpc_id            = aws_vpc.fme_server.id
   cidr_block        = "10.0.16.0/20"
-  availability_zone = format("%sa", aws_region.current.name)
+  availability_zone = format("%sa", data.aws_region.current.name)
   tags = {
-    "Name"    = format("%s-public2-%sa", var.public_snet_name, aws_region.current.name)
+    "Name"    = format("%s-public2-%sa", var.public_sn_name, data.aws_region.current.name)
   }
 }
 
 resource "aws_subnet" "private_subnet_az1" {
   vpc_id            = aws_vpc.fme_server.id
   cidr_block        = "10.0.128.0/20"
-  availability_zone = format("%sa", aws_region.current.name)
+  availability_zone = format("%sa", data.aws_region.current.name)
   tags = {
-    "Name"    = format("%s-private1-%sa", var.public_snet_name, aws_region.current.name)
+    "Name"    = format("%s-private1-%sa", var.public_sn_name, data.aws_region.current.name)
   }
 }
 
 resource "aws_subnet" "private_subnet_az2" {
   vpc_id            = aws_vpc.fme_server.id
   cidr_block        = "10.0.144.0/20"
-  availability_zone = format("%sa", aws_region.current.name)
+  availability_zone = format("%sa", data.aws_region.current.name)
   tags = {
-    "Name"    = format("%s-private2-%sa", var.public_snet_name, aws_region.current.name)
+    "Name"    = format("%s-private2-%sa", var.public_sn_name, data.aws_region.current.name)
   }
 }
 
@@ -85,12 +85,12 @@ resource "aws_default_route_table" "fmeserver_default_rt" {
 
 resource "aws_route_table_association" "private_subnet_az1" {
   subnet_id = aws_subnet.private_subnet_az1.id
-  route_table_id = aws_default_route_table.fmeserver_default_rt
+  route_table_id = aws_default_route_table.fmeserver_default_rt.id
 }
 
 resource "aws_route_table_association" "private_subnet_az2" {
   subnet_id = aws_subnet.private_subnet_az2.id
-  route_table_id = aws_default_route_table.fmeserver_default_rt
+  route_table_id = aws_default_route_table.fmeserver_default_rt.id
 }
 
 resource "aws_route_table" "fmeserver_public_rt" {
@@ -107,12 +107,12 @@ resource "aws_route_table" "fmeserver_public_rt" {
 
 resource "aws_route_table_association" "public_subnet_az1" {
   subnet_id = aws_subnet.public_subnet_az1.id
-  route_table_id = aws_route_table.fmeserver_public_rt
+  route_table_id = aws_route_table.fmeserver_public_rt.id
 }
 
 resource "aws_route_table_association" "public_subnet_az2" {
   subnet_id = aws_subnet.public_subnet_az2.id
-  route_table_id = aws_route_table.fmeserver_public_rt
+  route_table_id = aws_route_table.fmeserver_public_rt.id
 }
 
 resource "aws_db_subnet_group" "rds_subnet_roup" {
