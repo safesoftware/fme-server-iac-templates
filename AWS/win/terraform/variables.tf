@@ -81,9 +81,3 @@ variable "db_admin_pw" {
   description = "Backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE."
   sensitive   = true
 }
-
-variable "iam_instance_profile" {
-  type        = string
-  default     = "test"
-  description = "iam_instance_profile"
-}
