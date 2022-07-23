@@ -1,5 +1,5 @@
 # FME Server network module
-This module creates the requires network resources for a distributed FME Server deployment in Azure.
+This module creates the application load balancer for a distributed FME Server deployment in AWS.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -40,5 +40,6 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | Public dns name of the application load balancer |
-| <a name="output_core_target_group_arn"></a> [core\_target\_group\_arn](#output\_core\_target\_group\_arn) | The ARN of the FME Server websocket target group |
+| <a name="output_core_target_group_arn"></a> [core\_target\_group\_arn](#output\_core\_target\_group\_arn) | The ARN of the FME Server core target group |
+| <a name="output_websocket_target_group_arn"></a> [websocket\_target\_group\_arn](#output\_websocket\_target\_group\_arn) | The ARN of the FME Server websocket target group |
 <!-- END_TF_DOCS --> 

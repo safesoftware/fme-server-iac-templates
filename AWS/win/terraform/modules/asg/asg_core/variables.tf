@@ -18,39 +18,65 @@ variable "iam_instance_profile" {
   description = "IAM profile to be attached to the instances"
 }
 
-variable "externalhostname" {
+variable "db_dns_name" {
   type = string
-  description = "Public DNS name of the application load balancer"
+  description = "Fully qualified domain name of the postgresql database server"
 }
 
-variable "databasehostname" {
-  type = string
-  description = "DNS name of the RDS database"
+variable "db_admin_user" {
+  type        = string
+  description = "Backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DOT NOT HARDCODE."
+  sensitive   = true
 }
 
-variable "databaseUsername" {
+variable "db_admin_pw" {
+  type        = string
+  description = "Backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DOT NOT HARDCODE."
+  sensitive   = true
+}
+
+variable "ad_admin_pw" {
   type = string
-  description = "Admin username for the RDS database. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DOT NOT HARDCODE."
+  description = "Password of the admin user of the Active Directory service. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE."
   sensitive = true
 }
 
-variable "databasePassword" {
+variable "fsx_dns_name" {
   type = string
-  description = "Admin passoword for the RDS database. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DOT NOT HARDCODE."
-  sensitive = true
+  description = "Security group id for FME Server deployment"
 }
 
-variable "storageAccountName" {
+variable "ssm_document_name" {
   type = string
-  description = "Public DNS name of the FSx file share"
-}
-
-variable "storageAccountKey" {
-  type = string
-  description = "Password for the file share user"
+  description = "Name of the SSM document used to join instances to the Active Directory"
 }
    
-variable "domainConfig" {
+variable "alb_dns_name" {
   type = string
-  description = "Name of the domain configuration used to add new instances to the active directory domain"
-} 
+  description = "Public dns name of the application load balancer"
+}
+
+variable "core_target_group_arn" {
+  type = string
+  description = "The ARN of the FME Server core target group"
+}
+
+variable "websocket_target_group_arn" {
+  type = string
+  description = "The ARN of the FME Server websocket target group"
+}
+
+variable "engine_registration_target_group_arn" {
+  type = string
+  description = "The ARN of the FME Server engine registration target group"
+}
+
+variable "private_sn_az2_id" {
+  type = string
+  description = "Private subnet id in the second availability zone"
+}
+
+variable "private_sn_az1_id" {
+  type = string
+  description = "Private subnet id in the first availability zone"
+}

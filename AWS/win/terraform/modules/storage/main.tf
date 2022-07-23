@@ -1,6 +1,6 @@
 resource "aws_directory_service_directory" "fme_server" {
   name     = var.ad_name
-  password = var.ad_admin_user
+  password = var.ad_admin_pw
   edition  = "Standard"
   type     = "MicrosoftAD"
 
@@ -19,8 +19,9 @@ resource "aws_fsx_windows_file_system" "fme_server" {
 }
 
 resource "aws_ssm_document" "fme_server_ad" {
-  name          = "test_document"
-  document_type = "Command"
+  name            = "test_document"
+  document_format = "YAML"
+  document_type   = "Command"
 
   content = <<DOC
   ---

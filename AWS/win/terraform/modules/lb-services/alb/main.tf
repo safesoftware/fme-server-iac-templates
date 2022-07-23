@@ -3,7 +3,7 @@ resource "aws_lb" "fme_server_alb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [var.sg_id]
-  subnets            = [var.public_sn_az1_id, var.public_subnet_az2]
+  subnets            = [var.public_sn_az1_id, var.public_sn_az2_id]
 
   enable_deletion_protection = true
 }
