@@ -32,7 +32,10 @@ To remove the FME Server deployment run `terrform destroy` in your console and c
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.29.6 |
 
 ## Providers
 
@@ -42,13 +45,13 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_alb"></a> [alb](#module\_alb) |  | n/a |
-| <a name="module_asg_core"></a> [asg\_core](#module\_asg\_core) |  | n/a |
-| <a name="module_asg_engine"></a> [asg\_engine](#module\_asg\_engine) |  | n/a |
-| <a name="module_database"></a> [database](#module\_database) |  | n/a |
-| <a name="module_network"></a> [network](#module\_network) |  | n/a |
-| <a name="module_nlb"></a> [nlb](#module\_nlb) |  | n/a |
-| <a name="module_storage"></a> [storage](#module\_storage) |  | n/a |
+| <a name="module_alb"></a> [alb](#module\_alb) | ./modules/lb-services/alb/ | n/a |
+| <a name="module_asg_core"></a> [asg\_core](#module\_asg\_core) | ./modules/asg/asg_core/ | n/a |
+| <a name="module_asg_engine"></a> [asg\_engine](#module\_asg\_engine) | ./modules/asg/asg_engine/ | n/a |
+| <a name="module_database"></a> [database](#module\_database) | ./modules/database/ | n/a |
+| <a name="module_network"></a> [network](#module\_network) | ./modules/network/ | n/a |
+| <a name="module_nlb"></a> [nlb](#module\_nlb) | ./modules/lb-services/nlb/ | n/a |
+| <a name="module_storage"></a> [storage](#module\_storage) | ./modules/storage/ | n/a |
 
 ## Resources
 
@@ -56,9 +59,27 @@ No resources.
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_ad_admin_pw"></a> [ad\_admin\_pw](#input\_ad\_admin\_pw) | Password of the admin user of the Active Directory service. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_ad_name"></a> [ad\_name](#input\_ad\_name) | Name of the Active Directory service | `string` | `"tf-fmeserver.safe"` | no |
+| <a name="input_alb_name"></a> [alb\_name](#input\_alb\_name) | Name of the application load balancer | `string` | `"tf-application-lb"` | no |
+| <a name="input_db_admin_pw"></a> [db\_admin\_pw](#input\_db\_admin\_pw) | Backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_db_admin_user"></a> [db\_admin\_user](#input\_db\_admin\_user) | Backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_fme_core_image_id"></a> [fme\_core\_image\_id](#input\_fme\_core\_image\_id) | Id of the FME Sever core image | `string` | `"ami-033c4d4d7d4b334ab"` | no |
+| <a name="input_fme_engine_image_id"></a> [fme\_engine\_image\_id](#input\_fme\_engine\_image\_id) | Id of the FME Sever core image | `string` | `"ami-01bcc4b2970e7bead"` | no |
+| <a name="input_iam_instance_profile"></a> [iam\_instance\_profile](#input\_iam\_instance\_profile) | iam\_instance\_profile | `string` | `"test"` | no |
+| <a name="input_igw_name"></a> [igw\_name](#input\_igw\_name) | Internet gateway name | `string` | `"tf-internet-gw"` | no |
+| <a name="input_nat_name"></a> [nat\_name](#input\_nat\_name) | NAT gateway name | `string` | `"tf-nat-gw"` | no |
+| <a name="input_nlb_name"></a> [nlb\_name](#input\_nlb\_name) | Name of the network load balancer | `string` | `"tf-network-lb"` | no |
+| <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | `"gf"` | no |
+| <a name="input_private_sn_name"></a> [private\_sn\_name](#input\_private\_sn\_name) | Backend virtual network subnet name | `string` | `"tf-private-subnet"` | no |
+| <a name="input_public_sn_name"></a> [public\_sn\_name](#input\_public\_sn\_name) | Application gateway virtual network subnet name | `string` | `"tf-public-subnet"` | no |
+| <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Virtual private cloud name | `string` | `"tf-vpc"` | no |
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | Public dns name of the application load balancer |
 <!-- END_TF_DOCS --> 

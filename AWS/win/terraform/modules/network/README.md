@@ -43,12 +43,10 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_domain_name_label"></a> [domain\_name\_label](#input\_domain\_name\_label) | Label for the Domain Name. Will be used to make up the FQDN | `string` | n/a | yes |
 | <a name="input_igw_name"></a> [igw\_name](#input\_igw\_name) | Internet gateway name | `string` | n/a | yes |
 | <a name="input_nat_name"></a> [nat\_name](#input\_nat\_name) | NAT gateway name | `string` | n/a | yes |
-| <a name="input_pip_name"></a> [pip\_name](#input\_pip\_name) | Public ip name | `string` | n/a | yes |
-| <a name="input_private_snet_name"></a> [private\_snet\_name](#input\_private\_snet\_name) | Backend virtual network subnet name | `string` | n/a | yes |
-| <a name="input_public_snet_name"></a> [public\_snet\_name](#input\_public\_snet\_name) | Application gateway virtual network subnet name | `string` | n/a | yes |
+| <a name="input_private_sn_name"></a> [private\_sn\_name](#input\_private\_sn\_name) | Backend virtual network subnet name | `string` | n/a | yes |
+| <a name="input_public_sn_name"></a> [public\_sn\_name](#input\_public\_sn\_name) | Application gateway virtual network subnet name | `string` | n/a | yes |
 | <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Virtual private cloud name | `string` | n/a | yes |
 
 ## Outputs

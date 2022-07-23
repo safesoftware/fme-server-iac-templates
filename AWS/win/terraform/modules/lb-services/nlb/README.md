@@ -37,6 +37,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_core_target_group_arn"></a> [core\_target\_group\_arn](#output\_core\_target\_group\_arn) | The ARN of the FME Server engine registration target group |
-| <a name="output_nlb_dns_name"></a> [nlb\_dns\_name](#output\_nlb\_dns\_name) | Public dns name of the application load balancer |
+| <a name="output_engine_registration_target_group_arn"></a> [engine\_registration\_target\_group\_arn](#output\_engine\_registration\_target\_group\_arn) | The ARN of the FME Server engine registration target group |
+| <a name="output_nlb_dns_name"></a> [nlb\_dns\_name](#output\_nlb\_dns\_name) | Public dns name of the network load balancer |
 <!-- END_TF_DOCS --> 
