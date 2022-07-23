@@ -49,6 +49,7 @@ No providers.
 | <a name="module_asg_core"></a> [asg\_core](#module\_asg\_core) | ./modules/asg/asg_core/ | n/a |
 | <a name="module_asg_engine"></a> [asg\_engine](#module\_asg\_engine) | ./modules/asg/asg_engine/ | n/a |
 | <a name="module_database"></a> [database](#module\_database) | ./modules/database/ | n/a |
+| <a name="module_iam"></a> [iam](#module\_iam) | ./modules/iam/ | n/a |
 | <a name="module_network"></a> [network](#module\_network) | ./modules/network/ | n/a |
 | <a name="module_nlb"></a> [nlb](#module\_nlb) | ./modules/lb-services/nlb/ | n/a |
 | <a name="module_storage"></a> [storage](#module\_storage) | ./modules/storage/ | n/a |

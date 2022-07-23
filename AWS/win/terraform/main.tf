@@ -62,12 +62,16 @@ module "nlb" {
   private_sn_az1_id = module.network.private_sn_az1_id
 }
 
+module "iam" {
+  source = "./modules/iam/"
+}
+
 module "asg_core" {
   source                               = "./modules/asg/asg_core/"
   vpc_name                             = var.vpc_name
   fme_core_image_id                    = var.fme_core_image_id
   sg_id                                = module.network.sg_id
-  iam_instance_profile                 = var.iam_instance_profile
+  iam_instance_profile                 = module.iam.iam_instance_profile
   db_dns_name                          = module.database.db_dns_name
   db_admin_user                        = var.db_admin_user
   db_admin_pw                          = var.db_admin_pw
@@ -87,7 +91,7 @@ module "asg_engine" {
   vpc_name                             = var.vpc_name
   fme_engine_image_id                  = var.fme_engine_image_id
   sg_id                                = module.network.sg_id
-  iam_instance_profile                 = var.iam_instance_profile
+  iam_instance_profile                 = module.iam.iam_instance_profile
   db_dns_name                          = module.database.db_dns_name
   ad_admin_pw                          = var.ad_admin_pw
   fsx_dns_name                         = module.storage.fsx_dns_name
