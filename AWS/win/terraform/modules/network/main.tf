@@ -74,10 +74,20 @@ resource "aws_nat_gateway" "fme_server" {
 resource "aws_default_route_table" "fmeserver_default_rt" {
   default_route_table_id = aws_vpc.fme_server.default_route_table_id
 
-  route = {
-    cidr_block = "0.0.0.0/"
-    nat_gateway_id = aws_nat_gateway.fme_server.id
-  }
+  route = [{
+    cidr_block                 = "0.0.0.0/0"
+    nat_gateway_id             = aws_nat_gateway.fme_server.id
+    core_network_arn           = ""
+    destination_prefix_list_id = ""
+    egress_only_gateway_id     = ""
+    gateway_id                 = ""
+    instance_id                = ""
+    ipv6_cidr_block            = ""
+    network_interface_id       = ""
+    transit_gateway_id         = ""
+    vpc_endpoint_id            = ""
+    vpc_peering_connection_id  = ""
+  }]
   tags = {
     "Name"    = "Private subnets route table"
   } 
@@ -96,10 +106,22 @@ resource "aws_route_table_association" "private_subnet_az2" {
 resource "aws_route_table" "fmeserver_public_rt" {
   vpc_id = aws_vpc.fme_server.id
 
-  route = {
+  route = [{
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.fme_server.id
-  } 
+    core_network_arn           = ""
+    destination_prefix_list_id = ""
+    egress_only_gateway_id     = ""
+    nat_gateway_id             = ""
+    instance_id                = ""
+    ipv6_cidr_block            = ""
+    network_interface_id       = ""
+    transit_gateway_id         = ""
+    vpc_endpoint_id            = ""
+    vpc_peering_connection_id  = ""
+    carrier_gateway_id         = ""
+    local_gateway_id           = ""
+  }] 
     tags = {
     "Name"    = "Public subnets route table"
   } 
@@ -135,6 +157,10 @@ resource "aws_security_group" "fmeserver" {
       from_port        = 0
       to_port          = 0
       self             = true
+      cidr_blocks      = []
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
     },
     {
       description      = "Web UI from local IP"
@@ -142,6 +168,11 @@ resource "aws_security_group" "fmeserver" {
       from_port        = 80
       to_port          = 80
       cidr_blocks      = ["50.68.182.79/32"]
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
+      
     },
     {
       description      = "Web socket from local IP"
@@ -149,6 +180,10 @@ resource "aws_security_group" "fmeserver" {
       from_port        = 7078
       to_port          = 7078
       cidr_blocks      = ["50.68.182.79/32"]
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
     },
     {
       description      = "Web UI from NAT gateway"
@@ -156,6 +191,10 @@ resource "aws_security_group" "fmeserver" {
       from_port        = 80
       to_port          = 80
       cidr_blocks      = []
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
     },
     {
       description      = "Engine registration health check"
@@ -163,6 +202,10 @@ resource "aws_security_group" "fmeserver" {
       from_port        = 8080
       to_port          = 8080
       cidr_blocks      = [data.aws_vpc.fme_server.cidr_block]
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
     },
     {
       description      = "Engine registration AZ 1"
@@ -170,6 +213,10 @@ resource "aws_security_group" "fmeserver" {
       from_port        = 7070
       to_port          = 7070
       cidr_blocks      = [data.aws_subnet.private_subnet_az1.cidr_block]
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
     },
     {
       description      = "Engine registration AZ 2"
@@ -177,6 +224,10 @@ resource "aws_security_group" "fmeserver" {
       from_port        = 7070
       to_port          = 7070
       cidr_blocks      = [data.aws_subnet.private_subnet_az2.cidr_block]
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
     }
   ]
 
@@ -187,6 +238,10 @@ resource "aws_security_group" "fmeserver" {
       from_port        = 0
       to_port          = 0
       cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
     }
   ]
 

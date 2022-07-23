@@ -1,9 +1,11 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = ">= 3.29.6"
     }
   }
+  required_version = ">= 1.1.0"
 }
 
 provider "aws" {
@@ -70,12 +72,12 @@ module "asg_core" {
   db_admin_user                        = var.db_admin_user
   db_admin_pw                          = var.db_admin_pw
   ad_admin_pw                          = var.ad_admin_pw
-  fsx_dns_name                         = var.fsx_dns_name
-  ssm_document_name                    = var.ssm_document_name
+  fsx_dns_name                         = module.storage.fsx_dns_name
+  ssm_document_name                    = module.storage.ssm_document_name
   alb_dns_name                         = module.alb.alb_dns_name
   core_target_group_arn                = module.alb.core_target_group_arn
   websocket_target_group_arn           = module.alb.websocket_target_group_arn
-  engine_registration_target_group_arn = module.nbl.engine_registration_target_group_arn
+  engine_registration_target_group_arn = module.nlb.engine_registration_target_group_arn
   private_sn_az2_id                    = module.network.private_sn_az2_id
   private_sn_az1_id                    = module.network.private_sn_az1_id
 }
@@ -83,14 +85,14 @@ module "asg_core" {
 module "asg_engine" {
   source                               = "./modules/asg/asg_engine/"
   vpc_name                             = var.vpc_name
-  fme_core_image_id                    = var.fme_engine_image_id
+  fme_engine_image_id                  = var.fme_engine_image_id
   sg_id                                = module.network.sg_id
   iam_instance_profile                 = var.iam_instance_profile
   db_dns_name                          = module.database.db_dns_name
   ad_admin_pw                          = var.ad_admin_pw
-  fsx_dns_name                         = var.fsx_dns_name
-  ssm_document_name                    = var.ssm_document_name
-  alb_dns_name                         = module.alb.alb_dns_name
+  fsx_dns_name                         = module.storage.fsx_dns_name
+  ssm_document_name                    = module.storage.ssm_document_name
+  nlb_dns_name                         = module.nlb.nlb_dns_name
   private_sn_az2_id                    = module.network.private_sn_az2_id
   private_sn_az1_id                    = module.network.private_sn_az1_id
 }

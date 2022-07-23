@@ -7,7 +7,7 @@ locals {
       "$databasePassword"   = "${var.db_admin_pw}"
       "$storageAccountName" = "${var.fsx_dns_name}"
       "$storageAccountKey"  = "${var.ad_admin_pw}"
-      "$awsRegion"          = "${aws_region.current.name}" 
+      "$awsRegion"          = "${data.aws_region.current.name}" 
       "$domainConfig"       = "${var.ssm_document_name}"  
     }
 }
@@ -34,7 +34,7 @@ resource "aws_launch_template" "fme_server_core" {
     }
   }
 
-  user_data = filebase64(templatefile("./user_data/user_data_core.tftpl", { config = local.config }))
+  user_data = filebase64(templatefile("${path.module}/user_data/user_data_core.tftpl", { config = local.config }))
 }
 
 resource "aws_autoscaling_group" "fme_sever_core" {
@@ -46,10 +46,6 @@ resource "aws_autoscaling_group" "fme_sever_core" {
   launch_template {
     id      = aws_launch_template.fme_server_core.id
     version = "$Latest"
-  }
-  
-  tags = {
-    "Name"    = "fme-core"
   }
 }
 
