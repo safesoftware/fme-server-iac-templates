@@ -1,19 +1,19 @@
 variable "nlb_name" {
-  type = string
+  type        = string
   description = "Name of the network load balancer"
 }
 
 variable "vpc_id" {
-  type = string
+  type        = string
   description = "VPC id for FME Sever deployment"
 }
 
 variable "private_sn_az2_id" {
-  type = string
+  type        = string
   description = "Private subnet id in the second availability zone"
 }
 
 variable "private_sn_az1_id" {
-  type = string
+  type        = string
   description = "Private subnet id in the first availability zone"
 }

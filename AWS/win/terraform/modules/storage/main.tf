@@ -17,7 +17,7 @@ resource "aws_fsx_windows_file_system" "fme_server" {
   security_group_ids  = [var.sg_id]
   preferred_subnet_id = var.private_sn_az1_id
   throughput_capacity = 32
-  deployment_type = "MULTI_AZ_1"
+  deployment_type     = "MULTI_AZ_1"
 }
 
 locals {

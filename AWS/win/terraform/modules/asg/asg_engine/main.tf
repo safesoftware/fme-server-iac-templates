@@ -1,12 +1,12 @@
 data "aws_region" "current" {}
 locals {
-    config = {
-      "$engineregistrationhost" = "${var.nlb_dns_name}"
-      "$rds_secrets_arn"        = "${var.rds_secrets_arn}"
-      "$fsx_secrets_arn"        = "${var.fsx_secrets_arn}"
-      "$awsRegion"              = "${data.aws_region.current.name}" 
-      "$domainConfig"           = "${var.ssm_document_name}"  
-    }
+  config = {
+    "$engineregistrationhost" = "${var.nlb_dns_name}"
+    "$rds_secrets_arn"        = "${var.rds_secrets_arn}"
+    "$fsx_secrets_arn"        = "${var.fsx_secrets_arn}"
+    "$awsRegion"              = "${data.aws_region.current.name}"
+    "$domainConfig"           = "${var.ssm_document_name}"
+  }
 }
 
 resource "aws_launch_template" "fme_server_engine" {

@@ -13,18 +13,18 @@ provider "aws" {
   region  = "ca-central-1"
   default_tags {
     tags = {
-      "Owner"   = var.owner
+      "Owner" = var.owner
     }
   }
 }
 
 module "network" {
-  source           = "./modules/network/"
-  vpc_name         = var.vpc_name
-  sn_name          = var.sn_name
-  igw_name         = var.igw_name
-  eip_name         = var.eip_name
-  nat_name         = var.nat_name
+  source   = "./modules/network/"
+  vpc_name = var.vpc_name
+  sn_name  = var.sn_name
+  igw_name = var.igw_name
+  eip_name = var.eip_name
+  nat_name = var.nat_name
 }
 
 module "storage" {
@@ -63,13 +63,13 @@ module "nlb" {
 }
 
 module "iam" {
-  source               = "./modules/iam/"
-  rds_secrets_arn      = module.secrets.rds_secrets_arn
-  fsx_secrets_arn      = module.secrets.fsx_secrets_arn
+  source          = "./modules/iam/"
+  rds_secrets_arn = module.secrets.rds_secrets_arn
+  fsx_secrets_arn = module.secrets.fsx_secrets_arn
 }
 
 module "secrets" {
-  source = "./modules/secrets/"
+  source        = "./modules/secrets/"
   fsx_dns_name  = module.storage.fsx_dns_name
   db_dns_name   = module.database.db_dns_name
   ad_admin_pw   = var.ad_admin_pw

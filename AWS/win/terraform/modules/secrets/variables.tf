@@ -1,10 +1,10 @@
 variable "fsx_dns_name" {
-  type = string
+  type        = string
   description = "Security group id for FME Server deployment"
 }
 
 variable "db_dns_name" {
-  type = string
+  type        = string
   description = "Fully qualified domain name of the postgresql database server"
 }
 

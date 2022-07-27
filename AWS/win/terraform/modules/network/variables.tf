@@ -8,16 +8,16 @@ variable "sn_name" {
   description = "Subnet name prefix"
 }
 variable "igw_name" {
-  type = string
+  type        = string
   description = "Internet gateway name"
 }
 
 variable "eip_name" {
-  type = string
-  description = "Elastic IP name"  
+  type        = string
+  description = "Elastic IP name"
 }
 
 variable "nat_name" {
-  type = string
+  type        = string
   description = "NAT gateway name"
 }

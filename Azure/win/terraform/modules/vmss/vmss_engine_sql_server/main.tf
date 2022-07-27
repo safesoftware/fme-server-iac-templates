@@ -1,5 +1,5 @@
 locals {
-    default_tags                   = { owner = var.owner }
+  default_tags = { owner = var.owner }
 }
 
 
@@ -40,7 +40,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_engine" {
     publisher = "safesoftwareinc"
     product   = "fme-engine"
   }
-  
+
   custom_data = filebase64("./modules/database/sql_server/scripts/config_fmeserver_sql_confd_engine.ps1")
 
   extension {

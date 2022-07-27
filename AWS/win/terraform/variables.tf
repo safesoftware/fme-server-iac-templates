@@ -23,9 +23,9 @@ variable "igw_name" {
 }
 
 variable "eip_name" {
-  type = string
-  default = "tf-eip-name"
-  description = "Elastic IP name"  
+  type        = string
+  default     = "tf-eip-name"
+  description = "Elastic IP name"
 }
 
 variable "nat_name" {

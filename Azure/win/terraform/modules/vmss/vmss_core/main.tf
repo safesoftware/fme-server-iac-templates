@@ -1,5 +1,5 @@
 locals {
-    default_tags                   = { owner = var.owner }
+  default_tags = { owner = var.owner }
 }
 
 resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {

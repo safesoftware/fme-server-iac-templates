@@ -11,7 +11,7 @@ locals {
 }
 
 resource "aws_secretsmanager_secret" "fme_server_rds" {
-  name = "fmeserverRDSSecret"
+  name = "fmeserverRDSSecret_new"
 }
 
 resource "aws_secretsmanager_secret_version" "fme_server_rds" {
@@ -20,7 +20,7 @@ resource "aws_secretsmanager_secret_version" "fme_server_rds" {
 }
 
 resource "aws_secretsmanager_secret" "fme_server_fsx" {
-  name = "fmeserverFSXSecret"
+  name = "fmeserverFSXSecret_new"
 }
 
 resource "aws_secretsmanager_secret_version" "fme_server_fsx" {

@@ -1,11 +1,11 @@
 locals {
-    default_tags                   = { owner = var.owner }
+  default_tags = { owner = var.owner }
 }
 
-resource random_string st_name {
+resource "random_string" "st_name" {
   length  = 8
-  lower = false 
-  upper  = false
+  lower   = false
+  upper   = false
   special = false
 }
 

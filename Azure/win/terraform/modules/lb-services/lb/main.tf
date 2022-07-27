@@ -1,5 +1,5 @@
 locals {
-    default_tags                   = { owner = var.owner }
+  default_tags = { owner = var.owner }
 }
 
 resource "azurerm_lb" "fme_server" {
