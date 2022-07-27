@@ -3,8 +3,6 @@ resource "aws_lb" "fme_server_nlb" {
   internal           = true
   load_balancer_type = "network"
   subnets            = [var.private_sn_az1_id, var.private_sn_az2_id]
-
-  enable_deletion_protection = true
 }
 
 resource "aws_lb_target_group" "fme_server_engine-registration" {
