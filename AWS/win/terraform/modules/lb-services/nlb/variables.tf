@@ -3,11 +3,6 @@ variable "nlb_name" {
   description = "Name of the network load balancer"
 }
 
-variable "sg_id" {
-  type = string
-  description = "Security group id for FME Server deployment"
-}
-
 variable "vpc_id" {
   type = string
   description = "VPC id for FME Sever deployment"

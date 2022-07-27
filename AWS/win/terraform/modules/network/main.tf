@@ -26,16 +26,16 @@ resource "aws_subnet" "public_subnet_az1" {
   cidr_block        = "10.0.0.0/20"
   availability_zone = format("%sa", data.aws_region.current.name)
   tags = {
-    "Name"    = format("%s-public1-%sa", var.public_sn_name, data.aws_region.current.name)
+    "Name"    = format("%s-public1-%sa", var.sn_name, data.aws_region.current.name)
   }
 }
 
 resource "aws_subnet" "public_subnet_az2" {
   vpc_id            = aws_vpc.fme_server.id
   cidr_block        = "10.0.16.0/20"
-  availability_zone = format("%sa", data.aws_region.current.name)
+  availability_zone = format("%sb", data.aws_region.current.name)
   tags = {
-    "Name"    = format("%s-public2-%sa", var.public_sn_name, data.aws_region.current.name)
+    "Name"    = format("%s-public2-%sb", var.sn_name, data.aws_region.current.name)
   }
 }
 
@@ -44,16 +44,16 @@ resource "aws_subnet" "private_subnet_az1" {
   cidr_block        = "10.0.128.0/20"
   availability_zone = format("%sa", data.aws_region.current.name)
   tags = {
-    "Name"    = format("%s-private1-%sa", var.public_sn_name, data.aws_region.current.name)
+    "Name"    = format("%s-private1-%sa", var.sn_name, data.aws_region.current.name)
   }
 }
 
 resource "aws_subnet" "private_subnet_az2" {
   vpc_id            = aws_vpc.fme_server.id
   cidr_block        = "10.0.144.0/20"
-  availability_zone = format("%sa", data.aws_region.current.name)
+  availability_zone = format("%sb", data.aws_region.current.name)
   tags = {
-    "Name"    = format("%s-private2-%sa", var.public_sn_name, data.aws_region.current.name)
+    "Name"    = format("%s-private2-%sb", var.sn_name, data.aws_region.current.name)
   }
 }
 
@@ -63,9 +63,17 @@ resource "aws_internet_gateway" "fme_server" {
     "Name"    = var.igw_name
   }
 }
+resource "aws_eip" "fme_server_nat" {
+  vpc      = true
+  public_ipv4_pool = "amazon"
+  tags = {
+    "Name"    = var.eip_name
+  }
+}
 
 resource "aws_nat_gateway" "fme_server" {
   subnet_id = aws_subnet.public_subnet_az1.id
+  allocation_id = aws_eip.fme_server_nat.id
   tags = {
     "Name"    = var.nat_name
   }
@@ -74,20 +82,10 @@ resource "aws_nat_gateway" "fme_server" {
 resource "aws_default_route_table" "fmeserver_default_rt" {
   default_route_table_id = aws_vpc.fme_server.default_route_table_id
 
-  route = [{
+  route {
     cidr_block                 = "0.0.0.0/0"
     nat_gateway_id             = aws_nat_gateway.fme_server.id
-    core_network_arn           = ""
-    destination_prefix_list_id = ""
-    egress_only_gateway_id     = ""
-    gateway_id                 = ""
-    instance_id                = ""
-    ipv6_cidr_block            = ""
-    network_interface_id       = ""
-    transit_gateway_id         = ""
-    vpc_endpoint_id            = ""
-    vpc_peering_connection_id  = ""
-  }]
+  }
   tags = {
     "Name"    = "Private subnets route table"
   } 
@@ -106,23 +104,11 @@ resource "aws_route_table_association" "private_subnet_az2" {
 resource "aws_route_table" "fmeserver_public_rt" {
   vpc_id = aws_vpc.fme_server.id
 
-  route = [{
+  route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.fme_server.id
-    core_network_arn           = ""
-    destination_prefix_list_id = ""
-    egress_only_gateway_id     = ""
-    nat_gateway_id             = ""
-    instance_id                = ""
-    ipv6_cidr_block            = ""
-    network_interface_id       = ""
-    transit_gateway_id         = ""
-    vpc_endpoint_id            = ""
-    vpc_peering_connection_id  = ""
-    carrier_gateway_id         = ""
-    local_gateway_id           = ""
-  }] 
-    tags = {
+  }
+  tags = {
     "Name"    = "Public subnets route table"
   } 
 }
@@ -190,7 +176,7 @@ resource "aws_security_group" "fmeserver" {
       protocol         = "tcp"
       from_port        = 80
       to_port          = 80
-      cidr_blocks      = []
+      cidr_blocks      = [format("%s/32", aws_eip.fme_server_nat.public_ip)]
       ipv6_cidr_blocks = []
       prefix_list_ids  = []
       security_groups  = []
@@ -228,6 +214,17 @@ resource "aws_security_group" "fmeserver" {
       prefix_list_ids  = []
       security_groups  = []
       self             = false
+    },
+    {
+      cidr_blocks      = ["50.68.182.79/32"]
+      description      = ""
+      from_port        = 3389
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      protocol         = "tcp"
+      security_groups  = []
+      self             = false
+      to_port          = 3389
     }
   ]
 

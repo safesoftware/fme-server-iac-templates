@@ -24,3 +24,7 @@ variable "private_sn_az1_id" {
   description = "Private subnet id in the first availability zone"
 }
 
+variable "sg_id" {
+  type = string
+  description = "Security group id for FME Server deployment"
+}
