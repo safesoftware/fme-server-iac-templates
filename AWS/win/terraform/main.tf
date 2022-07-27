@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 3.29.6"
+      version = ">= 4.22.0"
     }
   }
   required_version = ">= 1.1.0"
@@ -21,9 +21,9 @@ provider "aws" {
 module "network" {
   source           = "./modules/network/"
   vpc_name         = var.vpc_name
-  private_sn_name  = var.private_sn_name
-  public_sn_name   = var.public_sn_name
+  sn_name          = var.sn_name
   igw_name         = var.igw_name
+  eip_name         = var.eip_name
   nat_name         = var.nat_name
 }
 
@@ -34,6 +34,7 @@ module "storage" {
   vpc_id            = module.network.vpc_id
   private_sn_az2_id = module.network.private_sn_az2_id
   private_sn_az1_id = module.network.private_sn_az1_id
+  sg_id             = module.network.sg_id
 }
 
 module "database" {
@@ -56,7 +57,6 @@ module "alb" {
 module "nlb" {
   source            = "./modules/lb-services/nlb/"
   nlb_name          = var.nlb_name
-  sg_id             = module.network.sg_id
   vpc_id            = module.network.vpc_id
   private_sn_az2_id = module.network.private_sn_az2_id
   private_sn_az1_id = module.network.private_sn_az1_id
@@ -87,16 +87,16 @@ module "asg_core" {
 }
 
 module "asg_engine" {
-  source                               = "./modules/asg/asg_engine/"
-  vpc_name                             = var.vpc_name
-  fme_engine_image_id                  = var.fme_engine_image_id
-  sg_id                                = module.network.sg_id
-  iam_instance_profile                 = module.iam.iam_instance_profile
-  db_dns_name                          = module.database.db_dns_name
-  ad_admin_pw                          = var.ad_admin_pw
-  fsx_dns_name                         = module.storage.fsx_dns_name
-  ssm_document_name                    = module.storage.ssm_document_name
-  nlb_dns_name                         = module.nlb.nlb_dns_name
-  private_sn_az2_id                    = module.network.private_sn_az2_id
-  private_sn_az1_id                    = module.network.private_sn_az1_id
+  source               = "./modules/asg/asg_engine/"
+  vpc_name             = var.vpc_name
+  fme_engine_image_id  = var.fme_engine_image_id
+  sg_id                = module.network.sg_id
+  iam_instance_profile = module.iam.iam_instance_profile
+  db_dns_name          = module.database.db_dns_name
+  ad_admin_pw          = var.ad_admin_pw
+  fsx_dns_name         = module.storage.fsx_dns_name
+  ssm_document_name    = module.storage.ssm_document_name
+  nlb_dns_name         = module.nlb.nlb_dns_name
+  private_sn_az2_id    = module.network.private_sn_az2_id
+  private_sn_az1_id    = module.network.private_sn_az1_id
 }

@@ -4,7 +4,7 @@ output "nlb_dns_name" {
 }
 
 output "engine_registration_target_group_arn" {
-  value = aws_lb_listener.fme_server_engine-registration.arn
+  value = aws_lb_target_group.fme_server_engine-registration.arn
   description = "The ARN of the FME Server engine registration target group"
 }
 

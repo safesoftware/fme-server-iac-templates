@@ -2,7 +2,6 @@ resource "aws_lb" "fme_server_nlb" {
   name               = var.nlb_name
   internal           = true
   load_balancer_type = "network"
-  security_groups    = [var.sg_id]
   subnets            = [var.private_sn_az1_id, var.private_sn_az2_id]
 
   enable_deletion_protection = true
@@ -22,7 +21,7 @@ resource "aws_lb_target_group" "fme_server_engine-registration" {
 
 resource "aws_lb_listener" "fme_server_engine-registration" {
   load_balancer_arn = aws_lb.fme_server_nlb.arn
-  port              = "7078"
+  port              = "7070"
   protocol          = "TCP"
 
   default_action {

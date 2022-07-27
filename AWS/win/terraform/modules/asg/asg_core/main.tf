@@ -23,9 +23,6 @@ resource "aws_launch_template" "fme_server_core" {
   metadata_options {
     http_endpoint = "enabled"
   }
-  monitoring {
-    enabled = true
-  }
   tag_specifications {
     resource_type = "instance"
 
@@ -34,7 +31,7 @@ resource "aws_launch_template" "fme_server_core" {
     }
   }
 
-  user_data = filebase64(templatefile("${path.module}/user_data/user_data_core.tftpl", { config = local.config }))
+  user_data = base64encode(templatefile("${path.module}/user_data/user_data_core.tftpl", { config = local.config }))
 }
 
 resource "aws_autoscaling_group" "fme_sever_core" {
