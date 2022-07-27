@@ -52,6 +52,7 @@ No providers.
 | <a name="module_iam"></a> [iam](#module\_iam) | ./modules/iam/ | n/a |
 | <a name="module_network"></a> [network](#module\_network) | ./modules/network/ | n/a |
 | <a name="module_nlb"></a> [nlb](#module\_nlb) | ./modules/lb-services/nlb/ | n/a |
+| <a name="module_secrets"></a> [secrets](#module\_secrets) | ./modules/secrets/ | n/a |
 | <a name="module_storage"></a> [storage](#module\_storage) | ./modules/storage/ | n/a |
 
 ## Resources

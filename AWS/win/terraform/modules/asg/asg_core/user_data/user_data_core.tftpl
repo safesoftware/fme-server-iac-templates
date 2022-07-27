@@ -4,6 +4,16 @@
 ${config_key} = "${config_value}"
 %{ endfor ~}
 
+$rds_secrets = Get-SECSecretValue -secretid $rds_secrets_arn -select SecretString | ConvertFrom-JSON
+$fsx_secrets = Get-SECSecretValue -secretid $fsx_secrets_arn -select SecretString | ConvertFrom-JSON
+
+$databasehostname = $rds_secrets.databasehostname
+$databaseUsername = $rds_secrets.db_admin_user
+$databasePassword = $rds_secrets.db_admin_pw
+$storageAccountName = $fsx_secrets.storageAccountName
+$storageAccountKey = $fsx_secrets.ad_admin_pw
+
+
 # Create task to initialize FME Server
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_aws.ps1 -databasehostname $databasehostname -databasePassword $databasePassword -databaseUsername $databaseUsername -externalhostname $externalhostname -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
 $trigger = New-ScheduledTaskTrigger -AtStartup
