@@ -1,5 +1,5 @@
-# Generate documentation from Terraform modules
-This script will run a terraform-docs command for each module that containts a ``main.tf`` file the repository.
+# Generate documentation for terraform modules
+This script will run a terraform-docs command for each module that contains a ``main.tf`` file in the repository.
 
 ## How to use this script
 ### Update existing documentation after changing the terraform configuration
@@ -10,8 +10,8 @@ In a CI/CD workflow the terraform-docs command can also be triggered by pull req
 
 ### Create documention for a new terraform configuration
 1. Create a ``README.md`` file next to the ``main.tf``
-2. Add a Titel and any custom documention
-3. Add the following paragraph to automatically insert the terraform docuementation the next time ``./generate-tf-docs.sh`` is run:
+2. Add a Titel and any custom documentation
+3. Add the following paragraph to automatically insert the terraform documentation the next time ``./generate-tf-docs.sh`` is run:
 ```
 <!-- BEGIN_TF_DOCS -->
 

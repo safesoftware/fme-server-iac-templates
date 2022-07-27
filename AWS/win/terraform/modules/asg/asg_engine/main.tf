@@ -2,9 +2,8 @@ data "aws_region" "current" {}
 locals {
     config = {
       "$engineregistrationhost" = "${var.nlb_dns_name}"
-      "$databasehostname"       = "${var.db_dns_name}"
-      "$storageAccountName"     = "${var.fsx_dns_name}"
-      "$storageAccountKey"      = "${var.ad_admin_pw}"
+      "$rds_secrets_arn"        = "${var.rds_secrets_arn}"
+      "$fsx_secrets_arn"        = "${var.fsx_secrets_arn}"
       "$awsRegion"              = "${data.aws_region.current.name}" 
       "$domainConfig"           = "${var.ssm_document_name}"  
     }

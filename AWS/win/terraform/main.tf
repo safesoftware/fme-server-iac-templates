@@ -63,7 +63,18 @@ module "nlb" {
 }
 
 module "iam" {
-  source = "./modules/iam/"
+  source               = "./modules/iam/"
+  rds_secrets_arn      = module.secrets.rds_secrets_arn
+  fsx_secrets_arn      = module.secrets.fsx_secrets_arn
+}
+
+module "secrets" {
+  source = "./modules/secrets/"
+  fsx_dns_name  = module.storage.fsx_dns_name
+  db_dns_name   = module.database.db_dns_name
+  ad_admin_pw   = var.ad_admin_pw
+  db_admin_user = var.db_admin_user
+  db_admin_pw   = var.db_admin_pw
 }
 
 module "asg_core" {
@@ -72,11 +83,8 @@ module "asg_core" {
   fme_core_image_id                    = var.fme_core_image_id
   sg_id                                = module.network.sg_id
   iam_instance_profile                 = module.iam.iam_instance_profile
-  db_dns_name                          = module.database.db_dns_name
-  db_admin_user                        = var.db_admin_user
-  db_admin_pw                          = var.db_admin_pw
-  ad_admin_pw                          = var.ad_admin_pw
-  fsx_dns_name                         = module.storage.fsx_dns_name
+  rds_secrets_arn                      = module.secrets.rds_secrets_arn
+  fsx_secrets_arn                      = module.secrets.fsx_secrets_arn
   ssm_document_name                    = module.storage.ssm_document_name
   alb_dns_name                         = module.alb.alb_dns_name
   core_target_group_arn                = module.alb.core_target_group_arn
@@ -92,9 +100,8 @@ module "asg_engine" {
   fme_engine_image_id  = var.fme_engine_image_id
   sg_id                = module.network.sg_id
   iam_instance_profile = module.iam.iam_instance_profile
-  db_dns_name          = module.database.db_dns_name
-  ad_admin_pw          = var.ad_admin_pw
-  fsx_dns_name         = module.storage.fsx_dns_name
+  rds_secrets_arn      = module.secrets.rds_secrets_arn
+  fsx_secrets_arn      = module.secrets.fsx_secrets_arn
   ssm_document_name    = module.storage.ssm_document_name
   nlb_dns_name         = module.nlb.nlb_dns_name
   private_sn_az2_id    = module.network.private_sn_az2_id
