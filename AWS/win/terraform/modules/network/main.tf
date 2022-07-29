@@ -13,7 +13,7 @@ data "aws_subnet" "private_subnet_az2" {
 }
 
 resource "aws_vpc" "fme_server" {
-  cidr_block           = "10.0.0.0/16"
+  cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
@@ -23,7 +23,7 @@ resource "aws_vpc" "fme_server" {
 
 resource "aws_subnet" "public_subnet_az1" {
   vpc_id            = aws_vpc.fme_server.id
-  cidr_block        = "10.0.0.0/20"
+  cidr_block        = var.public_sn1_cidr
   availability_zone = format("%sa", data.aws_region.current.name)
   tags = {
     "Name" = format("%s-public1-%sa", var.sn_name, data.aws_region.current.name)
@@ -32,7 +32,7 @@ resource "aws_subnet" "public_subnet_az1" {
 
 resource "aws_subnet" "public_subnet_az2" {
   vpc_id            = aws_vpc.fme_server.id
-  cidr_block        = "10.0.16.0/20"
+  cidr_block        = var.public_sn2_cidr
   availability_zone = format("%sb", data.aws_region.current.name)
   tags = {
     "Name" = format("%s-public2-%sb", var.sn_name, data.aws_region.current.name)
@@ -41,7 +41,7 @@ resource "aws_subnet" "public_subnet_az2" {
 
 resource "aws_subnet" "private_subnet_az1" {
   vpc_id            = aws_vpc.fme_server.id
-  cidr_block        = "10.0.128.0/20"
+  cidr_block        = var.private_sn1_cidr
   availability_zone = format("%sa", data.aws_region.current.name)
   tags = {
     "Name" = format("%s-private1-%sa", var.sn_name, data.aws_region.current.name)
@@ -50,7 +50,7 @@ resource "aws_subnet" "private_subnet_az1" {
 
 resource "aws_subnet" "private_subnet_az2" {
   vpc_id            = aws_vpc.fme_server.id
-  cidr_block        = "10.0.144.0/20"
+  cidr_block        = var.private_sn2_cidr
   availability_zone = format("%sb", data.aws_region.current.name)
   tags = {
     "Name" = format("%s-private2-%sb", var.sn_name, data.aws_region.current.name)

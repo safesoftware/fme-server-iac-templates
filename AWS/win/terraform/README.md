@@ -75,7 +75,12 @@ No resources.
 | <a name="input_nat_name"></a> [nat\_name](#input\_nat\_name) | NAT gateway name | `string` | `"tf-nat-gw"` | no |
 | <a name="input_nlb_name"></a> [nlb\_name](#input\_nlb\_name) | Name of the network load balancer | `string` | `"tf-network-lb"` | no |
 | <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | `"gf"` | no |
+| <a name="input_private_sn1_cidr"></a> [private\_sn1\_cidr](#input\_private\_sn1\_cidr) | CIDR range for private subnet in the first availability zone | `string` | `"10.0.128.0/20"` | no |
+| <a name="input_private_sn2_cidr"></a> [private\_sn2\_cidr](#input\_private\_sn2\_cidr) | CIDR range for private subnet in the second availability zone | `string` | `"10.0.144.0/20"` | no |
+| <a name="input_public_sn1_cidr"></a> [public\_sn1\_cidr](#input\_public\_sn1\_cidr) | CIDR range for public subnet in the first availability zone | `string` | `"10.0.0.0/20"` | no |
+| <a name="input_public_sn2_cidr"></a> [public\_sn2\_cidr](#input\_public\_sn2\_cidr) | CIDR range for public subnet in the second availability zone | `string` | `"10.0.16.0/20"` | no |
 | <a name="input_sn_name"></a> [sn\_name](#input\_sn\_name) | Subnet name prefix | `string` | `"tf-subnet"` | no |
+| <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR range for VPC | `string` | `"10.0.0.0/16"` | no |
 | <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Virtual private cloud name | `string` | `"tf-vpc"` | no |
 
 ## Outputs
