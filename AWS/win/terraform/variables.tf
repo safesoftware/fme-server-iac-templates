@@ -16,6 +16,36 @@ variable "sn_name" {
   description = "Subnet name prefix"
 }
 
+variable "vpc_cidr" {
+  type = string
+  default = "10.0.0.0/16"
+  description = "CIDR range for VPC"
+}
+
+variable "public_sn1_cidr" {
+  type = string
+  default = "10.0.0.0/20"
+  description = "CIDR range for public subnet in the first availability zone"
+}
+
+variable "public_sn2_cidr" {
+  type = string
+  default = "10.0.16.0/20"
+  description = "CIDR range for public subnet in the second availability zone"
+}
+
+variable "private_sn1_cidr" {
+  type = string
+  default = "10.0.128.0/20"
+  description = "CIDR range for private subnet in the first availability zone"
+}
+
+variable "private_sn2_cidr" {
+  type = string
+  default = "10.0.144.0/20"
+  description = "CIDR range for private subnet in the second availability zone"
+}
+
 variable "igw_name" {
   type        = string
   default     = "tf-internet-gw"

@@ -25,6 +25,11 @@ module "network" {
   igw_name = var.igw_name
   eip_name = var.eip_name
   nat_name = var.nat_name
+  vpc_cidr          = var.vpc_cidr
+  public_sn1_cidr   = var.public_sn1_cidr
+  public_sn2_cidr   = var.public_sn2_cidr
+  private_sn1_cidr  = var.private_sn1_cidr
+  private_sn2_cidr  = var.private_sn2_cidr
 }
 
 module "storage" {
