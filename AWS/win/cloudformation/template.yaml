@@ -294,9 +294,7 @@ Resources:
           IpProtocol: tcp
           FromPort: 80
           ToPort: 80
-          CidrIp: !Sub 
-            - "${ip}/32"
-            - { ip: !Ref NatEip } 
+          CidrIp: !Sub "${NatEip}/32"
         - Description: Engine registration health check
           IpProtocol: tcp
           FromPort: 8080
@@ -311,7 +309,7 @@ Resources:
           IpProtocol: tcp
           FromPort: 7070
           ToPort: 7070
-          CidrIp: !Ref PrivateSubnet1CIDR
+          CidrIp: !Ref PrivateSubnet2CIDR
       SecurityGroupEgress:
         - Description: "allow all"
           IpProtocol: "-1"
@@ -529,7 +527,7 @@ Resources:
     Properties: 
       Name: fmeserverFSXSecret072822
       SecretString: !Sub
-        '{"ad_admin_pw":"${AdAdminPw}","storageAccountName":"${AdName}"}'
+        '{"ad_admin_pw":"${AdAdminPw}","storageAccountName":"${WindowsFileSystem.DNSName}"}'
 
   # IAM role for EC2 instances
   IamEc2Role:
@@ -658,9 +656,9 @@ Resources:
           Fn::Base64:
             !Sub |
               <powershell>
-              $externalhostname = ${Alb.DNSName}
-              $awsRegion = ${AWS::Region}
-              $domainConfig = ${SsmDocument}
+              $externalhostname = "${Alb.DNSName}"
+              $awsRegion = "${AWS::Region}"
+              $domainConfig = "${SsmDocument}"
               $rds_secrets = Get-SECSecretValue -secretid ${RdsSecret} -select SecretString | ConvertFrom-JSON
               $fsx_secrets = Get-SECSecretValue -secretid ${FsxSecret} -select SecretString | ConvertFrom-JSON
               $databasehostname = $rds_secrets.databasehostname
@@ -706,19 +704,17 @@ Resources:
           Fn::Base64:
             !Sub |
               <powershell>
-              $engineregistrationhost = ${Elb.DNSName}
-              $awsRegion = ${AWS::Region}
-              $domainConfig = ${SsmDocument}
-              
+              $engineregistrationhost = "${Elb.DNSName}"
+              $awsRegion = "${AWS::Region}"
+              $domainConfig = "${SsmDocument}"
               $rds_secrets = Get-SECSecretValue -secretid ${RdsSecret} -select SecretString | ConvertFrom-JSON
-              $fsx_secrets = Get-SECSecretValue -secretid ${FsxSecret} -select SecretString | ConvertFrom-JSO
+              $fsx_secrets = Get-SECSecretValue -secretid ${FsxSecret} -select SecretString | ConvertFrom-JSON
               $databasehostname = $rds_secrets.databasehostname
               $storageAccountName = $fsx_secrets.storageAccountName
               $storageAccountKey = $fsx_secrets.ad_admin_pw
               
-              
               # Create task to initialize FME Server
-              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_aws.ps1 -databasehostname $databasehostname -databasePassword $databasePassword -databaseUsername $databaseUsername -externalhostname $externalhostname -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
+              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine_aws.ps1 -databasehostname $databasehostname -engineregistrationhost $engineregistrationhost -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
               $trigger = New-ScheduledTaskTrigger -AtStartup
               $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
               $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
