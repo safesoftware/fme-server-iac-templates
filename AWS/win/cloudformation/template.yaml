@@ -1,0 +1,765 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template to deploy a distributed FME Server in AWS
+
+Parameters:
+  Owner:
+    Type: String
+    Default: gf
+    Description: Default value for onwer tag
+
+  VpcName:
+    Type: String
+    Default: cf-vpc
+    Description: Virtual private cloud name
+
+  SnName:
+    Type: String
+    Default: cf-subnet
+    Description: Subnet name prefix
+
+  VpcCIDR:
+    Type: String
+    Default: 10.192.0.0/16
+    Description: Please enter the IP range (CIDR notation) for this VPC
+
+  PublicSubnet1CIDR:
+    Type: String
+    Default: 10.192.10.0/24
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the first Availability Zone
+
+  PublicSubnet2CIDR:
+    Type: String
+    Default: 10.192.11.0/24
+    Description: Please enter the IP range (CIDR notation) for the public subnet in the second Availability Zone
+
+  PrivateSubnet1CIDR:
+    Type: String
+    Default: 10.192.20.0/24
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the first Availability Zone
+
+  PrivateSubnet2CIDR:
+    Type: String
+    Default: 10.192.21.0/24
+    Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
+
+  PublicAccess:
+    Type: String
+    Default: 50.68.182.79/32
+    Description: CDIR range from which the FME Server Web UI and Websocket will be accessible
+
+  IgwName:
+    Type: String
+    Default: cf-internet-gw
+    Description: Internet gateway name
+
+  EipName:
+    Type: String
+    Default: cf-eip-name
+    Description: Elastic IP name
+
+  NatName:
+    Type: String
+    Default: cf-nat-gw
+    Description: NAT gateway name
+
+  AdName:
+    Type: String
+    Default: cf-fmeserver.safe
+    Description: Name of the Active Directory service
+
+  AlbName:
+    Type: String
+    Default: cf-application-lb
+    Description: Name of the application load balancer
+
+  NlbName:
+    Type: String
+    Default: cf-network-lb
+    Description: Name of the network load balancer
+
+  DbAdminUser:
+    Type: String
+    Default: postgres
+    Description: Backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE.
+    
+  DbAdminPw:
+    Type: String
+    Description: Backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE.
+    NoEcho: true
+
+  AdAdminPw:
+    Type: String
+    Description: Password of the admin user of the Active Directory service. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE.
+    NoEcho: true
+
+# Map AMIs to available regions
+Mappings: 
+  RegionMap: 
+    us-west-2: 
+      "fmeCore": "ami-033c4d4d7d4b334ab"
+      "fmeEngine": "ami-01bcc4b2970e7bead"
+    ca-central-1: 
+      "fmeCore": "ami-03d3d062bd7898488"
+      "fmeEngine": "ami-00370f1e5900ecb72"
+
+Resources:
+# Network resources
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: !Ref VpcName
+  
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref "AWS::Region"
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnet1CIDR
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: !Sub "${SnName}-public1-${AWS::Region}"
+  
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref "AWS::Region"
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnet2CIDR
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: !Sub "${SnName}-public2-${AWS::Region}"
+  
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref "AWS::Region"
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: !Sub "${SnName}-private1-${AWS::Region}"
+  
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref "AWS::Region"
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: !Sub "${SnName}-private2-${AWS::Region}"
+  
+  Igw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: !Ref IgwName
+  
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref Igw
+  
+  NatEip:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      PublicIpv4Pool: amazon
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: !Ref EipName
+  
+  Nat:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt 'NatEip.AllocationId'
+      SubnetId: !Ref PublicSubnet1
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: !Ref NatName
+  
+  DefaultRT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: Private subnets route table
+
+  PublicRT:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: Public subnets route table
+
+  DefaultRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref DefaultRT
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref Nat
+    
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicRT
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref Igw
+
+  DefaultRTAssocAZ1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref DefaultRT
+
+  DefaultRTAssocAZ2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref DefaultRT
+
+  PublicRTAssocAZ1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRT
+
+  PublicRTAssocAZ2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRT
+
+  Sg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: FME Server security group 
+      GroupDescription: Allows communication between FME Server components
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - Description: Web UI from local IP
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref PublicAccess
+        - Description: Websocket from local IP
+          IpProtocol: tcp
+          FromPort: 7078
+          ToPort: 7078
+          CidrIp: !Ref PublicAccess
+        - Description: Web UI from NAT gateway
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Sub "${NatEip}/32"
+        - Description: Engine registration health check
+          IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: !Ref VpcCIDR
+        - Description: Engine registration AZ 1
+          IpProtocol: tcp
+          FromPort: 7070
+          ToPort: 7070
+          CidrIp: !Ref PrivateSubnet1CIDR
+        - Description: Engine registration AZ 2
+          IpProtocol: tcp
+          FromPort: 7070
+          ToPort: 7070
+          CidrIp: !Ref PrivateSubnet2CIDR
+      SecurityGroupEgress:
+        - Description: "allow all"
+          IpProtocol: "-1"
+          FromPort: 0
+          ToPort: 0
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: FME Server security group
+
+  SelfRefSGIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description:  Allow all traffic between EC2, ALB, RDS & FSx in VPC
+      IpProtocol: -1
+      FromPort: 0
+      ToPort: 0
+      SourceSecurityGroupId: !Ref Sg
+      GroupId: !Ref Sg
+
+# Database resources
+  rdsDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: RDS subnet group
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: RDS subnet group
+
+  rdsDBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20 
+      DBInstanceClass: db.t3.small
+      VPCSecurityGroups:
+        - !Ref Sg
+      DBSubnetGroupName: !Ref rdsDBSubnetGroup
+      Engine: postgres
+      LicenseModel: postgresql-license
+      MasterUsername: !Ref DbAdminUser
+      MasterUserPassword: !Ref DbAdminPw
+      MultiAZ: true
+      Port: 5432
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: FME Server backend database
+  
+# Storage resources
+  myDirectory: 
+    Type: AWS::DirectoryService::MicrosoftAD
+    Properties: 
+      Name: !Ref AdName
+      Password: 
+        !Ref AdAdminPw
+      VpcSettings: 
+        SubnetIds: 
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+        VpcId: 
+          !Ref VPC
+
+  WindowsFileSystem:
+    Type: 'AWS::FSx::FileSystem'
+    Properties:
+      FileSystemType: WINDOWS
+      StorageCapacity: 32
+      StorageType: SSD
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      SecurityGroupIds:
+        - !Ref Sg
+      WindowsConfiguration:
+        ActiveDirectoryId: !Ref myDirectory
+        ThroughputCapacity: 32
+        DeploymentType: MULTI_AZ_1
+        PreferredSubnetId: !Ref PrivateSubnet1
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+        - Key: Name
+          Value: Windows Fileshare
+
+  SsmDocument: 
+    Type: AWS::SSM::Document
+    Properties:
+      Name: fmeserverDomainConfigTest
+      DocumentFormat: YAML
+      DocumentType: Command
+      Content:
+        schemaVersion: '1.2'
+        description: 'Automatic domain-join configuration created by the EC2 console.'
+        runtimeConfig:
+          aws:domainJoin:
+            Properties:
+              directoryId: !Ref myDirectory
+              directoryName: !Ref AdName
+              dnsIpAddresses: !GetAtt myDirectory.DnsIpAddresses
+  
+# Load balancing resources
+  Alb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties: 
+      Name: !Ref AlbName
+      Scheme: internet-facing
+      Type: application
+      SecurityGroups: 
+        - !Ref Sg
+      Subnets: 
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner 
+        - Key: Name
+          Value: !Ref AlbName
+
+  Elb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties: 
+      Name: !Ref NlbName
+      Scheme: internal
+      Type: network
+      Subnets: 
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner 
+        - Key: Name
+          Value: !Ref NlbName
+
+  CoreTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties: 
+      Name: fmeserver-core
+      Port: 8080
+      Protocol: HTTP
+      VpcId: !Ref VPC
+      HealthCheckPath: /
+      Matcher: 
+        HttpCode: 200
+
+  WsTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties: 
+      Name: fmeserver-ws
+      Port: 7078
+      Protocol: HTTP
+      VpcId: !Ref VPC
+      HealthCheckPath: /
+      Matcher: 
+        HttpCode: "200-400"
+
+  EngineRegistrationTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties: 
+      Name: engine-registration
+      Port: 7070
+      Protocol: TCP
+      VpcId: !Ref VPC
+      HealthCheckPath: /fmerest/v3/healthcheck
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: 8080
+
+  CoreListener:  
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties: 
+      DefaultActions: 
+        - Type: "forward"
+          TargetGroupArn: !Ref CoreTargetGroup
+      LoadBalancerArn: !Ref Alb
+      Port: 80
+      Protocol: HTTP
+
+  WsListener:  
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties: 
+      DefaultActions: 
+        - Type: "forward"
+          TargetGroupArn: !Ref WsTargetGroup
+      LoadBalancerArn: !Ref Alb
+      Port: 7078
+      Protocol: HTTP
+
+  EngineRegistrationListener:  
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties: 
+      DefaultActions: 
+        - Type: "forward"
+          TargetGroupArn: !Ref EngineRegistrationTargetGroup
+      LoadBalancerArn: !Ref Elb
+      Port: 7070
+      Protocol: TCP
+
+# Secrets manager
+  RdsSecret:  
+    Type: AWS::SecretsManager::Secret
+    Properties: 
+      Name: fmeserverRDSSecret072822
+      SecretString: !Sub '{"db_admin_user":"${DbAdminUser}","db_admin_pw":"${DbAdminPw}","databasehostname":"${rdsDBInstance.Endpoint.Address}"}'
+
+  FsxSecret:  
+    Type: AWS::SecretsManager::Secret
+    Properties: 
+      Name: fmeserverFSXSecret072822
+      SecretString: !Sub '{"ad_admin_pw":"${AdAdminPw}","storageAccountName":"${WindowsFileSystem.DNSName}"}'
+
+# IAM role for EC2 instances
+  IamEc2Role:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: AmazonEC2RoleforSecretManager
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - 'secretsmanager:GetSecretValue'
+                Resource:
+                  - !Ref RdsSecret
+                  - !Ref FsxSecret
+        - PolicyName: AmazonEC2RoleforSSM-ASGDomainJoin
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - 'ssm:DescribeAssociation'
+                  - 'ssm:GetDeployablePatchSnapshotForInstance'
+                  - 'ssm:GetDocument'
+                  - 'ssm:DescribeDocument'
+                  - 'ssm:GetManifest'
+                  - 'ssm:GetParameters'
+                  - 'ssm:ListAssociations'
+                  - 'ssm:ListInstanceAssociations'
+                  - 'ssm:PutInventory'
+                  - 'ssm:PutComplianceItems'
+                  - 'ssm:PutConfigurePackageResult'
+                  - 'ssm:UpdateAssociationStatus'
+                  - 'ssm:UpdateInstanceAssociationStatus'
+                  - 'ssm:UpdateInstanceInformation'
+                  - 'ssm:CreateAssociation'
+                Resource: '*'
+              - Effect: Allow
+                Action: 
+                  - 's3:GetBucketLocation'
+                  - 's3:PutObject'
+                  - 's3:GetObject'
+                  - 's3:GetEncryptionConfiguration'
+                  - 's3:AbortMultipartUpload'
+                  - 's3:ListMultipartUploadParts'
+                  - 's3:ListBucket'
+                  - 's3:ListBucketMultipartUploads'
+                Resource: '*'
+              - Effect: Allow
+                Action: 
+                  - 'ec2messages:AcknowledgeMessage'
+                  - 'ec2messages:DeleteMessage'
+                  - 'ec2messages:FailMessage'
+                  - 'ec2messages:GetEndpoint'
+                  - 'ec2messages:GetMessages'
+                  - 'ec2messages:SendReply'
+                Resource: '*'
+              - Effect: Allow
+                Action: 
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:DescribeLogGroups'
+                  - 'logs:DescribeLogStreams'
+                  - 'logs:PutLogEvents'
+                Resource: '*'  
+              - Effect: Allow
+                Action: 
+                  - 'ssmmessages:CreateControlChannel'
+                  - 'ssmmessages:CreateDataChannel'
+                  - 'ssmmessages:OpenControlChannel'
+                  - 'ssmmessages:OpenDataChannel'
+                Resource: '*'  
+              - Effect: Allow
+                Action: 
+                  - 'ds:CreateComputer'
+                  - 'ds:DescribeDirectories'
+                Resource: '*'  
+              - Effect: Allow
+                Action: 
+                  - 'cloudwatch:PutMetricData'
+                Resource: '*'
+              - Effect: Allow
+                Action: 
+                  - 'ec2:DescribeInstanceStatus'
+                Resource: '*'
+
+  IamInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      InstanceProfileName: fmeServerEC2JoinAD
+      Roles:
+        - !Ref IamEc2Role
+    
+# Auto scaling groups
+  CoreLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: fme-core
+      LaunchTemplateData:
+        IamInstanceProfile: 
+          Name: !Ref IamInstanceProfile 
+        ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", fmeCore]
+        InstanceType: t3.large
+        MetadataOptions: 
+          HttpEndpoint: enabled
+        SecurityGroupIds: 
+          - !Ref Sg
+        TagSpecifications: 
+          - ResourceType: instance
+            Tags:
+              - Key: Owner
+                Value: !Ref Owner 
+              - Key: Name
+                Value: fmeCore
+        UserData:
+          Fn::Base64:
+            !Sub |
+              <powershell>
+              $externalhostname = "${Alb.DNSName}"
+              $awsRegion = "${AWS::Region}"
+              $domainConfig = "${SsmDocument}"
+              $rds_secrets = Get-SECSecretValue -secretid ${RdsSecret} -select SecretString | ConvertFrom-JSON
+              $fsx_secrets = Get-SECSecretValue -secretid ${FsxSecret} -select SecretString | ConvertFrom-JSON
+              $databasehostname = $rds_secrets.databasehostname
+              $databaseUsername = $rds_secrets.db_admin_user
+              $databasePassword = $rds_secrets.db_admin_pw
+              $storageAccountName = $fsx_secrets.storageAccountName
+              $storageAccountKey = $fsx_secrets.ad_admin_pw
+              
+              # Create task to initialize FME Server
+              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_aws.ps1 -databasehostname $databasehostname -databasePassword $databasePassword -databaseUsername $databaseUsername -externalhostname $externalhostname -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
+              $trigger = New-ScheduledTaskTrigger -AtStartup
+              $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
+              $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
+              Register-ScheduledTask -TaskName "coreInit" -InputObject $definition
+              
+              # Add instance to a file share domain
+              Set-DefaultAWSRegion -Region $awsRegion
+              Set-Variable -name instance_id -value (Invoke-Restmethod -uri http://169.254.169.254/latest/meta-data/instance-id)
+              New-SSMAssociation -InstanceId $instance_id -Name "$domainConfig"
+              </powershell>
+            
+  EngineLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: fme-engine
+      LaunchTemplateData:
+        IamInstanceProfile: 
+          Name: !Ref IamInstanceProfile 
+        ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", fmeEngine]
+        InstanceType: t3.large
+        MetadataOptions: 
+          HttpEndpoint: enabled
+        SecurityGroupIds: 
+          - !Ref Sg
+        TagSpecifications: 
+          - ResourceType: instance
+            Tags:
+              - Key: Owner
+                Value: !Ref Owner 
+              - Key: Name
+                Value: fmeEngine
+        UserData:
+          Fn::Base64:
+            !Sub |
+              <powershell>
+              $engineregistrationhost = "${Elb.DNSName}"
+              $awsRegion = "${AWS::Region}"
+              $domainConfig = "${SsmDocument}"
+              $rds_secrets = Get-SECSecretValue -secretid ${RdsSecret} -select SecretString | ConvertFrom-JSON
+              $fsx_secrets = Get-SECSecretValue -secretid ${FsxSecret} -select SecretString | ConvertFrom-JSON
+              $databasehostname = $rds_secrets.databasehostname
+              $storageAccountName = $fsx_secrets.storageAccountName
+              $storageAccountKey = $fsx_secrets.ad_admin_pw
+              
+              # Create task to initialize FME Server
+              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine_aws.ps1 -databasehostname $databasehostname -engineregistrationhost $engineregistrationhost -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
+              $trigger = New-ScheduledTaskTrigger -AtStartup
+              $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
+              $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
+              Register-ScheduledTask -TaskName "engineInit" -InputObject $definition
+              
+              # Add instance to a file share domain
+              Set-DefaultAWSRegion -Region $awsRegion
+              Set-Variable -name instance_id -value (Invoke-Restmethod -uri http://169.254.169.254/latest/meta-data/instance-id)
+              New-SSMAssociation -InstanceId $instance_id -Name "$domainConfig"
+              </powershell>
+
+  CoreAsg:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      LaunchTemplate:
+        LaunchTemplateId: !Ref CoreLaunchTemplate
+        Version: !GetAtt CoreLaunchTemplate.LatestVersionNumber
+      DesiredCapacity: 2
+      MaxSize: 2
+      MinSize: 1
+      TargetGroupARNs:
+        - !Ref CoreTargetGroup
+        - !Ref WsTargetGroup
+        - !Ref EngineRegistrationTargetGroup
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+          PropagateAtLaunch: True
+        - Key: Name
+          Value: fmeCore
+          PropagateAtLaunch: True
+
+  EngineAsg:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      LaunchTemplate:
+        LaunchTemplateId: !Ref EngineLaunchTemplate
+        Version: !GetAtt EngineLaunchTemplate.LatestVersionNumber
+      DesiredCapacity: 2
+      MaxSize: 2
+      MinSize: 1
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+          PropagateAtLaunch: True
+        - Key: Name
+          Value: fmeEngine
+          PropagateAtLaunch: True
+      
+
