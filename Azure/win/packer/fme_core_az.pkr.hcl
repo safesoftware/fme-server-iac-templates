@@ -8,7 +8,7 @@ source "azure-arm" "fme_core" {
   image_offer                       = "WindowsServer"
   image_publisher                   = "MicrosoftWindowsServer"
   image_sku                         = "2022-Datacenter"
-  managed_image_name                = "fmeCore22623"
+  managed_image_name                = "fmeCore22715"
   managed_image_resource_group_name = "fmeImages"
   os_type                           = "Windows"
   os_disk_size_gb                   = 150
@@ -29,7 +29,7 @@ build {
 
   provisioner "powershell" {
     script = "scripts/install-server-core.ps1"
-    environment_vars = ["INSTALLER_URL=https://downloads.safe.com/fme/2022/fme-server-2022.1.1-b22623-win-x64.exe"]
+    environment_vars = ["INSTALLER_URL=https://downloads.safe.com/fme/beta/fme-server-2022.2-b22715-win-x64-beta.exe"]
   }
 
   provisioner "powershell" {
