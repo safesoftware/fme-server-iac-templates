@@ -1,13 +1,13 @@
 # FME Server (Distributed deployment, Windows)
-These Bicep scripts deploy [FME Server (Distributed deployment, Windows)](https://azuremarketplace.microsoft.com/en-US/marketplace/apps/safesoftwareinc.fme-server-distributed-deployment?tab=overview) in your Azure Subscription. The scripts can be used as a boilerplate for automic deployments of the public FME Server Azure VM images in your own environment with your own configurations.
+These Bicep scripts deploy [FME Server (Distributed deployment, Windows)](https://azuremarketplace.microsoft.com/en-US/marketplace/apps/safesoftwareinc.fme-server-distributed-deployment?tab=overview) in your Azure Subscription. The scripts can be used as a boilerplate for automatic deployments of the public FME Server Azure VM images in your own environment with your own configurations.
 # How to use the scripts
 ## Quickstart
 ### Prerequisites
 To deploy FME Server (Distributed deployment, Windows) on Microsoft Azure from a local machine, the Azure CLI and Bicep need to be installed. Follow this documentation depending on your scenario: [Install Bicep tools](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/install)
 ### Apply the deployment
-Once all prerequistes are installed you confirmed the Bicep scripts can be deployed via the following steps
+Once all prerequisites are installed you confirmed the Bicep scripts can be deployed via the following steps
 1. Create a resource group in your Azure subscription for the deployment in your preferred location: ```az group create -l <location> -n <resource-group-name>```
-2. Review the parameters. Most of the parameters have default values assinged, but can be changed in the `main.bicep` file. You will be prompted for any variable that does not have a default value.
+2. Review the parameters. Most of the parameters have default values assigned, but can be changed in the `main.bicep` file. You will be prompted for any variable that does not have a default value.
 3. Run ```az deployment group create --resource-group <resource-group-name> --template-file main.bicep``` from the directory that that holds the `main.bicep` file and provide any variables you are prompted for. This will take about 10 - 20 minutes.
 ### Test FME Server
 Once the deployment is complete it is time to test FME Server. The public URL for the new FME Server can be found in the overview of the Application Gateway resource. Follow these steps to test FME Server:
@@ -23,8 +23,8 @@ To delete the FME Server deployment remove the resource group: ```az group delet
 |`location`|Location for the resources.||
 |`vmSizeCore`|Size of VMs in the Core VM Scale Set.|'Standard_D2s_v3'|
 |`vmSizeEngine`|Size of VMs in the Engine VM Scale Set.|'Standard_D2s_v3'|
-|`vmssNameCore`|Name of the VM Scaleset for the Core machines|'fmeserver-core'|
-|`vmssNameEngine`|Name of the VM Scaleset for the Engine machines|'fmeserver-engine'|
+|`vmssNameCore`|Name of the VM Scale Set for the Core machines|'fmeserver-core'|
+|`vmssNameEngine`|Name of the VM Scale Set for the Engine machines|'fmeserver-engine'|
 |`instanceCountCore`|'Number of Core VM instances.|1|
 |`instanceCountEngine`|Number of Engine VM instances.|1|
 |`storageAccountName`|Name of the storage account|'fmeserver{uniqueString}'|

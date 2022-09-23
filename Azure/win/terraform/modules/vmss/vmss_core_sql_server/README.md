@@ -1,5 +1,5 @@
 # FME Server Core VMSS module using Azure SQL Server
-This module creates the virtual machince scale set for the FME Core of a distributed FME Server deployment using a Azure SQL Server backend database.
+This module creates the virtual machine scale set for the FME Core of a distributed FME Server deployment using a Azure SQL Server backend database.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

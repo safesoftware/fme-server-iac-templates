@@ -111,4 +111,7 @@ module "asg_engine" {
   nlb_dns_name         = module.nlb.nlb_dns_name
   private_sn_az2_id    = module.network.private_sn_az2_id
   private_sn_az1_id    = module.network.private_sn_az1_id
+  depends_on = [
+    module.asg_core
+  ]
 }

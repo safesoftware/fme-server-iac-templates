@@ -4,7 +4,7 @@ This module creates the required storage account and fileshare for a distributed
 |Parameter|Description|
 |---|---|
 |`location` | Location for the resources.
-|`tags` | Onwer tag to be added to the resources.
+|`tags` | Owner tag to be added to the resources.
 |`subnetId` | ID of the backend subnet of the FME Server deployment (see network module).
 |`fileShareName` | Name of the fileshare.
 |`storageAccountName` | Name of the storage account.

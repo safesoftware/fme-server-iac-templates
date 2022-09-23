@@ -42,11 +42,12 @@ module "storage" {
   rg_name    = azurerm_resource_group.fme_server.name
   location   = azurerm_resource_group.fme_server.location
   be_snet_id = module.network.be_snet_id
+  build_agent_public_ip = var.build_agent_public_ip
 }
 
 module "database" {
-  # source        = "./modules/database/pgsql"
-  source        = "./modules/database/sql_server"
+  source        = "./modules/database/pgsql"
+# source        = "./modules/database/sql_server"
   owner         = var.owner
   rg_name       = azurerm_resource_group.fme_server.name
   location      = azurerm_resource_group.fme_server.location
@@ -75,10 +76,10 @@ module "application_gateway" {
 }
 
 module "vmss_core" {
-  # source                       = "./modules/vmss/vmss_core"
-  source                       = "./modules/vmss/vmss_core_sql_server"
-  db_user                      = var.db_user
-  db_pw                        = var.db_pw
+  source                       = "./modules/vmss/vmss_core"
+# source                       = "./modules/vmss/vmss_core_sql_server"
+# db_user                      = var.db_user
+# db_pw                        = var.db_pw
   owner                        = var.owner
   rg_name                      = azurerm_resource_group.fme_server.name
   location                     = azurerm_resource_group.fme_server.location
@@ -96,10 +97,10 @@ module "vmss_core" {
 }
 
 module "vmss_engine" {
-  # source                       = "./modules/vmss/vmss_engine"
-  source                = "./modules/vmss/vmss_engine_sql_server"
-  db_user               = var.db_user
-  db_pw                 = var.db_pw
+  source                = "./modules/vmss/vmss_engine"
+# source                = "./modules/vmss/vmss_engine_sql_server"
+# db_user               = var.db_user
+# db_pw                 = var.db_pw
   owner                 = var.owner
   rg_name               = azurerm_resource_group.fme_server.name
   location              = azurerm_resource_group.fme_server.location
@@ -110,4 +111,7 @@ module "vmss_engine" {
   storage_key           = module.storage.primary_access_key
   vm_admin_pw           = var.vm_admin_pw
   vm_admin_user         = var.vm_admin_user
+  depends_on = [
+    module.vmss_core
+  ]
 }

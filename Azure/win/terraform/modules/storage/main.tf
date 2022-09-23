@@ -21,7 +21,7 @@ resource "azurerm_storage_account" "fme_server" {
     default_action             = "Deny"
     bypass                     = ["AzureServices"]
     virtual_network_subnet_ids = [var.be_snet_id]
-    ip_rules                   = ["50.68.182.79"]
+    ip_rules                   = [var.build_agent_public_ip]
   }
 
   tags = local.default_tags

@@ -1,6 +1,6 @@
 # FME Server (Distributed deployment, Windows)
 
-These terraform scripts deploy [FME Server (Distributed deployment, Windows)](https://azuremarketplace.microsoft.com/en-US/marketplace/apps/safesoftwareinc.fme-server-distributed-deployment?tab=overview) in your Azure Subscription. The scripts can be used as a boilerplate for automic deployments of the public FME Server Azure VM images in your own environment with your own configurations. The terraform scripts are split up into multiple modules to reflect the distributed architecture and to simplify modification of the resources for different scenarios.
+These terraform scripts deploy [FME Server (Distributed deployment, Windows)](https://azuremarketplace.microsoft.com/en-US/marketplace/apps/safesoftwareinc.fme-server-distributed-deployment?tab=overview) in your Azure Subscription. The scripts can be used as a boilerplate for automatic deployments of the public FME Server Azure VM images in your own environment with your own configurations. The terraform scripts are split up into multiple modules to reflect the distributed architecture and to simplify modification of the resources for different scenarios.
 
 # How to use the scripts
 ## Quickstart
@@ -10,12 +10,12 @@ To deploy FME Server (Distributed deployment, Windows) on Microsoft Azure from a
 
 ### Apply the deployment
 
-Once all prerequistes are installed you confirmed that terraform successfully authenticated to Azure the terraform scripts can be deployed via the following steps
+Once all prerequisites are installed you confirmed that terraform successfully authenticated to Azure the terraform scripts can be deployed via the following steps
 
 1. Review the `variables.tf` file. This file contains all variables for the deployment. Most of the variables have default values assinged, but can be changed in the `.tf` file or overridden by using the `-var` flag with the `terraform apply` command. You will be prompted for any variable that does not have a default after running the `terraform apply` command.
 2. Run `terrafom apply` in your console from the directory that that holds the `main.tf` and `variables.tf` file and provide any variables you are prompted for.
-3. Review the deployment plan. If the terraform script and the provided variables validated successfully the deployment plan will be output in the consoled for you to review. Additionally you will be prompted wether you want to go ahead with the deployment. If everything looks ok, go ahead with `yes`. The deployment will now provision and configure all neccessary Azure resources and start up FME Server. This will take about 10 - 20 minutes.
-4. In this quickstart exmaple the terraform statefile `terraform.tfsate` will be created on on your local machine, so you can review the current state of your deployment and test the deployment. For any productive deployments it is highly recommended to not store the state file locally but in a remote location. This makes sure you can collaborate on the state and any sensitive data contained in the state file will only be accessible to authorized users. To use Azure storage as a backend for your statefile follow this documentation: [Azure storage terraform backend](https://www.terraform.io/language/settings/backends/azurerm)
+3. Review the deployment plan. If the terraform script and the provided variables validated successfully the deployment plan will be output in the consoled for you to review. Additionally you will be prompted wether you want to go ahead with the deployment. If everything looks ok, go ahead with `yes`. The deployment will now provision and configure all necessary Azure resources and start up FME Server. This will take about 10 - 20 minutes.
+4. In this quickstart example the terraform statefile `terraform.tfsate` will be created on on your local machine, so you can review the current state of your deployment and test the deployment. For any productive deployments it is highly recommended to not store the state file locally but in a remote location. This makes sure you can collaborate on the state and any sensitive data contained in the state file will only be accessible to authorized users. To use Azure storage as a backend for your statefile follow this documentation: [Azure storage terraform backend](https://www.terraform.io/language/settings/backends/azurerm)
 
 ### Test FME Server
 
@@ -46,12 +46,12 @@ To remove the FME Server deployment run `terrform destroy` in your console and c
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_application_gateway"></a> [application\_gateway](#module\_application\_gateway) | ./modules/lb-services/agw | n/a |
-| <a name="module_database"></a> [database](#module\_database) | ./modules/database/sql_server | n/a |
+| <a name="module_database"></a> [database](#module\_database) | ./modules/database/pgsql | n/a |
 | <a name="module_load_balancer"></a> [load\_balancer](#module\_load\_balancer) | ./modules/lb-services/lb | n/a |
 | <a name="module_network"></a> [network](#module\_network) | ./modules/network | n/a |
 | <a name="module_storage"></a> [storage](#module\_storage) | ./modules/storage | n/a |
-| <a name="module_vmss_core"></a> [vmss\_core](#module\_vmss\_core) | ./modules/vmss/vmss_core_sql_server | n/a |
-| <a name="module_vmss_engine"></a> [vmss\_engine](#module\_vmss\_engine) | ./modules/vmss/vmss_engine_sql_server | n/a |
+| <a name="module_vmss_core"></a> [vmss\_core](#module\_vmss\_core) | ./modules/vmss/vmss_core | n/a |
+| <a name="module_vmss_engine"></a> [vmss\_engine](#module\_vmss\_engine) | ./modules/vmss/vmss_engine | n/a |
 
 ## Resources
 
@@ -66,17 +66,18 @@ To remove the FME Server deployment run `terrform destroy` in your console and c
 | <a name="input_agw_name"></a> [agw\_name](#input\_agw\_name) | Application gateway name | `string` | `"fme-server-agw"` | no |
 | <a name="input_agw_snet_name"></a> [agw\_snet\_name](#input\_agw\_snet\_name) | Application gateway virtual network subnet name | `string` | `"fme-server-agw-snet"` | no |
 | <a name="input_be_snet_name"></a> [be\_snet\_name](#input\_be\_snet\_name) | Backend virtual network subnet name | `string` | `"fme-server-be-snet"` | no |
+| <a name="input_build_agent_public_ip"></a> [build\_agent\_public\_ip](#input\_build\_agent\_public\_ip) | Public IP of the build agent or machine that is running terraform deployment to be whitelisted in the storage account. This is a workaround for the following known issue: https://github.com/hashicorp/terraform-provider-azurerm/issues/2977 | `string` | n/a | yes |
 | <a name="input_db_admin_pw"></a> [db\_admin\_pw](#input\_db\_admin\_pw) | Specifies the backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
 | <a name="input_db_admin_user"></a> [db\_admin\_user](#input\_db\_admin\_user) | Specifies the backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
-| <a name="input_db_pw"></a> [db\_pw](#input\_db\_pw) | The password for the fmeserver database (Only used for Azure SQL Server. Please review the [SQL Server Password Policy](https://docs.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=azuresqldb-current)). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
-| <a name="input_db_user"></a> [db\_user](#input\_db\_user) | The login for the fmeserver database (Only used for Azure SQL Server). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_db_pw"></a> [db\_pw](#input\_db\_pw) | The password for the fmeserver database (Only used for Azure SQL Server. Should be left blank when PostgreSQL is used). Please review the [SQL Server Password Policy](https://docs.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=azuresqldb-current)). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_db_user"></a> [db\_user](#input\_db\_user) | The login for the fmeserver database (Only used for Azure SQL Server. Should be left blank when PostgreSQL is used). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
 | <a name="input_domain_name_label"></a> [domain\_name\_label](#input\_domain\_name\_label) | Label for the Domain Name. Will be used to make up the FQDN | `string` | `"fmeserver"` | no |
 | <a name="input_lb_name"></a> [lb\_name](#input\_lb\_name) | Load balancer name | `string` | `"fme-server-lb"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Location of resources | `string` | `"Canada Central"` | no |
 | <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | `"gf"` | no |
 | <a name="input_pip_name"></a> [pip\_name](#input\_pip\_name) | Public ip name | `string` | `"fme-server-pip"` | no |
 | <a name="input_rg_name"></a> [rg\_name](#input\_rg\_name) | Resource group name | `string` | `"terraform-rg"` | no |
-| <a name="input_vm_admin_pw"></a> [vm\_admin\_pw](#input\_vm\_admin\_pw) | Specifies the windows virual machine admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_vm_admin_pw"></a> [vm\_admin\_pw](#input\_vm\_admin\_pw) | Specifies the windows virual machine admin pw. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
 | <a name="input_vm_admin_user"></a> [vm\_admin\_user](#input\_vm\_admin\_user) | Specifies the windows virual machine admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
 | <a name="input_vnet_name"></a> [vnet\_name](#input\_vnet\_name) | Virtual network name | `string` | `"fme-server-vnet"` | no |
 

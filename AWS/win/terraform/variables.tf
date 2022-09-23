@@ -66,13 +66,13 @@ variable "nat_name" {
 
 variable "fme_core_image_id" {
   type        = string
-  default     = "ami-03d3d062bd7898488"
+  default     = "ami-0a5957f3a61c0a54e"
   description = "Id of the FME Sever core image"
 }
 
 variable "fme_engine_image_id" {
   type        = string
-  default     = "ami-00370f1e5900ecb72"
+  default     = "ami-0932e6d7cda8cdec0"
   description = "Id of the FME Sever core image"
 }
 
