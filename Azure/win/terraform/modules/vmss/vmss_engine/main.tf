@@ -28,6 +28,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_engine" {
     }
   }
 
+  # source_image_id = ""
   source_image_reference {
     publisher = "safesoftwareinc"
     offer     = "fme-engine"

@@ -4,7 +4,7 @@ This module creates load balancer for a distributed FME Server deployment in Azu
 |Parameter|Description|
 |---|---|
 |`location` | Location for the resources.
-|`tags` | Onwer tag to be added to the resources.
+|`tags` | Owner tag to be added to the resources.
 |`subnetId` | ID of the backend subnet of the FME Server deployment (see network module).
 |`engineRegistrationLoadBalancerName` | Specifies the name of the load balancer.|
 ## Output

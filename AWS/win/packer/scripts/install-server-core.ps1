@@ -4,7 +4,7 @@ Write-Host "Downloading installer from $installer_url"
 $ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -Uri "$installer_url" -OutFile C:\fme-server.exe
 Write-Host "Installing FME Server..."
-Start-Process C:\fme-server.exe -Wait -ArgumentList "-s", "-dC:\FME", "-sp""FMESERVERHOSTNAME=localhost SERVLETPORT=8080 DEPLOYMENTNAME=localhost WEBSERVERHOSTNAME=localhost NODENAME=localhost FMESERVERSHAREDDATA=C:\Data DATABASETYPE=PostgreSQL INSTALLTYPE=Distributed ADDLOCAL=FMEServerCore,Services,FMEServerDatabase,Complete /qn /norestart"""  
+Start-Process C:\fme-server.exe -Wait -ArgumentList "-s", "-dC:\FME", "-sp""FMESERVERHOSTNAME=localhost SERVLETPORT=8080 DEPLOYMENTNAME=localhost WEBSERVERHOSTNAME=localhost NODENAME=localhost FMESERVERSHAREDDATA=C:\Data DATABASETYPE=PostgreSQL INSTALLTYPE=Distributed ADDLOCAL=FMEServerCore,Services,FMEServerDatabase /qn /norestart"""  
 Start-Sleep -s 60
 
 Stop-Service -Name "FME Server Core"

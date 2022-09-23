@@ -1,2 +1,2 @@
 # FME Server (Distributed deployment, Windows)
-This CloudFormation templates create all neccessary resources for a distributed FME Sever deployement using public AMIs for the core and engine ec2 instances.
+This CloudFormation templates create all necessary resources for a distributed FME Sever deployment using public AMIs for the core and engine ec2 instances.

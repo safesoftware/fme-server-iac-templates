@@ -1,3 +1,8 @@
+variable "installer_url" {
+  type = string
+  default = "https://downloads.safe.com/fme/2022/fme-server-2022.1.2-b22627-win-x64.exe"
+}
+
 source "azure-arm" "fme_engine" {
   azure_tags = {
     owner = "gf"
@@ -8,7 +13,7 @@ source "azure-arm" "fme_engine" {
   image_offer                       = "WindowsServer"
   image_publisher                   = "MicrosoftWindowsServer"
   image_sku                         = "2022-Datacenter"
-  managed_image_name                = "fmeEngine22715"
+  managed_image_name                = "fmeEngine22733"
   managed_image_resource_group_name = "fmeImages"
   os_type                           = "Windows"
   os_disk_size_gb                   = 150
@@ -29,7 +34,7 @@ build {
 
   provisioner "powershell" {
     script = "scripts/install-server-engine.ps1"
-    environment_vars = ["INSTALLER_URL=https://downloads.safe.com/fme/beta/fme-server-2022.2-b22715-win-x64-beta.exe"]
+    environment_vars = ["INSTALLER_URL=${var.installer_url}"]
   }
 
   provisioner "powershell" {

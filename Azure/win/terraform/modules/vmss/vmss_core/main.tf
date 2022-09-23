@@ -29,7 +29,9 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
     }
   }
 
+  # source_image_id = ""
   source_image_reference {
+    
     publisher = "safesoftwareinc"
     offer     = "fme-core"
     sku       = "fme-core-2022-0-0-2-windows-byol"

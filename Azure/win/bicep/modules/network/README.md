@@ -5,7 +5,7 @@ This module creates the requires network resources for a distributed FME Server 
 |Parameter|Description|
 |---|---|
 |`location` | Location for the resources.
-|`tags` | Onwer tag to be added to the resources.
+|`tags` | Owner tag to be added to the resources.
 |`virtualNetworkName` | Specifies the virtual network name.
 |`subnetName` | Specifies backend virtual network subnet name.
 |`subnetAGName` | Specifies application gateway virtual network subnet name.

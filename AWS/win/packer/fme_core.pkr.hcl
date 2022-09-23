@@ -19,6 +19,11 @@ variable "tags" {
   }
 }
 
+variable "installer_url" {
+  type = string
+  default = "https://downloads.safe.com/fme/2022/fme-server-2022.1.2-b22627-win-x64.exe"
+}
+
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 
 # source blocks are generated from your builders; a source can be referenced in
@@ -60,30 +65,8 @@ build {
 
   provisioner "powershell" {
     script = "scripts/install-server-core.ps1"
-    environment_vars = ["INSTALLER_URL=https://downloads.safe.com/fme/2022/fme-server-2022.0.1.1-b22350-win-x64.exe"]
+    environment_vars = ["INSTALLER_URL=${var.installer_url}"]
   }
-
-  provisioner "powershell" {
-    inline = [
-      "# Install Google Chrome Browser",
-      "$Path = $env:TEMP",
-      "$Installer = \"chrome_installer.exe\"",
-      "Invoke-WebRequest \"https://dl.google.com/chrome/install/latest/chrome_installer.exe\" -OutFile $Path$Installer",
-      "Start-Process -FilePath $Path$Installer -Args \"/silent /install\" -Verb RunAs -Wait; Remove-Item $Path$Installer",
-      "# Disable Internet Explorer Enhanced Security",
-      "$AdminKey = \"HKLM:\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components\\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}\"",
-      "$UserKey = \"HKLM:\\SOFTWARE\\Microsoft\\Active Setup\\Installed Components\\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}\"",
-      "Set-ItemProperty -Path $AdminKey -Name \"IsInstalled\" -Value 0 -Force",
-      "Set-ItemProperty -Path $UserKey -Name \"IsInstalled\" -Value 0 -Force"
-    ]
-  }
-
-  # provisioner "powershell" {
-  #   inline = [
-  #     "& $env:SystemRoot\\System32\\Sysprep\\Sysprep.exe /oobe /generalize /quiet /quit /mode:vm",
-  #     "while($true) { $imageState = Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Setup\\State | Select ImageState; if($imageState.ImageState -ne 'IMAGE_STATE_GENERALIZE_RESEAL_TO_OOBE') { Write-Output $imageState.ImageState; Start-Sleep -s 10  } else { break } }"
-  #   ]
-  # }
 
   provisioner "powershell" {
     inline = [
