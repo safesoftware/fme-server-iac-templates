@@ -4,8 +4,7 @@ Description: Template to deploy a distributed FME Server in AWS
 Parameters:
   Owner:
     Type: String
-    Default: gf
-    Description: Default value for onwer tag
+    Description: Default value for owner tag
 
   VpcName:
     Type: String

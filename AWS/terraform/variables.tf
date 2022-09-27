@@ -1,6 +1,5 @@
 variable "owner" {
   type        = string
-  default     = "gf"
   description = "Default value for onwer tag"
 }
 
