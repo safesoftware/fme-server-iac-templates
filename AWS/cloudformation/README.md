@@ -1,0 +1,17 @@
+# FME Server (Distributed deployment, Windows)
+This CloudFormation templates create all necessary resources for a distributed FME Sever deployment using public AMIs for the core and engine ec2 instances.
+# How to use the scripts
+## Quickstart
+### Prerequisites
+#### AWS Console
+To deploy FME Server (Distributed deployment, Windows) on AWS from a local machine, you need access to an AWS Account via the console with sufficient permissions to deploy the services included in the template file. Follow this documentation depending on your scenario: [Cloudformation: Get Started](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/GettingStarted.Walkthrough.html)
+
+#### AWS CLI
+An alternative way to deploy the template is using the AWS CLI. To install and setup the AWS CLI follow this [documentation](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html).
+
+### Apply the deployment
+ A good tool to review changes before they are applied are Cloudformation change sets. While this is primarily recommended for updates that are applied to an existing stack this is a great tool review and get familiar with the services that are created from a cloudformation template. When [Creating a stack on the AWS CloudFormation console](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-create-stack.html) you will have the option to either create the stack or a change set for reviewing the services. For more information regarding change set review this documentation: [Updating stacks using change sets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html). To create a stack or a change set with the AWS CLI follow this [User guide](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-using-cli.html) and review the [AWS CLI Command Reference](https://docs.aws.amazon.com/cli/latest/reference/cloudformation/index.html#cli-aws-cloudformation)
+ ## Specify AMIs
+ The AMIs used for the deployment and specified in a mapping that picks the relevant AMIs according to the region of the deployment. Before deploying the cloudformation template make sure that available AMIs are specified in the Mappings section of the template.
+ # To do
+ - create separate NSGs for RDS and FSX
