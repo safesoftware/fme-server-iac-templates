@@ -37,10 +37,11 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing 
   name: storageAccountName
 }
 
-resource fmeEngineImage 'Microsoft.Compute/images@2022-03-01' existing = {
-  name: 'fmeEngine-20220927163615'
-  scope: resourceGroup('fmeImages')
-}
+// To use a custom image instead of the Azure Marketplace image the an existing image resource needs to be referenced by its name and resource group:
+// resource fmeEngineImage 'Microsoft.Compute/images@2022-03-01' existing = {
+//   name: 'IMAGE_NAME'
+//   scope: resourceGroup('IMAGE_RG_NAME')
+// }
 
 resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-03-01' = if (vmssName == 'fmeserver-engine') {
   name: vmssName
@@ -49,11 +50,11 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
     name: vmSizeEngine
     capacity: instanceCountEngine
   }
-  // plan: {
-  //   publisher: 'safesoftwareinc'
-  //   name: 'fme-engine-2022-0-0-2-windows-byol'
-  //   product: 'fme-engine'
-  // }
+  plan: {
+    publisher: 'safesoftwareinc'
+    name: 'fme-engine-2022-0-0-2-windows-byol'
+    product: 'fme-engine'
+  }
   properties: {
     overprovision: false
     upgradePolicy: {
@@ -66,11 +67,12 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
           caching: 'ReadWrite'
         }
         imageReference: {
-          id: fmeEngineImage.id
-          // publisher: 'safesoftwareinc'
-          // offer: 'fme-engine'
-          // sku: 'fme-engine-2022-0-0-2-windows-byol'
-          // version: '1.0.0'
+          // To use a custom image the 'plan' block and the publisher, offer, sku & version properties need to be commented. If an an existing image resource has been added it can be reference by its id:
+          // id: fmeEngineImage.id
+          publisher: 'safesoftwareinc'
+          offer: 'fme-engine'
+          sku: 'fme-engine-2022-0-0-2-windows-byol'
+          version: '1.0.0'
         }
       }
       osProfile: {

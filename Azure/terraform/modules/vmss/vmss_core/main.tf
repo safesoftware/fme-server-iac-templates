@@ -29,20 +29,21 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
     }
   }
 
-  source_image_id = "/subscriptions/47d1fbb4-9204-40d6-8efe-3ced9b077d2d/resourceGroups/fmeImages/providers/Microsoft.Compute/images/fmeCore-20220927163615"
-  # source_image_reference {
+  # To use a custom source_image_id instead of the Azure Marketplace image the 'source_image_reference' and 'plan' blocks need to be commented
+  # source_image_id = ""
+  source_image_reference {
     
-  #   publisher = "safesoftwareinc"
-  #   offer     = "fme-core"
-  #   sku       = "fme-core-2022-0-0-2-windows-byol"
-  #   version   = "latest"
-  # }
+    publisher = "safesoftwareinc"
+    offer     = "fme-core"
+    sku       = "fme-core-2022-0-0-2-windows-byol"
+    version   = "latest"
+  }
 
-  # plan {
-  #   name      = "fme-core-2022-0-0-2-windows-byol"
-  #   publisher = "safesoftwareinc"
-  #   product   = "fme-core"
-  # }
+  plan {
+    name      = "fme-core-2022-0-0-2-windows-byol"
+    publisher = "safesoftwareinc"
+    product   = "fme-core"
+  }
 
   extension {
     name                 = "core-script"
