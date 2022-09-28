@@ -26,6 +26,9 @@ Once the deployment is complete it is time to test FME Server. The public URL fo
 2. [Request and Install a License](https://docs.safe.com/fme/html/FME_Server_Documentation/AdminGuide/Request_and_Install_a_License-2-Tier.htm)
 3. [Run Workspace](https://docs.safe.com/fme/html/FME_Server_Documentation/WebUI/Run-Workspace.htm?)
 
+### Connect to instance via RDP
+To connect to the instance via RDP it is recommended to launch a Windows ec2 instance in a public network of the deployment and to allow RDP access in the FME Server Security Group. The FME Core and FME Engine instances can then be accessed via RDP from the new ec2 instance via their private IPs using the Active Directory admin account as login.
+
 ### Delete the deployment
 
 To remove the FME Server deployment run `terrform destroy` in your console and confirm the prompt with `yes`.
@@ -69,16 +72,18 @@ No resources.
 | <a name="input_db_admin_pw"></a> [db\_admin\_pw](#input\_db\_admin\_pw) | Backend database admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE. | `string` | n/a | yes |
 | <a name="input_db_admin_user"></a> [db\_admin\_user](#input\_db\_admin\_user) | Backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE. | `string` | n/a | yes |
 | <a name="input_eip_name"></a> [eip\_name](#input\_eip\_name) | Elastic IP name | `string` | `"tf-eip-name"` | no |
-| <a name="input_fme_core_image_id"></a> [fme\_core\_image\_id](#input\_fme\_core\_image\_id) | Id of the FME Sever core image | `string` | `"ami-0a5957f3a61c0a54e"` | no |
-| <a name="input_fme_engine_image_id"></a> [fme\_engine\_image\_id](#input\_fme\_engine\_image\_id) | Id of the FME Sever core image | `string` | `"ami-0932e6d7cda8cdec0"` | no |
+| <a name="input_fme_core_image_id"></a> [fme\_core\_image\_id](#input\_fme\_core\_image\_id) | Id of the FME Sever core image. The AMI needs to be available in the region used for the deployment | `string` | n/a | yes |
+| <a name="input_fme_engine_image_id"></a> [fme\_engine\_image\_id](#input\_fme\_engine\_image\_id) | Id of the FME Sever core image. The AMI needs to be available in the region used for the deployment | `string` | n/a | yes |
 | <a name="input_igw_name"></a> [igw\_name](#input\_igw\_name) | Internet gateway name | `string` | `"tf-internet-gw"` | no |
 | <a name="input_nat_name"></a> [nat\_name](#input\_nat\_name) | NAT gateway name | `string` | `"tf-nat-gw"` | no |
 | <a name="input_nlb_name"></a> [nlb\_name](#input\_nlb\_name) | Name of the network load balancer | `string` | `"tf-network-lb"` | no |
-| <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | `"gf"` | no |
+| <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | n/a | yes |
 | <a name="input_private_sn1_cidr"></a> [private\_sn1\_cidr](#input\_private\_sn1\_cidr) | CIDR range for private subnet in the first availability zone | `string` | `"10.0.128.0/20"` | no |
 | <a name="input_private_sn2_cidr"></a> [private\_sn2\_cidr](#input\_private\_sn2\_cidr) | CIDR range for private subnet in the second availability zone | `string` | `"10.0.144.0/20"` | no |
+| <a name="input_public_access"></a> [public\_access](#input\_public\_access) | CDIR range from which the FME Server Web UI and Websocket will be accessible | `string` | n/a | yes |
 | <a name="input_public_sn1_cidr"></a> [public\_sn1\_cidr](#input\_public\_sn1\_cidr) | CIDR range for public subnet in the first availability zone | `string` | `"10.0.0.0/20"` | no |
 | <a name="input_public_sn2_cidr"></a> [public\_sn2\_cidr](#input\_public\_sn2\_cidr) | CIDR range for public subnet in the second availability zone | `string` | `"10.0.16.0/20"` | no |
+| <a name="input_region"></a> [region](#input\_region) | AWS region in which FME Sever will be deployed | `string` | n/a | yes |
 | <a name="input_sn_name"></a> [sn\_name](#input\_sn\_name) | Subnet name prefix | `string` | `"tf-subnet"` | no |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR range for VPC | `string` | `"10.0.0.0/16"` | no |
 | <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Virtual private cloud name | `string` | `"tf-vpc"` | no |

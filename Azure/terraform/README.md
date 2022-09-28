@@ -74,7 +74,7 @@ To remove the FME Server deployment run `terrform destroy` in your console and c
 | <a name="input_domain_name_label"></a> [domain\_name\_label](#input\_domain\_name\_label) | Label for the Domain Name. Will be used to make up the FQDN | `string` | `"fmeserver"` | no |
 | <a name="input_lb_name"></a> [lb\_name](#input\_lb\_name) | Load balancer name | `string` | `"fme-server-lb"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Location of resources | `string` | `"Canada Central"` | no |
-| <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | `"gf"` | no |
+| <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | n/a | yes |
 | <a name="input_pip_name"></a> [pip\_name](#input\_pip\_name) | Public ip name | `string` | `"fme-server-pip"` | no |
 | <a name="input_rg_name"></a> [rg\_name](#input\_rg\_name) | Resource group name | `string` | `"terraform-rg"` | no |
 | <a name="input_vm_admin_pw"></a> [vm\_admin\_pw](#input\_vm\_admin\_pw) | Specifies the windows virual machine admin pw. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |

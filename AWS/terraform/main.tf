@@ -10,7 +10,7 @@ terraform {
 
 provider "aws" {
   profile = "default"
-  region  = "ca-central-1"
+  region  = var.region
   default_tags {
     tags = {
       "Owner" = var.owner
@@ -26,6 +26,7 @@ module "network" {
   eip_name         = var.eip_name
   nat_name         = var.nat_name
   vpc_cidr         = var.vpc_cidr
+  public_access    = var.public_access
   public_sn1_cidr  = var.public_sn1_cidr
   public_sn2_cidr  = var.public_sn2_cidr
   private_sn1_cidr = var.private_sn1_cidr

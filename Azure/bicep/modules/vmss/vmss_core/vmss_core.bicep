@@ -56,6 +56,11 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing 
   name: storageAccountName
 }
 
+resource fmeCoreImage 'Microsoft.Compute/images@2022-03-01' existing = {
+  name: 'fmeCore-20220927163615'
+  scope: resourceGroup('fmeImages')
+}
+
 resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-03-01' = if (vmssName == 'fmeserver-core') {
   name: vmssName
   location: location
@@ -63,11 +68,11 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
     name: vmSizeCore
     capacity: instanceCountCore
   }
-  plan: {
-    publisher: 'safesoftwareinc'
-    name: 'fme-core-2022-0-0-2-windows-byol'
-    product: 'fme-core'
-  }
+  // plan: {
+  //   publisher: 'safesoftwareinc'
+  //   name: 'fme-core-2022-0-0-2-windows-byol'
+  //   product: 'fme-core'
+  // }
   properties: {
     overprovision: false
     upgradePolicy: {
@@ -80,10 +85,11 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
           caching: 'ReadWrite'
         }
         imageReference: {
-          publisher: 'safesoftwareinc'
-          offer: 'fme-core'
-          sku: 'fme-core-2022-0-0-2-windows-byol'
-          version: '1.0.0'
+          id: fmeCoreImage.id
+          // publisher: 'safesoftwareinc'
+          // offer: 'fme-core'
+          // sku: 'fme-core-2022-0-0-2-windows-byol'
+          // version: '1.0.0'
         }
       }
       osProfile: {

@@ -49,6 +49,7 @@ No modules.
 | <a name="input_nat_name"></a> [nat\_name](#input\_nat\_name) | NAT gateway name | `string` | n/a | yes |
 | <a name="input_private_sn1_cidr"></a> [private\_sn1\_cidr](#input\_private\_sn1\_cidr) | CIDR range for private subnet in the first availability zone | `string` | n/a | yes |
 | <a name="input_private_sn2_cidr"></a> [private\_sn2\_cidr](#input\_private\_sn2\_cidr) | CIDR range for private subnet in the second availability zone | `string` | n/a | yes |
+| <a name="input_public_access"></a> [public\_access](#input\_public\_access) | CDIR range from which the FME Server Web UI and Websocket will be accessible | `string` | n/a | yes |
 | <a name="input_public_sn1_cidr"></a> [public\_sn1\_cidr](#input\_public\_sn1\_cidr) | CIDR range for public subnet in the first availability zone | `string` | n/a | yes |
 | <a name="input_public_sn2_cidr"></a> [public\_sn2\_cidr](#input\_public\_sn2\_cidr) | CIDR range for public subnet in the second availability zone | `string` | n/a | yes |
 | <a name="input_sn_name"></a> [sn\_name](#input\_sn\_name) | Subnet name prefix | `string` | n/a | yes |

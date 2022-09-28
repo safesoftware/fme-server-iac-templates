@@ -3,6 +3,15 @@ variable "owner" {
   description = "Default value for onwer tag"
 }
 
+variable "public_access" {
+  type        = string
+  description = "CDIR range from which the FME Server Web UI and Websocket will be accessible"
+}
+
+variable "region" {
+  type = string
+  description = "AWS region in which FME Sever will be deployed" 
+}
 variable "vpc_name" {
   type        = string
   default     = "tf-vpc"
@@ -65,14 +74,12 @@ variable "nat_name" {
 
 variable "fme_core_image_id" {
   type        = string
-  default     = "ami-0a5957f3a61c0a54e"
-  description = "Id of the FME Sever core image"
+  description = "Id of the FME Sever core image. The AMI needs to be available in the region used for the deployment"
 }
 
 variable "fme_engine_image_id" {
   type        = string
-  default     = "ami-0932e6d7cda8cdec0"
-  description = "Id of the FME Sever core image"
+  description = "Id of the FME Sever core image. The AMI needs to be available in the region used for the deployment"
 }
 
 variable "ad_name" {

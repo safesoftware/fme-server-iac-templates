@@ -8,6 +8,11 @@ variable "sn_name" {
   description = "Subnet name prefix"
 }
 
+variable "public_access" {
+  type        = string
+  description = "CDIR range from which the FME Server Web UI and Websocket will be accessible"
+}
+
 variable "vpc_cidr" {
   type        = string
   description = "CIDR range for VPC"

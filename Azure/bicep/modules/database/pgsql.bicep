@@ -14,6 +14,7 @@ param postgresServerName string
 param postgresqlAdministratorLogin string
 
 @description ('Backend database admin password')
+@secure()
 param postgresqlAdministratorLoginPassword string
 
 resource postgresServer 'Microsoft.DBforPostgreSQL/servers@2017-12-01' = {

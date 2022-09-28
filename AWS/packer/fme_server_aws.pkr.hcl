@@ -1,12 +1,3 @@
-packer {
-  required_plugins {
-    amazon = {
-      version = ">=1.0.0"
-      source = "github.com/hashicorp/amazon"
-    }
-  }
-}
-
 variable "region" {
   type    = string
 }
@@ -31,7 +22,6 @@ source "amazon-ebs" "fme_core" {
   region                = "${var.region}"
   source_ami            = "ami-0280d580c37d161bf"
   user_data_file        = "scripts/bootstrap_win.txt"
-  winrm_password        = "SuperS3cr3t!!!!"
   winrm_username        = "Administrator"
   disable_stop_instance = true
   
@@ -55,7 +45,6 @@ source "amazon-ebs" "fme_engine" {
   region         = "${var.region}"
   source_ami     = "ami-0280d580c37d161bf"
   user_data_file = "scripts/bootstrap_win.txt"
-  winrm_password = "SuperS3cr3t!!!!"
   winrm_username = "Administrator"
   disable_stop_instance = true
   

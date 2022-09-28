@@ -180,6 +180,9 @@ module vmssEngine 'modules/vmss/vmss_engine/vmss_engine.bicep' = {
     vmSizeEngine: vmSizeEngine
     vmssName: vmssNameEngine
   }
+  dependsOn: [
+    vmssCore
+  ]
 }
 
 output fqdn string = network.outputs.publicIpFqdn

@@ -153,7 +153,7 @@ resource "aws_security_group" "fmeserver" {
       protocol         = "tcp"
       from_port        = 80
       to_port          = 80
-      cidr_blocks      = ["50.68.182.79/32"]
+      cidr_blocks      = [var.public_access]
       ipv6_cidr_blocks = []
       prefix_list_ids  = []
       security_groups  = []
@@ -165,7 +165,7 @@ resource "aws_security_group" "fmeserver" {
       protocol         = "tcp"
       from_port        = 7078
       to_port          = 7078
-      cidr_blocks      = ["50.68.182.79/32"]
+      cidr_blocks      = [var.public_access]
       ipv6_cidr_blocks = []
       prefix_list_ids  = []
       security_groups  = []
@@ -214,17 +214,6 @@ resource "aws_security_group" "fmeserver" {
       prefix_list_ids  = []
       security_groups  = []
       self             = false
-    },
-    {
-      cidr_blocks      = ["50.68.182.79/32"]
-      description      = ""
-      from_port        = 3389
-      ipv6_cidr_blocks = []
-      prefix_list_ids  = []
-      protocol         = "tcp"
-      security_groups  = []
-      self             = false
-      to_port          = 3389
     }
   ]
 

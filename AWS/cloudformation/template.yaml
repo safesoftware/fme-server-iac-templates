@@ -6,6 +6,10 @@ Parameters:
     Type: String
     Description: Default value for owner tag
 
+  PublicAccess:
+    Type: String
+    Description: CDIR range from which the FME Server Web UI and Websocket will be accessible
+
   VpcName:
     Type: String
     Default: cf-vpc
@@ -40,11 +44,6 @@ Parameters:
     Type: String
     Default: 10.192.21.0/24
     Description: Please enter the IP range (CIDR notation) for the private subnet in the second Availability Zone
-
-  PublicAccess:
-    Type: String
-    Default: 50.68.182.79/32
-    Description: CDIR range from which the FME Server Web UI and Websocket will be accessible
 
   IgwName:
     Type: String
@@ -816,4 +815,7 @@ Resources:
         - Key: Name
           Value: fmeEngine
           PropagateAtLaunch: True
-      
+Outputs:
+  FMESeverFQDN:
+    Description: The FQDN of the FME Server
+    Value: !GetAtt Alb.DNSName
