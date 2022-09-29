@@ -15,6 +15,18 @@ variable "location" {
   description = "Location of resources"
 }
 
+variable "instance_count_core" {
+  type = number
+  default = 2
+  description = "Number of Core VM instances"
+}
+
+variable "instance_count_engine" {
+  type = number
+  default = 2
+  description = "Number of engine VM instances"
+}
+
 variable "vnet_name" {
   type        = string
   default     = "fme-server-vnet"

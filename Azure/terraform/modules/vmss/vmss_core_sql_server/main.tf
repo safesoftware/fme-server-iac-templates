@@ -7,7 +7,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
   resource_group_name = var.rg_name
   location            = var.location
   sku                 = "Standard_D2s_v3"
-  instances           = 1
+  instances           = var.instance_count_core
   admin_password      = var.vm_admin_pw
   admin_username      = var.vm_admin_user
 

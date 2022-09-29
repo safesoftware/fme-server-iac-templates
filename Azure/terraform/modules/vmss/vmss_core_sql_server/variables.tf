@@ -13,6 +13,11 @@ variable "location" {
   description = "Location of resources"
 }
 
+variable "instance_count_core" {
+  type = number
+  description = "Number of Core VM instances"
+}
+
 variable "be_snet_id" {
   type        = string
   description = "Backend virtual network subnet id"

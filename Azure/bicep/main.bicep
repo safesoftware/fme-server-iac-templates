@@ -11,10 +11,10 @@ param vmSizeCore string = 'Standard_D2s_v3'
 param vmSizeEngine string = 'Standard_D2s_v3'
 
 @description('Number of Core VM instances.')
-param instanceCountCore int = 1
+param instanceCountCore int = 2
 
 @description('Number of Engine VM instances.')
-param instanceCountEngine int = 1
+param instanceCountEngine int = 2
 
 @description('Name of the storage account')
 param storageAccountName string = 'fmeserver${uniqueString(resourceGroup().id)}'

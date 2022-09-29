@@ -83,6 +83,7 @@ module "vmss_core" {
   owner                        = var.owner
   rg_name                      = azurerm_resource_group.fme_server.name
   location                     = azurerm_resource_group.fme_server.location
+  instance_count_core          = var.instance_count_core
   be_snet_id                   = module.network.be_snet_id
   lb_be_address_pool_id        = module.load_balancer.be_address_pool_id
   agw_backend_address_pool_ids = module.application_gateway.backend_address_pool_ids
@@ -104,6 +105,7 @@ module "vmss_engine" {
   owner                 = var.owner
   rg_name               = azurerm_resource_group.fme_server.name
   location              = azurerm_resource_group.fme_server.location
+  instance_count_engine = var.instance_count_engine
   be_snet_id            = module.network.be_snet_id
   db_fqdn               = module.database.fqdn
   lb_private_ip_address = module.load_balancer.private_ip_address
