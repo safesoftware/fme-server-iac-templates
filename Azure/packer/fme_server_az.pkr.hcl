@@ -1,3 +1,7 @@
+variable "resource_group" {
+  type    = string
+}
+
 variable "installer_url" {
   type = string
 }
@@ -11,7 +15,7 @@ locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 source "azure-arm" "fme_core" {
   azure_tags                        = "${var.tags}"
   use_azure_cli_auth                = true
-  build_resource_group_name         = "fmeImages"
+  build_resource_group_name         = "${var.resource_group}"
   communicator                      = "winrm"
   image_offer                       = "WindowsServer"
   image_publisher                   = "MicrosoftWindowsServer"
