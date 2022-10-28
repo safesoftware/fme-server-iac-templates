@@ -58,11 +58,11 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing 
 
 // To use a custom image instead of the Azure Marketplace image the an existing image resource needs to be referenced by its name and resource group:
 // resource fmeCoreImage 'Microsoft.Compute/images@2022-03-01' existing = {
-//   name: 'IMAGE_NAME'
-//   scope: resourceGroup('IMAGE_RG_NAME')
+//   name: '<image_name>'
+//   scope: resourceGroup('<rg_name.')
 // }
 
-resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-03-01' = if (vmssName == 'fmeserver-core') {
+resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-03-01' = {
   name: vmssName
   location: location
   sku: {
@@ -87,7 +87,7 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
         }
         imageReference: {
           // To use a custom image the 'plan' block and the publisher, offer, sku & version properties need to be commented. If an an existing image resource has been added it can be reference by its id:
-          //id: fmeCoreImage.id
+          // id: fmeCoreImage.id
           publisher: 'safesoftwareinc'
           offer: 'fme-core'
           sku: 'fme-core-2022-0-0-2-windows-byol'
@@ -95,7 +95,7 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
         }
       }
       osProfile: {
-        computerNamePrefix: 'core'
+        computerNamePrefix: vmssName
         adminUsername: adminUsername
         adminPassword: adminPassword
       }

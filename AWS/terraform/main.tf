@@ -100,7 +100,7 @@ module "asg_core" {
   private_sn_az1_id                    = module.network.private_sn_az1_id
 }
 
-module "asg_engine" {
+module "asg_standard_engine" {
   source               = "./modules/asg/asg_engine/"
   vpc_name             = var.vpc_name
   fme_engine_image_id  = var.fme_engine_image_id
@@ -112,6 +112,29 @@ module "asg_engine" {
   nlb_dns_name         = module.nlb.nlb_dns_name
   private_sn_az2_id    = module.network.private_sn_az2_id
   private_sn_az1_id    = module.network.private_sn_az1_id
+  engine_type          = "STANDARD"
+  node_managed         = "true"
+  engine_name          = "standard"
+  depends_on = [
+    module.asg_core
+  ]
+}
+
+module "asg_cpuusage_engine" {
+  source               = "./modules/asg/asg_engine/"
+  vpc_name             = var.vpc_name
+  fme_engine_image_id  = var.fme_engine_image_id
+  sg_id                = module.network.sg_id
+  iam_instance_profile = module.iam.iam_instance_profile
+  rds_secrets_arn      = module.secrets.rds_secrets_arn
+  fsx_secrets_arn      = module.secrets.fsx_secrets_arn
+  ssm_document_name    = module.storage.ssm_document_name
+  nlb_dns_name         = module.nlb.nlb_dns_name
+  private_sn_az2_id    = module.network.private_sn_az2_id
+  private_sn_az1_id    = module.network.private_sn_az1_id
+  engine_type          = "DYNAMIC"
+  node_managed         = "false"
+  engine_name          = "cpuUsage"
   depends_on = [
     module.asg_core
   ]

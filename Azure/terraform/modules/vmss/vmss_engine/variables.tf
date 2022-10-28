@@ -13,6 +13,16 @@ variable "location" {
   description = "Location of resources"
 }
 
+variable "vmss_name" {
+  type = string
+  description = "Name of the virtual machine scale set"
+}
+
+variable "engine_type" {
+  type = string
+  description = "The type of FME Server Engine. Possible values are STANDARD and DYNAMIC"
+}
+
 variable "instance_count_engine" {
   type = number
   description = "Number of engine VM instances"

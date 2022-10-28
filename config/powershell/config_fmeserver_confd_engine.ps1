@@ -2,12 +2,14 @@ param(
  [string] $engineregistrationhost,
  [string] $databasehostname,
  [string] $storageAccountName,
- [string] $storageAccountKey
+ [string] $storageAccountKey,
+ [string] $engineType = "STANDARD",
+ [string] $nodeManaged = "true"
 )
 
 try {
     # try on Azure first
-    $private_ip = Invoke-RestMethod -Uri "http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/privateIpAddress?api-version=2017-08-01&format=text"  -Headers @{"Metadata"="true"}
+    $private_ip = Invoke-RestMethod -Uri "http://169.254.169.254/metadata/instance/compute/osProfile/computerName?api-version=2021-02-01&format=text" -Headers @{"Metadata"="true"}
     # get the first part of the database hostname to use with the username
     $hostShort,$rest = $databaseHostname -split '\.',2
     # update variables for Azure
@@ -43,6 +45,8 @@ Add-Content "$modified_values" "pgsqlpasswordescaped: `"fmeserver`""
 Add-Content "$modified_values" "pgsqlconnectionstring: `"jdbc:postgresql://${databasehostname}:5432/fmeserver`""
 Add-Content "$modified_values" "logprefix: `"${private_ip}_`""
 Add-Content "$modified_values" "postgresrootpassword: `"postgres`""
+Add-Content "$modified_values" "enginetype: `"${engineType}`""
+Add-Content "$modified_values" "nodemanaged: `"${nodeManaged}`""
 
 # replace blanked out values to ensure confd runs correctly
 ((Get-Content -path "$default_values" -Raw) -replace '<<DATABASE_PASSWORD>>','"fmeserver"') | Set-Content -Path "$default_values"
@@ -98,7 +102,7 @@ Start-Service -Name "FME Server Engines"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-# remove coreInit taks on AWS only
+# remove coreInit task on AWS only
 if ($aws) {
     Unregister-ScheduledTask -TaskName "engineInit" -Confirm:$false
 }

@@ -10,6 +10,10 @@ variable "tags" {
   type = map(string)
 }
 
+variable "source_ami" {
+  type = string
+}
+
 locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 
 # source blocks are generated from your builders; a source can be referenced in
@@ -20,7 +24,7 @@ source "amazon-ebs" "fme_core" {
   communicator          = "winrm"
   instance_type         = "t3.large"
   region                = "${var.region}"
-  source_ami            = "ami-0280d580c37d161bf"
+  source_ami            = "${var.source_ami}"
   user_data_file        = "scripts/bootstrap_win.txt"
   winrm_username        = "Administrator"
   disable_stop_instance = true
@@ -43,7 +47,7 @@ source "amazon-ebs" "fme_engine" {
   communicator   = "winrm"
   instance_type  = "t3.large"
   region         = "${var.region}"
-  source_ami     = "ami-0280d580c37d161bf"
+  source_ami     = "${var.source_ami}"
   user_data_file = "scripts/bootstrap_win.txt"
   winrm_username = "Administrator"
   disable_stop_instance = true
@@ -67,7 +71,7 @@ build {
   sources = ["source.amazon-ebs.fme_core"]
   
   provisioner "file" {
-    source = "../../config/powershell/config_fmeserver_confd_generic.ps1"
+    source = "../../config/powershell/config_fmeserver_confd.ps1"
     destination = "C:\\config_fmeserver_confd_aws.ps1"
   }
 
@@ -88,7 +92,7 @@ build {
   sources = ["source.amazon-ebs.fme_engine"]
   
   provisioner "file" {
-    source = "../../config/powershell/config_fmeserver_confd_engine_generic.ps1"
+    source = "../../config/powershell/config_fmeserver_confd_engine.ps1"
     destination = "C:\\config_fmeserver_confd_engine_aws.ps1"
   }
 

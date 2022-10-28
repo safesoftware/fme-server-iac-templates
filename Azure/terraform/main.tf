@@ -97,11 +97,13 @@ module "vmss_core" {
   vm_admin_user                = var.vm_admin_user
 }
 
-module "vmss_engine" {
+module "vmss_standard_engine" {
   source                = "./modules/vmss/vmss_engine"
 # source                = "./modules/vmss/vmss_engine_sql_server"
 # db_user               = var.db_user
 # db_pw                 = var.db_pw
+  vmss_name             = "standard"
+  engine_type           = "STANDARD" 
   owner                 = var.owner
   rg_name               = azurerm_resource_group.fme_server.name
   location              = azurerm_resource_group.fme_server.location
@@ -117,3 +119,29 @@ module "vmss_engine" {
     module.vmss_core
   ]
 }
+
+# The CPU-Usage (Dynamic) Engine scale set is optional and a custom image is recommended following these instructions is recommended: https://github.com/safesoftware/fme-server-iac-templates/tree/main/Azure/packer
+
+# module "vmss_cpuusage_engine" {
+#   source                = "./modules/vmss/vmss_engine"
+# # source                = "./modules/vmss/vmss_engine_sql_server"
+# # db_user               = var.db_user
+# # db_pw                 = var.db_pw
+#   vmss_name             = "cpuUsage"
+#   engine_type           = "DYNAMIC" 
+#   owner                 = var.owner
+#   rg_name               = azurerm_resource_group.fme_server.name
+#   location              = azurerm_resource_group.fme_server.location
+#   instance_count_engine = var.instance_count_engine
+#   be_snet_id            = module.network.be_snet_id
+#   db_fqdn               = module.database.fqdn
+#   lb_private_ip_address = module.load_balancer.private_ip_address
+#   storage_name          = module.storage.name
+#   storage_key           = module.storage.primary_access_key
+#   vm_admin_pw           = var.vm_admin_pw
+#   vm_admin_user         = var.vm_admin_user
+#   depends_on = [
+#     module.vmss_core
+#   ]
+# }
+

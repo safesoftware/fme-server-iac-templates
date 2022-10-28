@@ -8,6 +8,13 @@ param vmSizeEngine string
 @maxLength(61)
 param vmssName string
 
+@description('The type of FME Server Engine. Possible values are STANDARD and DYNAMIC')
+@allowed([
+  'STANDARD'
+  'DYNAMIC'
+])
+param engineType string
+
 @description('Number of Engine VM instances.')
 param instanceCountEngine int
 
@@ -33,17 +40,19 @@ param engineRegistrationHost string
 @description('Backend subnet ID.')
 param subnetId string
 
+var engineTypeConfig = engineType == 'STANDARD' ? '' : '-engineType DYNAMIC -nodeManaged false'
+
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' existing = {
   name: storageAccountName
 }
 
 // To use a custom image instead of the Azure Marketplace image the an existing image resource needs to be referenced by its name and resource group:
 // resource fmeEngineImage 'Microsoft.Compute/images@2022-03-01' existing = {
-//   name: 'IMAGE_NAME'
-//   scope: resourceGroup('IMAGE_RG_NAME')
+//   name: '<image_name>'
+//   scope: resourceGroup('<rg_name>')
 // }
 
-resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-03-01' = if (vmssName == 'fmeserver-engine') {
+resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-03-01' = {
   name: vmssName
   location: location
   sku: {
@@ -76,7 +85,7 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
         }
       }
       osProfile: {
-        computerNamePrefix: 'engine'
+        computerNamePrefix: vmssName
         adminUsername: adminUsername
         adminPassword: adminPassword
       }
@@ -107,7 +116,7 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
             properties: {
               publisher: 'Microsoft.Compute'
               protectedSettings: {
-                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname ${postgresFqdn} -engineregistrationhost ${engineRegistrationHost} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccount.id, '2019-04-01').keys[0].value} >C:\\confd-log.txt 2>&1'
+                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname ${postgresFqdn} -engineregistrationhost ${engineRegistrationHost} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccount.id, '2019-04-01').keys[0].value} ${engineTypeConfig}>C:\\confd-log.txt 2>&1'
               }
               typeHandlerVersion: '1.8'
               autoUpgradeMinorVersion: true

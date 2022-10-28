@@ -51,7 +51,8 @@ To remove the FME Server deployment run `terrform destroy` in your console and c
 | <a name="module_network"></a> [network](#module\_network) | ./modules/network | n/a |
 | <a name="module_storage"></a> [storage](#module\_storage) | ./modules/storage | n/a |
 | <a name="module_vmss_core"></a> [vmss\_core](#module\_vmss\_core) | ./modules/vmss/vmss_core | n/a |
-| <a name="module_vmss_engine"></a> [vmss\_engine](#module\_vmss\_engine) | ./modules/vmss/vmss_engine | n/a |
+| <a name="module_vmss_cpuusage_engine"></a> [vmss\_cpuusage\_engine](#module\_vmss\_cpuusage\_engine) | ./modules/vmss/vmss_engine | n/a |
+| <a name="module_vmss_standard_engine"></a> [vmss\_standard\_engine](#module\_vmss\_standard\_engine) | ./modules/vmss/vmss_engine | n/a |
 
 ## Resources
 

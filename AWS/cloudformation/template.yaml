@@ -84,11 +84,11 @@ Parameters:
 Mappings: 
   RegionMap: 
     us-west-2: 
-      "fmeCore": "ami-0654116f6a19d9c89"
-      "fmeEngine": "ami-092ac67ab2349bf62"
+      "fmeCore": "ami-<xxxx>"
+      "fmeEngine": "ami-ami-<xxxx>"
     ca-central-1: 
-      "fmeCore": "ami-04926c1c54bf12a7d"
-      "fmeEngine": "ami-0dc8e82456db469ea"
+      "fmeCore": "ami-ami-<xxxx>"
+      "fmeEngine": "ami-ami-<xxxx>"
 
 Resources:
 # Network resources
@@ -726,10 +726,10 @@ Resources:
               New-SSMAssociation -InstanceId $instance_id -Name "$domainConfig"
               </powershell>
             
-  EngineLaunchTemplate:
+  StandardEngineLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
-      LaunchTemplateName: fme-engine
+      LaunchTemplateName: fme-standard-engine
       LaunchTemplateData:
         IamInstanceProfile: 
           Name: !Ref IamInstanceProfile 
@@ -758,9 +758,59 @@ Resources:
               $databasehostname = $rds_secrets.host
               $storageAccountName = "${WindowsFileSystem.DNSName}"
               $storageAccountKey = $fsx_secrets.password
+              $engineType = "STANDARD"
+              $nodeManaged = "true"
               
               # Create task to initialize FME Server
-              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine_aws.ps1 -databasehostname $databasehostname -engineregistrationhost $engineregistrationhost -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
+              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine_aws.ps1 -databasehostname $databasehostname -engineregistrationhost $engineregistrationhost -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey -engineType $engineType -nodeManaged $nodeManaged >C:\\confd-log.txt 2>&1"
+              $trigger = New-ScheduledTaskTrigger -AtStartup
+              $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
+              $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
+              Register-ScheduledTask -TaskName "engineInit" -InputObject $definition
+              
+              # Add instance to a file share domain
+              Set-DefaultAWSRegion -Region $awsRegion
+              Set-Variable -name instance_id -value (Invoke-Restmethod -uri http://169.254.169.254/latest/meta-data/instance-id)
+              New-SSMAssociation -InstanceId $instance_id -Name "$domainConfig"
+              </powershell>
+
+  CpuUsageEngineLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: fme-cpuUsage-engine
+      LaunchTemplateData:
+        IamInstanceProfile: 
+          Name: !Ref IamInstanceProfile 
+        ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", fmeEngine]
+        InstanceType: t3.large
+        MetadataOptions: 
+          HttpEndpoint: enabled
+        SecurityGroupIds: 
+          - !Ref Sg
+        TagSpecifications: 
+          - ResourceType: instance
+            Tags:
+              - Key: Owner
+                Value: !Ref Owner 
+              - Key: Name
+                Value: fmeEngine
+        UserData:
+          Fn::Base64:
+            !Sub |
+              <powershell>
+              $engineregistrationhost = "${Elb.DNSName}"
+              $awsRegion = "${AWS::Region}"
+              $domainConfig = "${SsmDocument}"
+              $rds_secrets = Get-SECSecretValue -secretid ${RdsSecret} -select SecretString | ConvertFrom-JSON
+              $fsx_secrets = Get-SECSecretValue -secretid ${FsxSecret} -select SecretString | ConvertFrom-JSON
+              $databasehostname = $rds_secrets.host
+              $storageAccountName = "${WindowsFileSystem.DNSName}"
+              $storageAccountKey = $fsx_secrets.password
+              $engineType = "DYNAMIC"
+              $nodeManaged = "false"
+              
+              # Create task to initialize FME Server
+              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine_aws.ps1 -databasehostname $databasehostname -engineregistrationhost $engineregistrationhost -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey -engineType $engineType -nodeManaged $nodeManaged >C:\\confd-log.txt 2>&1"
               $trigger = New-ScheduledTaskTrigger -AtStartup
               $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
               $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
@@ -796,15 +846,35 @@ Resources:
           Value: fmeCore
           PropagateAtLaunch: True
 
-  EngineAsg:
+  StandardEngineAsg:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       VPCZoneIdentifier:
         - !Ref PrivateSubnet1
         - !Ref PrivateSubnet2
       LaunchTemplate:
-        LaunchTemplateId: !Ref EngineLaunchTemplate
-        Version: !GetAtt EngineLaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref StandardEngineLaunchTemplate
+        Version: !GetAtt StandardEngineLaunchTemplate.LatestVersionNumber
+      DesiredCapacity: 2
+      MaxSize: 2
+      MinSize: 1
+      Tags:
+        - Key: Owner
+          Value: !Ref Owner
+          PropagateAtLaunch: True
+        - Key: Name
+          Value: fmeEngine
+          PropagateAtLaunch: True
+
+  CpuUsageEngineAsg:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      LaunchTemplate:
+        LaunchTemplateId: !Ref CpuUsageEngineLaunchTemplate
+        Version: !GetAtt CpuUsageEngineLaunchTemplate.LatestVersionNumber
       DesiredCapacity: 2
       MaxSize: 2
       MinSize: 1

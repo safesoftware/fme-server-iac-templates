@@ -142,7 +142,7 @@ Start-Service -Name "FMEServerAppServer"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-# remove coreInit taks on AWS only
+# remove coreInit task on AWS only
 if ($aws) {
     Unregister-ScheduledTask -TaskName "coreInit" -Confirm:$false
 }

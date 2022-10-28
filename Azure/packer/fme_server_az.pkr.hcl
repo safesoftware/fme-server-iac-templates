@@ -54,7 +54,7 @@ build {
   sources = ["source.azure-arm.fme_core"]
 
   provisioner "file" {
-    source = "../../config/powershell/config_fmeserver_confd_generic.ps1"
+    source = "../../config/powershell/config_fmeserver_confd.ps1"
     destination = "C:\\config_fmeserver_confd.ps1"
   }
 
@@ -75,7 +75,7 @@ build {
   sources = ["source.azure-arm.fme_engine"]
 
   provisioner "file" {
-    source = "../../config/powershell/config_fmeserver_confd_engine_generic.ps1"
+    source = "../../config/powershell/config_fmeserver_confd_engine.ps1"
     destination = "C:\\config_fmeserver_confd_engine.ps1"
   }
 

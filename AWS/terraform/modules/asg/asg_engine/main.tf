@@ -6,11 +6,13 @@ locals {
     "$fsx_secrets_arn"        = "${var.fsx_secrets_arn}"
     "$awsRegion"              = "${data.aws_region.current.name}"
     "$domainConfig"           = "${var.ssm_document_name}"
+    "$engineType"             = "${var.engine_type}"
+    "$nodeManaged"            = "${var.node_managed}"
   }
 }
 
 resource "aws_launch_template" "fme_server_engine" {
-  name                   = "fme-engine"
+  name                   = var.engine_name
   image_id               = var.fme_engine_image_id
   instance_type          = "t3.large"
   vpc_security_group_ids = [var.sg_id]
@@ -24,7 +26,7 @@ resource "aws_launch_template" "fme_server_engine" {
     resource_type = "instance"
 
     tags = {
-      Name = "fme-engine"
+      Name = var.engine_name
     }
   }
 
@@ -32,6 +34,7 @@ resource "aws_launch_template" "fme_server_engine" {
 }
 
 resource "aws_autoscaling_group" "fme_sever_engine" {
+  name_prefix         = var.engine_name
   desired_capacity    = 2
   max_size            = 2
   min_size            = 1

@@ -8,6 +8,21 @@ variable "fme_engine_image_id" {
   description = "Id of the FME Sever core image"
 }
 
+variable "engine_type" {
+  type = string
+  description = "The type of FME Server Engine. Possible values are STANDARD and DYNAMIC"
+}
+
+variable "engine_name" {
+  type        = string
+  description = "Virtual private cloud name"
+}
+
+variable "node_managed" {
+  type = string
+  description = "Whether the engine nodes can be manged via the Web UI. For cpu-usage (dynamic) engines it is recommended to us 'false'. Possible values are 'true' and 'false'"
+}
+
 variable "sg_id" {
   type        = string
   description = "Security group id for FME Server deployment"
