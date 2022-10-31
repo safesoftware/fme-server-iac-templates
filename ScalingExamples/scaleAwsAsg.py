@@ -1,41 +1,35 @@
-"""Scaling CPU-Usage (Dynamic) FME Server Engines (Azure)
+"""Scaling CPU-Usage (Dynamic) FME Server Engines (AWS)
 
 This script allows the user scale CPU-Usage (Dynamic) FME Server Engines with
-Azure Virtual Machine Scale Sets (VMSS) based on the number of queued jobs for
+AWS ec2 Auto Scaling Groups (asg) based on the number of queued jobs for
 a defined FME Server Queue.
 
 The constants are retrieved form environment variables:
 
-RG_NAME         Name of the Azure Resource Group
-VMSS_NAME       Name of the Virtual Machnine Scale Set
+ASG_NAME        Name of the ec2 Auto Scaling Group
 JOB_THRESHOLD   Threshold to scale the FME Server Engine either in or out 
 QUEUE           Name of the FME Server Queue
-SUBSCRIPTION_ID Azure Subscription ID
 FME_SERVER      FME Server URL
 FME_TOKEN       FME Server token
 
 This uses the FMEServerAPI.py as wrapper for the FME Server REST API
 Required modules:
 os
-azure-identity
-azure-mgmt-compute
+boto3
 """
 
 import os
-from azure.mgmt.compute import ComputeManagementClient
-from azure.identity import DefaultAzureCredential
+import boto3
 from FMEServerAPI import FMEServer
 
-RG_NAME         = os.environ["RG_NAME"]
-VMSS_NAME       = os.environ["VMSS_NAME"]
-JOB_THRESHOLD   = os.environ["JOB_THRESHOLD"]
-QUEUE           = os.environ["QUEUE"]
-SUBSCRIPTION_ID = os.environ["SUBSCRIPTION_ID"]
-FME_SERVER      = os.environ["FME_SERVER"]
-FME_TOKEN       = os.environ["FME_TOKEN"]
+ASG_NAME      = os.environ["ASG_NAME"]
+JOB_THRESHOLD = os.environ["JOB_THRESHOLD"]
+QUEUE         = os.environ["QUEUE"]
+FME_SERVER    = os.environ["FME_SERVER"]
+FME_TOKEN     = os.environ["FME_TOKEN"]
 
-credential = DefaultAzureCredential()
-compute_client = ComputeManagementClient(credential, SUBSCRIPTION_ID)
+aws_autoscaling_client = boto3.client('autoscaling')
+aws_ec2_client = boto3.resource('ec2')
 fme_client = FMEServer(FME_SERVER, FME_TOKEN)
 
 def activateScaleInProtection(instance_id: str) -> bool:
@@ -43,13 +37,11 @@ def activateScaleInProtection(instance_id: str) -> bool:
     Protects an instance from scale in operations
     """
     if instance_id:
-        vm = compute_client.virtual_machine_scale_set_vms.get(
-            RG_NAME,VMSS_NAME, instance_id)
-        vm.protection_policy = {'protect_from_scale_in':True}
-        compute_client.virtual_machine_scale_set_vms.begin_update(
-            RG_NAME, VMSS_NAME, instance_id, vm)
+        aws_autoscaling_client.set_instance_protection(
+            AutoScalingGroupName=ASG_NAME, InstanceIds=[instance_id],
+            ProtectedFromScaleIn=True)
     else:
-        False
+        return False
     return True
 
 def deactivateScaleInProtection(instance_id: str) -> bool:
@@ -57,13 +49,11 @@ def deactivateScaleInProtection(instance_id: str) -> bool:
     Remove protection from scale in
     """
     if instance_id:
-        vm = compute_client.virtual_machine_scale_set_vms.get(
-            RG_NAME,VMSS_NAME, instance_id)
-        vm.protection_policy = {'protect_from_scale_in':False}
-        compute_client.virtual_machine_scale_set_vms.begin_update(
-            RG_NAME, VMSS_NAME, instance_id, vm)
+        aws_autoscaling_client.set_instance_protection(
+            AutoScalingGroupName=ASG_NAME, InstanceIds=[instance_id],
+             ProtectedFromScaleIn=False)
     else:
-        False
+        return False
     return True
 
 def getInstanceId(hostname: str) -> str:
@@ -71,12 +61,12 @@ def getInstanceId(hostname: str) -> str:
     Retrieves an instance ID of the VMSS that matches the hostname of
     FME Server Engines 
     """
-    vms = compute_client.virtual_machine_scale_set_vms.list(
-        RG_NAME, VMSS_NAME)
+    asg = aws_autoscaling_client.describe_auto_scaling_groups(
+        AutoScalingGroupNames=[ASG_NAME])
     instance_id = ""
-    for i in vms:
-        if i.os_profile.computer_name == hostname:
-            instance_id = i.id.split("/")[-1]      
+    for i in asg["AutoScalingGroups"][0]["Instances"]:
+        if aws_ec2_client.Instance(i["InstanceId"]).private_ip_address == hostname:
+            instance_id = i["InstanceId"]     
     return instance_id
 
 def updateScaleInProtection() -> bool:
@@ -93,24 +83,26 @@ def updateScaleInProtection() -> bool:
             deactivateScaleInProtection(getInstanceId(i["hostname"]))
     return True
 
-def updateScaleSetCapacity(action: str, min_cap: int = 0) -> bool:
+def updateScaleSetCapacity(action: str, min_cap: int = 1) -> bool:
     """
     Update the scale in protection and scales the VMSS in or out based
     on the specified action
     """
-    updateScaleInProtection()
-    vmss = compute_client.virtual_machine_scale_sets.get(RG_NAME, VMSS_NAME)
+    asg = aws_autoscaling_client.describe_auto_scaling_groups(
+        AutoScalingGroupNames=[ASG_NAME])
+    capacity = asg["AutoScalingGroups"][0]["DesiredCapacity"]
     if action == "scaleOut":
-        vmss.sku.capacity += 1
+        aws_autoscaling_client.set_desired_capacity(
+            AutoScalingGroupName=ASG_NAME, DesiredCapacity=capacity+1)
     elif action == "scaleIn":
-        if vmss.sku.capacity > min_cap:
-            vmss.sku.capacity -= 1
+        updateScaleInProtection()
+        if capacity > min_cap:
+            aws_autoscaling_client.set_desired_capacity(
+                AutoScalingGroupName=ASG_NAME, DesiredCapacity=capacity-1)
         else:
            return False
     else:
         raise Exception ("Please specify scaleOut or scaleIn for action.")
-    compute_client.virtual_machine_scale_sets.begin_create_or_update(
-        RG_NAME, VMSS_NAME, vmss)
     return True
 
 def getQueuedJobs() -> int:
@@ -140,3 +132,4 @@ def scale() -> bool:
 
 if __name__ == "__main__":
     scale()
+

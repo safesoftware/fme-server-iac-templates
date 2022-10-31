@@ -59,19 +59,19 @@ class FMEServer:
             totalCount = req["totalCount"]
         return result
 
-    def post(self, path: str, body: dict) -> str:
+    def post(self, path: str, body: dict) -> int:
         url = self.server + path
         req = requests.post(
             url, headers=self.requestHeaders, json=body).status_code
         return req
 
-    def put(self, path: str, body: dict) -> str:
+    def put(self, path: str, body: dict) -> int:
         url = self.server + path
         req = requests.put(
             url, headers=self.requestHeaders,json=body).status_code
         return req
     
-    def delete(self, path: str) -> str:
+    def delete(self, path: str) -> int:
         url = self.server + path
         req = requests.delete(url, headers=self.requestHeaders).status_code
         return req
