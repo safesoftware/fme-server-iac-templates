@@ -32,5 +32,8 @@ fme_server_aws.pkr.hcl
 ```
 ### Modifying the AMIs
 To modify the AMI by installing additional 3rd party software or adding file packer provisioners, similar as used in this example for FME Server, should be used. For more details please review this [documentation](https://www.packer.io/docs/provisioners)
+
+### Remove AMIs
+To the the ec2 AMIs they need to be deregistered. For more details follow this documentation: [Deregister your AMI](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/deregister-ami.htmls)
  
 

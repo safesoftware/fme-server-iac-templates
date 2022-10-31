@@ -21,7 +21,7 @@ source "azure-arm" "fme_core" {
   image_publisher                   = "MicrosoftWindowsServer"
   image_sku                         = "2022-Datacenter"
   managed_image_name                = "fmeCore-${local.timestamp}"
-  managed_image_resource_group_name = "fmeImages"
+  managed_image_resource_group_name = "${var.resource_group}"
   os_type                           = "Windows"
   os_disk_size_gb                   = 150
   vm_size                           = "Standard_D3_v2"
@@ -34,13 +34,13 @@ source "azure-arm" "fme_core" {
 source "azure-arm" "fme_engine" {
   azure_tags                        = "${var.tags}"
   use_azure_cli_auth                = true
-  build_resource_group_name         = "fmeImages"
+  build_resource_group_name         = "${var.resource_group}"
   communicator                      = "winrm"
   image_offer                       = "WindowsServer"
   image_publisher                   = "MicrosoftWindowsServer"
   image_sku                         = "2022-Datacenter"
   managed_image_name                = "fmeEngine-${local.timestamp}"
-  managed_image_resource_group_name = "fmeImages"
+  managed_image_resource_group_name = "${var.resource_group}"
   os_type                           = "Windows"
   os_disk_size_gb                   = 150
   vm_size                           = "Standard_D3_v2"
