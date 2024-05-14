@@ -59,7 +59,7 @@ build {
   }
 
   provisioner "powershell" {
-    script = "../../config/powershell/install-server-core.ps1"
+    script = "../../config/powershell/install-flow-core.ps1"
     environment_vars = ["INSTALLER_URL=${var.installer_url}"]
   }
 
@@ -80,7 +80,7 @@ build {
   }
 
   provisioner "powershell" {
-    script = "../../config/powershell/install-server-engine.ps1"
+    script = "../../config/powershell/install-flow-engine.ps1"
     environment_vars = ["INSTALLER_URL=${var.installer_url}"]
   }
 

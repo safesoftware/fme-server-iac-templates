@@ -28,13 +28,13 @@ catch {
     $storageAccountPath = "$storageAccountName\share"
     $aws = $true
 }
-$default_values = "C:\Program Files\FMEServer\Config\values.yml"
-$modified_values = "C:\Program Files\FMEServer\Config\values-modified.yml"
+$default_values = "C:\Program Files\FMEFlow\Config\values.yml"
+$modified_values = "C:\Program Files\FMEFlow\Config\values-modified.yml"
 
 # write out yaml file with modified data
 Remove-Item "$modified_values"
 Add-Content "$modified_values" "repositoryserverrootdir: `"Z:/fmeserverdata`"" 
-Add-Content "$modified_values" "fmeserverhostnamelocal: `"${engineregistrationhost}`""
+Add-Content "$modified_values" "corehostname: `"${engineregistrationhost}`""
 Add-Content "$modified_values" "nodename: `"${private_ip}`""
 Add-Content "$modified_values" "redishosts: `"${private_ip}`""
 Add-Content "$modified_values" "servletport: `"8080`""
@@ -53,17 +53,17 @@ Add-Content "$modified_values" "nodemanaged: `"${nodeManaged}`""
 ((Get-Content -path "$default_values" -Raw) -replace '<<POSTGRES_ROOT_PASSWORD>>','"postgres"') | Set-Content -Path "$default_values"
 
 $ErrorActionPreference = 'SilentlyContinue'
-Push-Location -Path "C:\Program Files\FMEServer\Config\confd"
-& "C:\Program Files\FMEServer\Config\confd\confd.exe" -confdir "C:\Program Files\FMEServer\Config\confd" -backend file -file "C:\Program Files\FMEServer\Config\values.yml" -file "$modified_values" -onetime
+Push-Location -Path "C:\Program Files\FMEFlow\Config\confd"
+& "C:\Program Files\FMEFlow\Config\confd\confd.exe" -confdir "C:\Program Files\FMEFlow\Config\confd" -backend file -file "C:\Program Files\FMEFlow\Config\values.yml" -file "$modified_values" -onetime
 Pop-Location
 
 # add ssl mode to jdbc connection string and set username to include hostname
-(Get-Content "C:\Program Files\FMEServer\Server\fmeDatabaseConfig.txt") `
+(Get-Content "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt") `
     -replace '5432/fmeserver', '5432/fmeserver?sslmode=require' `
     -replace "DB_USERNAME=fmeserver","DB_USERNAME=$fmeDatabaseUsername" |
-  Out-File "C:\Program Files\FMEServer\Server\fmeDatabaseConfig.txt.updated"
-Move-Item -Path "C:\Program Files\FMEServer\Server\fmeDatabaseConfig.txt.updated" -Destination "C:\Program Files\FMEServer\Server\fmeDatabaseConfig.txt" -Force
-((Get-Content "C:\Program Files\FMEServer\Server\fmeDatabaseConfig.txt") -join "`n") + "`n" | Set-Content -NoNewline "C:\Program Files\FMEServer\Server\fmeDatabaseConfig.txt"
+  Out-File "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt.updated"
+Move-Item -Path "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt.updated" -Destination "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt" -Force
+((Get-Content "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt") -join "`n") + "`n" | Set-Content -NoNewline "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt"
 
 # connect to the azure file share
 $connectTestResult = Test-NetConnection -ComputerName $storageAccountName -Port 445
@@ -95,7 +95,7 @@ $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $
 Register-ScheduledTask -TaskName "AzureMountFiles" -InputObject $definition
 
 #Start only one engine per host
-Set-Content -Path "C:\Program Files\FMEServer\Server\processMonitorConfigEngines.txt" -Value (get-content -Path "C:\Program Files\FMEServer\Server\processMonitorConfigEngines.txt" | Select-String -Pattern '_Engine2=!' -NotMatch)
+Set-Content -Path "C:\Program Files\FMEFlow\Server\processMonitorConfigEngines.txt" -Value (get-content -Path "C:\Program Files\FMEFlow\Server\processMonitorConfigEngines.txt" | Select-String -Pattern '_Engine2=!' -NotMatch)
 
 Set-Service -Name "FME Server Engines" -StartupType "Automatic"
 Start-Service -Name "FME Server Engines"
