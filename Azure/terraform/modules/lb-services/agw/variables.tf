@@ -15,13 +15,13 @@ variable "location" {
 
 variable "vnet_name" {
   type        = string
-  default     = "fme-server-vnet"
+  default     = "fme-flow-vnet"
   description = "Virtual network name"
 }
 
 variable "agw_name" {
   type        = string
-  default     = "fme-server-agw"
+  default     = "fme-flow-agw"
   description = "description"
 }
 

@@ -19,7 +19,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_db_instance.fme_server](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance) | resource |
+| [aws_db_instance.fme_flow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_instance) | resource |
 
 ## Inputs
 

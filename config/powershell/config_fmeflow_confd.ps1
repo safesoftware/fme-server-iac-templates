@@ -17,7 +17,7 @@ try {
     $fmeDatabaseUsername = "fmeflow@$hostShort"
     $storageUserName = "Azure\$storageAccountName"
     $storageAccountName = "$storageAccountName.file.core.windows.net"
-    $storageAccountPath = "$storageAccountName\fmeserverdata"
+    $storageAccountPath = "$storageAccountName\fmeflowdata"
     $aws = $false
 }
 catch {
@@ -35,7 +35,7 @@ $modified_values = "C:\Program Files\FMEFlow\Config\values-modified.yml"
 
 # write out yaml file with modified data
 Remove-Item "$modified_values"
-Add-Content "$modified_values" "repositoryserverrootdir: `"Z:/fmeserverdata`"" 
+Add-Content "$modified_values" "repositoryserverrootdir: `"Z:/fmeflowdata`"" 
 Add-Content "$modified_values" "hostname: `"${private_ip}`""
 Add-Content "$modified_values" "nodename: `"${private_ip}`""
 Add-Content "$modified_values" "corehostname: `"${private_ip}`""
@@ -93,9 +93,9 @@ if ($connectTestResult.TcpTestSucceeded) {
     Write-Error -Message "Unable to reach the Azure storage account via port 445. Check to make sure your organization or ISP is not blocking port 445, or use Azure P2S VPN, Azure S2S VPN, or Express Route to tunnel SMB traffic over a different port."
 }
 
-if ( !(Test-Path -Path 'Z:\fmeserverdata\localization' -PathType Container) ) {
-    New-Item -Path 'Z:\fmeserverdata' -ItemType Directory
-    Copy-Item 'C:\Data\*' -Destination 'Z:\fmeserverdata' -Recurse
+if ( !(Test-Path -Path 'Z:\fmeflowdata\localization' -PathType Container) ) {
+    New-Item -Path 'Z:\fmeflowdata' -ItemType Directory
+    Copy-Item 'C:\Data\*' -Destination 'Z:\fmeflowdata' -Recurse
 }
 
 # Wait until database is available before writing the schema

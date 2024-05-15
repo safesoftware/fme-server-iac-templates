@@ -2,7 +2,7 @@ locals {
   default_tags = { owner = var.owner }
 }
 
-resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
+resource "azurerm_windows_virtual_machine_scale_set" "fme_flow_core" {
   name                = "core"
   resource_group_name = var.rg_name
   location            = var.location

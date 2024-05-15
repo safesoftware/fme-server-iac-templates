@@ -29,43 +29,43 @@ variable "instance_count_engine" {
 
 variable "vnet_name" {
   type        = string
-  default     = "fme-server-vnet"
+  default     = "fme-flow-vnet"
   description = "Virtual network name"
 }
 
 variable "be_snet_name" {
   type        = string
-  default     = "fme-server-be-snet"
+  default     = "fme-flow-be-snet"
   description = "Backend virtual network subnet name"
 }
 
 variable "agw_snet_name" {
   type        = string
-  default     = "fme-server-agw-snet"
+  default     = "fme-flow-agw-snet"
   description = "Application gateway virtual network subnet name"
 }
 
 variable "pip_name" {
   type        = string
-  default     = "fme-server-pip"
+  default     = "fme-flow-pip"
   description = "Public ip name"
 }
 
 variable "domain_name_label" {
   type        = string
-  default     = "fmeserver"
+  default     = "fmeflow"
   description = "Label for the Domain Name. Will be used to make up the FQDN"
 }
 
 variable "lb_name" {
   type        = string
-  default     = "fme-server-lb"
+  default     = "fme-flow-lb"
   description = "Load balancer name"
 }
 
 variable "agw_name" {
   type        = string
-  default     = "fme-server-agw"
+  default     = "fme-flow-agw"
   description = "Application gateway name"
 }
 
@@ -95,13 +95,13 @@ variable "db_admin_pw" {
 
 variable "db_user" {
   type        = string
-  description = "The login for the fmeserver database (Only used for Azure SQL Server. Should be left blank when PostgreSQL is used). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE."
+  description = "The login for the fmeflow database (Only used for Azure SQL Server. Should be left blank when PostgreSQL is used). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE."
   sensitive   = true
 }
 
 variable "db_pw" {
   type        = string
-  description = "The password for the fmeserver database (Only used for Azure SQL Server. Should be left blank when PostgreSQL is used). Please review the [SQL Server Password Policy](https://docs.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=azuresqldb-current)). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE."
+  description = "The password for the fmeflow database (Only used for Azure SQL Server. Should be left blank when PostgreSQL is used). Please review the [SQL Server Password Policy](https://docs.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=azuresqldb-current)). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE."
   sensitive   = true
 }
 

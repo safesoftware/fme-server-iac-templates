@@ -84,7 +84,7 @@ variable "fme_engine_image_id" {
 
 variable "ad_name" {
   type        = string
-  default     = "tf-fmeserver.safe"
+  default     = "tf-fmeflow.safe"
   description = "Name of the Active Directory service"
 }
 

@@ -1,4 +1,4 @@
-resource "aws_directory_service_directory" "fme_server" {
+resource "aws_directory_service_directory" "fme_flow" {
   name     = var.ad_name
   password = var.ad_admin_pw
   edition  = "Standard"
@@ -10,8 +10,8 @@ resource "aws_directory_service_directory" "fme_server" {
   }
 }
 
-resource "aws_fsx_windows_file_system" "fme_server" {
-  active_directory_id = aws_directory_service_directory.fme_server.id
+resource "aws_fsx_windows_file_system" "fme_flow" {
+  active_directory_id = aws_directory_service_directory.fme_flow.id
   storage_capacity    = 32
   subnet_ids          = [var.private_sn_az1_id, var.private_sn_az2_id]
   security_group_ids  = [var.sg_id]
@@ -21,11 +21,11 @@ resource "aws_fsx_windows_file_system" "fme_server" {
 }
 
 locals {
-  dnsIpAddresses = format("[\"%s\"]", join("\", \"", aws_directory_service_directory.fme_server.dns_ip_addresses))
+  dnsIpAddresses = format("[\"%s\"]", join("\", \"", aws_directory_service_directory.fme_flow.dns_ip_addresses))
 }
 
-resource "aws_ssm_document" "fme_server_ad" {
-  name            = "fmeserverDomainConfig"
+resource "aws_ssm_document" "fme_flow_ad" {
+  name            = "fmeflowDomainConfig"
   document_format = "JSON"
   document_type   = "Command"
 
@@ -37,8 +37,8 @@ resource "aws_ssm_document" "fme_server_ad" {
       "aws:domainJoin":{
          "properties":
             {
-              "directoryId": "${aws_directory_service_directory.fme_server.id}",
-              "directoryName": "${aws_directory_service_directory.fme_server.name}",
+              "directoryId": "${aws_directory_service_directory.fme_flow.id}",
+              "directoryName": "${aws_directory_service_directory.fme_flow.name}",
               "dnsIpAddresses": ${local.dnsIpAddresses}
             }
       }

@@ -8,7 +8,7 @@
 |Parameter|Description|Usage example|
 |---|---|---|
 |`resource_group`|Set the Azure resource group in which the VM images are built and stored.|`-var 'resource_group=myImages-rg'`|
-|`installer_url`|The installer URL needs to point to a FME Flow windows installer executable and can be obtained from [safe.com/downloads](safe.com/downloads).|`-var 'installer_url=https://downloads.safe.com/fme/2022/fme-server-2022.1.2-b22627-win-x64.exe'`|
+|`installer_url`|The installer URL needs to point to a FME Flow windows installer executable and can be obtained from [safe.com/downloads](safe.com/downloads).|`-var 'installer_url=https://downloads.safe.com/fme/2024/win64/fme-flow-2024.0.2.1-b24217-win-x64.exe'`|
 |`tags`|At minimum it is recommended to set a Owner and fme_build tag, but additional tags can also be added via the tags variable.|`-var 'tags={Owner="QA",fme_build="22627"}'`|
 ### Create the Windows Images
 1. Open a command line in the packer directory (directory with .pkr.hcl files)

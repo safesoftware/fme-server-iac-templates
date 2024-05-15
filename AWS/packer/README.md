@@ -8,7 +8,7 @@
 |Parameter|Description|Usage example|
 |---|---|---|
 |`region`|Set the AWS region in which the AMI is built. After creating an AMI it can be moved to other regions.|`-var 'region=us-west-2'`|
-|`installer_url`|The installer URL needs to point to a FME Flow windows installer executable and can be obtained from [safe.com/downloads](safe.com/downloads).|`-var 'installer_url=https://downloads.safe.com/fme/2022/fme-server-2022.1.2-b22627-win-x64.exe'`|
+|`installer_url`|The installer URL needs to point to a FME Flow windows installer executable and can be obtained from [safe.com/downloads](safe.com/downloads).|`-var 'installer_url=https://downloads.safe.com/fme/2024/win64/fme-flow-2024.0.2.1-b24217-win-x64.exe'`|
 |`tags`|At minimum it is recommended to set a Owner and fme_build tag, but additional tags can also be added via the tags variable.|`-var 'tags={Owner="QA",fme_build="22627"}'`|
 |`source_ami`|Set the source AMI for the building process. Microsoft Windows Server 2022 Base are recommend for FME Flow Core and Engine. Make sure the AMI is available in the AWS region.| `-var 'source_ami=ami-0174b6693aaeab3f6'`|
 ### Create the AMIs

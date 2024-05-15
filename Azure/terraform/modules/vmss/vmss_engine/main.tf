@@ -3,7 +3,7 @@ locals {
   engine_type = var.engine_type == "STANDARD" ? "" : "-engineType DYNAMIC -nodeManaged false"
 }
 
-resource "azurerm_windows_virtual_machine_scale_set" "fme_server_engine" {
+resource "azurerm_windows_virtual_machine_scale_set" "fme_flow_engine" {
   name                = var.vmss_name
   resource_group_name = var.rg_name
   location            = var.location

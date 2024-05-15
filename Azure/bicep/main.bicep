@@ -20,13 +20,13 @@ param instanceCountStandardEngine int = 2
 param instanceCountCpuTimeEngine int = 2
 
 @description('Name of the storage account')
-param storageAccountName string = 'fmeserver${uniqueString(resourceGroup().id)}'
+param storageAccountName string = 'fmeflow${uniqueString(resourceGroup().id)}'
 
 @description('Name of the Postgresql server')
-param postgresServerName string = 'fmeserver-postgresql-${uniqueString(resourceGroup().id)}'
+param postgresServerName string = 'fmeflow-postgresql-${uniqueString(resourceGroup().id)}'
 
 @description('Name of the virtual network')
-param virtualNetworkName string = 'fmeserver-vnet'
+param virtualNetworkName string = 'fmeflow-vnet'
 
 @description('Address prefix of the virtual network')
 param addressPrefixes array = ['10.0.0.0/16']
@@ -44,10 +44,10 @@ param subnetAGName string = 'AGSubnet'
 param subnetAGPrefix string = '10.0.1.0/24'
 
 @description('Name of the public ip address')
-param publicIpName string = 'fmeserver-pip'
+param publicIpName string = 'fmeflow-pip'
 
 @description('DNS of the public ip address for the VM')
-param publicIpDns string = 'fmeserver-${uniqueString(resourceGroup().id)}'
+param publicIpDns string = 'fmeflow-${uniqueString(resourceGroup().id)}'
 
 @description('Allocation method for the public ip address')
 @allowed([
@@ -64,10 +64,10 @@ param publicIpAllocationMethod string = 'Dynamic'
 param publicIpSku string = 'Basic'
 
 @description('Name of the resource group for the existing virtual network')
-param applicationGatewayName string = 'fmeserver-appgateway'
+param applicationGatewayName string = 'fmeflow-appgateway'
 
 @description('Name of the resource group for the existing virtual network')
-param engineRegistrationLoadBalancerName string = 'fmeserver-engineregistration'
+param engineRegistrationLoadBalancerName string = 'fmeflow-engineregistration'
 
 @description('Admin username on all VMs.')
 param adminUsername string
@@ -79,12 +79,12 @@ param adminPassword string
 var vmssNameCore = 'core'
 var postgresqlAdministratorLogin = 'postgres'
 var postgresqlAdministratorLoginPassword = 'P${uniqueString(resourceGroup().id, deployment().name, 'ad909260-dc63-4102-983f-4f82af7a6840')}x!'
-var fileShareName = 'fmeserverdata'
+var fileShareName = 'fmeflowdata'
 var tags = {
   owner: ownerValue 
 }
 module network 'modules/network/network.bicep' = {
-  name: 'fme-server-network'
+  name: 'fme-flow-network'
   params: {
     addressPrefixes: addressPrefixes
     location: location
@@ -102,7 +102,7 @@ module network 'modules/network/network.bicep' = {
 }
 
 module loadBalancer 'modules/lb-services/lb/lb.bicep' = {
-  name: 'fme-server-loadBalancer'
+  name: 'fme-flow-loadBalancer'
   params: {
     engineRegistrationLoadBalancerName: engineRegistrationLoadBalancerName
     location: location
@@ -112,7 +112,7 @@ module loadBalancer 'modules/lb-services/lb/lb.bicep' = {
 }
 
 module applicationGateway 'modules/lb-services/agw/agw.bicep' = {
-  name: 'fme-server-agw'
+  name: 'fme-flow-agw'
   params: {
     applicationGatewayName: applicationGatewayName
     location: location
@@ -123,7 +123,7 @@ module applicationGateway 'modules/lb-services/agw/agw.bicep' = {
 }
 
 module pgsql 'modules/database/pgsql.bicep' = {
-  name: 'fme-server-pgsql'
+  name: 'fme-flow-pgsql'
   params: {
     location: location
     postgresqlAdministratorLogin: postgresqlAdministratorLogin
@@ -134,7 +134,7 @@ module pgsql 'modules/database/pgsql.bicep' = {
   }
 }
 module storage 'modules/storage/storage.bicep' = {
-  name: 'fme-server-storage'
+  name: 'fme-flow-storage'
   params: {
     fileShareName: fileShareName
     location: location

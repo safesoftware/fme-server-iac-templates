@@ -16,7 +16,7 @@ try {
     $fmeDatabaseUsername = "fmeflow@$hostShort"
     $storageUserName = "Azure\$storageAccountName"
     $storageAccountName = "$storageAccountName.file.core.windows.net"
-    $storageAccountPath = "$storageAccountName\fmeserverdata"
+    $storageAccountPath = "$storageAccountName\fmeflowdata"
     $aws = $false
 }
 catch {
@@ -33,7 +33,7 @@ $modified_values = "C:\Program Files\FMEFlow\Config\values-modified.yml"
 
 # write out yaml file with modified data
 Remove-Item "$modified_values"
-Add-Content "$modified_values" "repositoryserverrootdir: `"Z:/fmeserverdata`"" 
+Add-Content "$modified_values" "repositoryserverrootdir: `"Z:/fmeflowdata`"" 
 Add-Content "$modified_values" "corehostname: `"${engineregistrationhost}`""
 Add-Content "$modified_values" "nodename: `"${private_ip}`""
 Add-Content "$modified_values" "redishosts: `"${private_ip}`""

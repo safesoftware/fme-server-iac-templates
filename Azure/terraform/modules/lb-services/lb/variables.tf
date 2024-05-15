@@ -15,7 +15,7 @@ variable "location" {
 
 variable "lb_name" {
   type        = string
-  default     = "fme-server-lb"
+  default     = "fme-flow-lb"
   description = "Load balancer name"
 }
 

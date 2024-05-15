@@ -19,7 +19,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_windows_virtual_machine_scale_set.fme_server_engine](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine_scale_set) | resource |
+| [azurerm_windows_virtual_machine_scale_set.fme_flow_engine](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine_scale_set) | resource |
 
 ## Inputs
 
@@ -27,8 +27,8 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_be_snet_id"></a> [be\_snet\_id](#input\_be\_snet\_id) | Backend virtual network subnet id | `string` | n/a | yes |
 | <a name="input_db_fqdn"></a> [db\_fqdn](#input\_db\_fqdn) | Fully qualified domain name of the postgresql database server | `string` | n/a | yes |
-| <a name="input_db_pw"></a> [db\_pw](#input\_db\_pw) | The password for the fmeserver database (Only used for Azure SQL Server. Please review the [SQL Server Password Policy](https://docs.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=azuresqldb-current)). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
-| <a name="input_db_user"></a> [db\_user](#input\_db\_user) | The login for the fmeserver database (Only used for Azure SQL Server). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_db_pw"></a> [db\_pw](#input\_db\_pw) | The password for the fmeflow database (Only used for Azure SQL Server. Please review the [SQL Server Password Policy](https://docs.microsoft.com/en-us/sql/relational-databases/security/password-policy?view=azuresqldb-current)). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
+| <a name="input_db_user"></a> [db\_user](#input\_db\_user) | The login for the fmeflow database (Only used for Azure SQL Server). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
 | <a name="input_instance_count_engine"></a> [instance\_count\_engine](#input\_instance\_count\_engine) | Number of engine VM instances | `number` | n/a | yes |
 | <a name="input_lb_private_ip_address"></a> [lb\_private\_ip\_address](#input\_lb\_private\_ip\_address) | Private IP address of the load balancer | `string` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | Location of resources | `string` | n/a | yes |

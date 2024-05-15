@@ -20,8 +20,8 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_postgresql_server.fme_server](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/postgresql_server) | resource |
-| [azurerm_postgresql_virtual_network_rule.fme_server](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/postgresql_virtual_network_rule) | resource |
+| [azurerm_postgresql_server.fme_flow](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/postgresql_server) | resource |
+| [azurerm_postgresql_virtual_network_rule.fme_flow](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/postgresql_virtual_network_rule) | resource |
 | [random_string.db_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 
 ## Inputs

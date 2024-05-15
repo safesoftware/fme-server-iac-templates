@@ -19,9 +19,9 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_directory_service_directory.fme_server](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/directory_service_directory) | resource |
-| [aws_fsx_windows_file_system.fme_server](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/fsx_windows_file_system) | resource |
-| [aws_ssm_document.fme_server_ad](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_document) | resource |
+| [aws_directory_service_directory.fme_flow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/directory_service_directory) | resource |
+| [aws_fsx_windows_file_system.fme_flow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/fsx_windows_file_system) | resource |
+| [aws_ssm_document.fme_flow_ad](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_document) | resource |
 
 ## Inputs
 

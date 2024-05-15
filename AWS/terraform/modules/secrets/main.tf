@@ -10,23 +10,23 @@ locals {
   }
 }
 
-resource "aws_secretsmanager_secret" "fme_server_rds" {
-  name                    = "fmeserverRDSSecret"
+resource "aws_secretsmanager_secret" "fme_flow_rds" {
+  name                    = "fmeflowRDSSecret"
   recovery_window_in_days = 0
 }
 
-resource "aws_secretsmanager_secret_version" "fme_server_rds" {
-  secret_id     = aws_secretsmanager_secret.fme_server_rds.id
+resource "aws_secretsmanager_secret_version" "fme_flow_rds" {
+  secret_id     = aws_secretsmanager_secret.fme_flow_rds.id
   secret_string = jsonencode(local.rds)
 }
 
-resource "aws_secretsmanager_secret" "fme_server_fsx" {
-  name                    = "fmeserverFSXSecret"
+resource "aws_secretsmanager_secret" "fme_flow_fsx" {
+  name                    = "fmeflowFSXSecret"
   recovery_window_in_days = 0
 }
 
-resource "aws_secretsmanager_secret_version" "fme_server_fsx" {
-  secret_id     = aws_secretsmanager_secret.fme_server_fsx.id
+resource "aws_secretsmanager_secret_version" "fme_flow_fsx" {
+  secret_id     = aws_secretsmanager_secret.fme_flow_fsx.id
   secret_string = jsonencode(local.fsx)
 }
 

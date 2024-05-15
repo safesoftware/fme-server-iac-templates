@@ -72,7 +72,7 @@ build {
   
   provisioner "file" {
     source = "../../config/powershell/config_fmeflow_confd.ps1"
-    destination = "C:\\config_fmeserver_confd_aws.ps1"
+    destination = "C:\\config_fmeflow_confd_aws.ps1"
   }
 
   provisioner "powershell" {

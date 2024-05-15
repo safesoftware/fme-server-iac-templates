@@ -19,16 +19,16 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_lb.fme_server](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb) | resource |
-| [azurerm_lb_backend_address_pool.fme_server](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_backend_address_pool) | resource |
-| [azurerm_lb_rule.fme_server](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_rule) | resource |
+| [azurerm_lb.fme_flow](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb) | resource |
+| [azurerm_lb_backend_address_pool.fme_flow](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_backend_address_pool) | resource |
+| [azurerm_lb_rule.fme_flow](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/lb_rule) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_be_snet_id"></a> [be\_snet\_id](#input\_be\_snet\_id) | Backend virtual network subnet id | `string` | n/a | yes |
-| <a name="input_lb_name"></a> [lb\_name](#input\_lb\_name) | Load balancer name | `string` | `"fme-server-lb"` | no |
+| <a name="input_lb_name"></a> [lb\_name](#input\_lb\_name) | Load balancer name | `string` | `"fme-flow-lb"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Location of resources | `string` | n/a | yes |
 | <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | n/a | yes |
 | <a name="input_rg_name"></a> [rg\_name](#input\_rg\_name) | Resource group name | `string` | n/a | yes |

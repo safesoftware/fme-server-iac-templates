@@ -1,8 +1,8 @@
-resource "aws_iam_instance_profile" "fme_server" {
+resource "aws_iam_instance_profile" "fme_flow" {
   name = "tf-fmeServerEC2JoinAD"
-  role = aws_iam_role.fme_server.name
+  role = aws_iam_role.fme_flow.name
 }
-resource "aws_iam_role" "fme_server" {
+resource "aws_iam_role" "fme_flow" {
   name = "tf-EC2JoinAD"
 
   assume_role_policy = jsonencode({

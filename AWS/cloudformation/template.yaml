@@ -62,7 +62,7 @@ Parameters:
 
   AdName:
     Type: String
-    Default: cf-fmeserver.safe
+    Default: cf-fmeflow.safe
     Description: Name of the Active Directory service
 
   AlbName:
@@ -434,7 +434,7 @@ Resources:
   SsmDocument: 
     Type: AWS::SSM::Document
     Properties:
-      Name: fmeserverDomainConfigTest
+      Name: fmeflowDomainConfigTest
       DocumentFormat: YAML
       DocumentType: Command
       Content:
@@ -483,7 +483,7 @@ Resources:
   CoreTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties: 
-      Name: fmeserver-core
+      Name: fmeflow-core
       Port: 8080
       Protocol: HTTP
       VpcId: !Ref VPC
@@ -494,7 +494,7 @@ Resources:
   WsTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties: 
-      Name: fmeserver-ws
+      Name: fmeflow-ws
       Port: 7078
       Protocol: HTTP
       VpcId: !Ref VPC
@@ -547,7 +547,7 @@ Resources:
   RdsSecret:  
     Type: AWS::SecretsManager::Secret
     Properties: 
-      Name: fmeserverRDSSecret
+      Name: fmeflowRDSSecret
       GenerateSecretString:
         SecretStringTemplate: !Sub '{"username":"${DbAdminUser}"}'
         GenerateStringKey: "password"
@@ -566,7 +566,7 @@ Resources:
   FsxSecret:  
     Type: AWS::SecretsManager::Secret
     Properties: 
-      Name: fmeserverFSXSecret12082022
+      Name: fmeflowFSXSecret12082022
       GenerateSecretString:
         SecretStringTemplate: '{"username":"Admin"}'
         GenerateStringKey: "password"
@@ -714,7 +714,7 @@ Resources:
               $storageAccountKey = $fsx_secrets.password
               
               # Create task to initialize FME Flow
-              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_aws.ps1 -databasehostname $databasehostname -databasePassword $databasePassword -databaseUsername $databaseUsername -externalhostname $externalhostname -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
+              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeflow_confd_aws.ps1 -databasehostname $databasehostname -databasePassword $databasePassword -databaseUsername $databaseUsername -externalhostname $externalhostname -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
               $trigger = New-ScheduledTaskTrigger -AtStartup
               $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
               $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Flow core"

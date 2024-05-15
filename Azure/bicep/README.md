@@ -23,14 +23,14 @@ To delete the FME Flow deployment remove the resource group: ```az group delete 
 |`location`|Location for the resources.||
 |`vmSizeCore`|Size of VMs in the Core VM Scale Set.|'Standard_D2s_v3'|
 |`vmSizeEngine`|Size of VMs in the Engine VM Scale Set.|'Standard_D2s_v3'|
-|`vmssNameCore`|Name of the VM Scale Set for the Core machines|'fmeserver-core'|
-|`vmssNameEngine`|Name of the VM Scale Set for the Engine machines|'fmeserver-engine'|
+|`vmssNameCore`|Name of the VM Scale Set for the Core machines|'fmeflow-core'|
+|`vmssNameEngine`|Name of the VM Scale Set for the Engine machines|'fmeflow-engine'|
 |`instanceCountCore`|'Number of Core VM instances.|1|
 |`instanceCountEngine`|Number of Engine VM instances.|1|
-|`storageAccountName`|Name of the storage account|'fmeserver{uniqueString}'|
+|`storageAccountName`|Name of the storage account|'fmeflow{uniqueString}'|
 |`storageAccountResourceGroup`|Name of the resource group for the existing virtual network||
-|`postgresServerName`|Name of the Postgresql server|'fmeserver-postgresql-{uniqueString}'|
-|`virtualNetworkName`|Name of the virtual network|'fmeserver-vnet'|
+|`postgresServerName`|Name of the Postgresql server|'fmeflow-postgresql-{uniqueString}'|
+|`virtualNetworkName`|Name of the virtual network|'fmeflow-vnet'|
 |`addressPrefixes`|Address prefix of the virtual network|'10.0.0.0/16'|
 |`subnetName`|Name of the subnet|'default'|
 |`subnetPrefix`|Subnet prefix of the virtual network|'10.0.0.0/24'|
@@ -38,12 +38,12 @@ To delete the FME Flow deployment remove the resource group: ```az group delete 
 |`subnetAGPrefix`|Subnet prefix of the Application Gateway subnet|'10.0.1.0/24'|
 |`virtualNetworkResourceGroup`|Name of the resource group for the existing virtual network||
 |`publicIpNewOrExisting`|Determines whether or not a new public ip should be provisioned.|'new'|
-|`publicIpName`|Name of the public ip address|'fmeserver-pip'|
-|`publicIpDns`|DNS of the public ip address for the VM|'fmeserver-{uniqueString}'|
+|`publicIpName`|Name of the public ip address|'fmeflow-pip'|
+|`publicIpDns`|DNS of the public ip address for the VM|'fmeflow-{uniqueString}'|
 |`publicIpAllocationMethod`|'Allocation method for the public ip address')|'Dynamic'|
 |`publicIpSku`|Name of the resource group for the public ip address|'Basic'|
-|`applicationGatewayName`|Name of the resource group for the existing virtual network|'fmeserver-appgateway'|
-|`engineRegistrationLoadBalancerName`|Name of the resource group for the existing virtual network'|'fmeserver-engineregistration'|
+|`applicationGatewayName`|Name of the resource group for the existing virtual network|'fmeflow-appgateway'|
+|`engineRegistrationLoadBalancerName`|Name of the resource group for the existing virtual network'|'fmeflow-engineregistration'|
 |`adminUsername`|Admin username on all VMs.||
 |`adminPassword`|Admin password on all VMs.||
 # Todo

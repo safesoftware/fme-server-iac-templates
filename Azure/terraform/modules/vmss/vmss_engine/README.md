@@ -19,7 +19,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_windows_virtual_machine_scale_set.fme_server_engine](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine_scale_set) | resource |
+| [azurerm_windows_virtual_machine_scale_set.fme_flow_engine](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine_scale_set) | resource |
 
 ## Inputs
 

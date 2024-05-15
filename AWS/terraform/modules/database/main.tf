@@ -1,4 +1,4 @@
-resource "aws_db_instance" "fme_server" {
+resource "aws_db_instance" "fme_flow" {
   allocated_storage      = 20
   instance_class         = "db.t3.small"
   engine                 = "postgres"

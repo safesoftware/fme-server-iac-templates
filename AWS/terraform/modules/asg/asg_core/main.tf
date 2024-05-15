@@ -9,7 +9,7 @@ locals {
   }
 }
 
-resource "aws_launch_template" "fme_server_core" {
+resource "aws_launch_template" "fme_flow_core" {
   name                   = "fme-core"
   image_id               = var.fme_core_image_id
   instance_type          = "t3.large"
@@ -38,7 +38,7 @@ resource "aws_autoscaling_group" "fme_sever_core" {
   vpc_zone_identifier = [var.private_sn_az1_id, var.private_sn_az2_id]
   target_group_arns   = [var.core_target_group_arn, var.websocket_target_group_arn, var.engine_registration_target_group_arn]
   launch_template {
-    id      = aws_launch_template.fme_server_core.id
+    id      = aws_launch_template.fme_flow_core.id
     version = "$Latest"
   }
 }
