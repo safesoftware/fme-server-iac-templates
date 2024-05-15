@@ -20,7 +20,7 @@ packer validate \
 -var 'region=<REGION>' \
 -var 'installer_url=<INSTALLER_URL>' \
 -var 'tags={Owner="<OWNER",fme_build="<FME_BUILD>"}' \
-fme_server_aws.pkr.hcl
+fme_flow_aws.pkr.hcl
 ```
 4. Build the images:
 ```
@@ -28,7 +28,7 @@ packer build \
 -var 'region=<REGION>' \
 -var 'installer_url=<INSTALLER_URL>' \
 -var 'tags={Owner="<OWNER",fme_build="<FME_BUILD>"}' \
-fme_server_aws.pkr.hcl
+fme_flow_aws.pkr.hcl
 ```
 ### Modifying the AMIs
 To modify the AMI by installing additional 3rd party software or adding file packer provisioners, similar as used in this example for FME Flow, should be used. For more details please review this [documentation](https://www.packer.io/docs/provisioners)

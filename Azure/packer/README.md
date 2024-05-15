@@ -19,7 +19,7 @@ packer validate \
 -var 'resource_group=<RESOURCE_GROUP_NAME>'
 -var 'installer_url=<INSTALLER_URL>' \
 -var 'tags={Owner="<OWNER>",fme_build="<FME_BUILD>"}' \
-fme_server_az.pkr.hcl
+fme_flow_az.pkr.hcl
 ```
 4. Build the images:
 ```
@@ -27,7 +27,7 @@ packer build \
 -var 'resource_group=<RESOURCE_GROUP_NAME>'
 -var 'installer_url=<INSTALLER_URL>' \
 -var 'tags={Owner="<OWNER>",fme_build="<FME_BUILD>"}' \
-fme_server_az.pkr.hcl
+fme_flow_az.pkr.hcl
 ```
 ### Modifying the Windows Images
 To modify the Windows Images by installing additional 3rd party software or adding file packer provisioners, similar as used in this example for FME Flow, should be used. For more details please review this [documentation](https://www.packer.io/docs/provisioners).
