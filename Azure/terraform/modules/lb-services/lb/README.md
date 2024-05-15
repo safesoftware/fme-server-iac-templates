@@ -1,5 +1,5 @@
-# FME Server load balancer module
-This module creates load balancer for a distributed FME Server deployment in Azure. The load balancer makes sure the available engines will connect to an available core in case a core that has engines registered is becoming unavailable. 
+# FME Flow load balancer module
+This module creates load balancer for a distributed FME Flow deployment in Azure. The load balancer makes sure the available engines will connect to an available core in case a core that has engines registered is becoming unavailable. 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

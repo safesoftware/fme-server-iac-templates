@@ -133,8 +133,8 @@ resource "aws_db_subnet_group" "rds_subnet_roup" {
 
 resource "aws_security_group" "fmeserver" {
   vpc_id      = aws_vpc.fme_server.id
-  name        = "FME Server security group"
-  description = "Allows communication between FME Server components"
+  name        = "FME Flow security group"
+  description = "Allows communication between FME Flow components"
 
   ingress = [
     {
@@ -232,6 +232,6 @@ resource "aws_security_group" "fmeserver" {
   ]
 
   tags = {
-    "Name" = "FME Server security group"
+    "Name" = "FME Flow security group"
   }
 }

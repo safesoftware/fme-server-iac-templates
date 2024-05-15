@@ -24,8 +24,8 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_fsx_secrets_arn"></a> [fsx\_secrets\_arn](#input\_fsx\_secrets\_arn) | Secret id for FME Server storage | `string` | n/a | yes |
-| <a name="input_rds_secrets_arn"></a> [rds\_secrets\_arn](#input\_rds\_secrets\_arn) | Secret id for FME Server backend database | `string` | n/a | yes |
+| <a name="input_fsx_secrets_arn"></a> [fsx\_secrets\_arn](#input\_fsx\_secrets\_arn) | Secret id for FME Flow storage | `string` | n/a | yes |
+| <a name="input_rds_secrets_arn"></a> [rds\_secrets\_arn](#input\_rds\_secrets\_arn) | Secret id for FME Flow backend database | `string` | n/a | yes |
 
 ## Outputs
 

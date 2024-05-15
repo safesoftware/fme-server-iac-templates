@@ -1,12 +1,12 @@
-# FME Server (Distributed deployment, Windows)
+# FME Flow (Distributed deployment, Windows)
 
-These terraform scripts deploy [FME Server (Distributed deployment, Windows)](https://azuremarketplace.microsoft.com/en-US/marketplace/apps/safesoftwareinc.fme-server-distributed-deployment?tab=overview) in your Azure Subscription. The scripts can be used as a boilerplate for automatic deployments of the public FME Server Azure VM images in your own environment with your own configurations. The terraform scripts are split up into multiple modules to reflect the distributed architecture and to simplify modification of the resources for different scenarios.
+These terraform scripts deploy [FME Flow (Distributed deployment, Windows)](https://azuremarketplace.microsoft.com/en-US/marketplace/apps/safesoftwareinc.fme-server-distributed-deployment?tab=overview) in your Azure Subscription. The scripts can be used as a boilerplate for automatic deployments of the public FME Flow Azure VM images in your own environment with your own configurations. The terraform scripts are split up into multiple modules to reflect the distributed architecture and to simplify modification of the resources for different scenarios.
 
 # How to use the scripts
 ## Quickstart
 ### Prerequisites
 
-To deploy FME Server (Distributed deployment, Windows) on Microsoft Azure from a local machine, the Azure CLI and terraform need to be installed, configured and terraform needs to be authenticated to Azure. Follow this documentation depending on your scenario: [Quickstart: Install and Configure Terraform](https://docs.microsoft.com/en-us/azure/developer/terraform/quickstart-configure)
+To deploy FME Flow (Distributed deployment, Windows) on Microsoft Azure from a local machine, the Azure CLI and terraform need to be installed, configured and terraform needs to be authenticated to Azure. Follow this documentation depending on your scenario: [Quickstart: Install and Configure Terraform](https://docs.microsoft.com/en-us/azure/developer/terraform/quickstart-configure)
 
 ### Apply the deployment
 
@@ -14,19 +14,19 @@ Once all prerequisites are installed you confirmed that terraform successfully a
 
 1. Review the `variables.tf` file. This file contains all variables for the deployment. Most of the variables have default values assigned, but can be changed in the `.tf` file or overridden by using the `-var` flag with the `terraform apply` command. You will be prompted for any variable that does not have a default after running the `terraform apply` command.
 2. Run `terraform apply` in your console from the directory that that holds the `main.tf` and `variables.tf` file and provide any variables you are prompted for.
-3. Review the deployment plan. If the terraform script and the provided variables validated successfully the deployment plan will be output in the consoled for you to review. Additionally you will be prompted wether you want to go ahead with the deployment. If everything looks ok, go ahead with `yes`. The deployment will now provision and configure all necessary Azure resources and start up FME Server. This will take about 10 - 20 minutes.
+3. Review the deployment plan. If the terraform script and the provided variables validated successfully the deployment plan will be output in the consoled for you to review. Additionally you will be prompted wether you want to go ahead with the deployment. If everything looks ok, go ahead with `yes`. The deployment will now provision and configure all necessary Azure resources and start up FME Flow. This will take about 10 - 20 minutes.
 4. In this quickstart example the terraform statefile `terraform.tfsate` will be created on on your local machine, so you can review the current state of your deployment and test the deployment. For any productive deployments it is highly recommended to not store the state file locally but in a remote location. This makes sure you can collaborate on the state and any sensitive data contained in the state file will only be accessible to authorized users. To use Azure storage as a backend for your statefile follow this documentation: [Azure storage terraform backend](https://www.terraform.io/language/settings/backends/azurerm)
 
-### Test FME Server
+### Test FME Flow
 
-Once the deployment is complete it is time to test FME Server. The public URL for the new FME Server can be found in the overview of the Application Gateway resource. Follow these steps to test FME Server:
+Once the deployment is complete it is time to test FME Flow. The public URL for the new FME Flow can be found in the overview of the Application Gateway resource. Follow these steps to test FME Flow:
 1. [Log on to the Web User Interface](https://docs.safe.com/fme/html/FME_Server_Documentation/AdminGuide/Log-on-Get-Started-2-Tier.htm)
 2. [Request and Install a License](https://docs.safe.com/fme/html/FME_Server_Documentation/AdminGuide/Request_and_Install_a_License-2-Tier.htm)
 3. [Run Workspace](https://docs.safe.com/fme/html/FME_Server_Documentation/WebUI/Run-Workspace.htm?)
 
 ### Delete the deployment
 
-To remove the FME Server deployment run `terrform destroy` in your console and confirm the prompt with `yes`.
+To remove the FME Flow deployment run `terrform destroy` in your console and confirm the prompt with `yes`.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -88,17 +88,17 @@ To remove the FME Server deployment run `terrform destroy` in your console and c
 
 | Name | Description |
 |------|-------------|
-| <a name="output_fme_server_fqdn"></a> [fme\_server\_fqdn](#output\_fme\_server\_fqdn) | External hostname of FME Server |
+| <a name="output_fme_server_fqdn"></a> [fme\_server\_fqdn](#output\_fme\_server\_fqdn) | External hostname of FME Flow |
 <!-- END_TF_DOCS --> 
 ## Modifying resources
 The terraform scripts provide an easy way to read and modify the configuration.
 ### Changing Resource configurations
-Most of the default resource configurations follow the minimum of the recommended machine specifications for FME Server. However for demanding workflows it is recommended to scale the the resources accordingly. With terraform it is easy to scale the resources by just updating the configuration (e.g. for the virtual machine scale sets of the core and engine) and rerun the `terraform apply` command.
+Most of the default resource configurations follow the minimum of the recommended machine specifications for FME Flow. However for demanding workflows it is recommended to scale the the resources accordingly. With terraform it is easy to scale the resources by just updating the configuration (e.g. for the virtual machine scale sets of the core and engine) and rerun the `terraform apply` command.
 ### Changing backend DB configuration
 #### Use Azure SQL
 A Azure SQL Server database as the FME Sever backend database can be used by changing the the module source of the database module to `./modules/database/sql_server` in the `main.tf` file. Additionally the default PowerShell script on the core virtual machine scale set (VMSS) needs to be overridden with the script provided in `./modules/database/sql_server/script`. To do this the `custom_data` property of the core VMSS can be used to upload the file and a new extension property of the core VMSS that runs the new script instead of the default script can be added. This change is already prepared in the `main.tf` file and only requires uncommenting/commenting of the respective sections in the database and the core VMSS modules.
 #### Use existing database
-The most important prerequisite to use an existing database with the distributed FME Server deployment is network connectivity between the database and the backend VNet that is created for the FME Server deployment. There are different ways to accomplish this. In the default configuration a network rule is added to the database server that is used. To use an existing Azure SQL or PostgreSQL database the exising resources can be [imported](https://www.terraform.io/cli/import) into the terraform configuration. This way the existing resources and any changes to them can also be managed be by terraform. Another option is to only provide the necessary variables in the `variables.tf` to make sure the FME core and engines can connect to the database.
+The most important prerequisite to use an existing database with the distributed FME Flow deployment is network connectivity between the database and the backend VNet that is created for the FME Flow deployment. There are different ways to accomplish this. In the default configuration a network rule is added to the database server that is used. To use an existing Azure SQL or PostgreSQL database the exising resources can be [imported](https://www.terraform.io/cli/import) into the terraform configuration. This way the existing resources and any changes to them can also be managed be by terraform. Another option is to only provide the necessary variables in the `variables.tf` to make sure the FME core and engines can connect to the database.
 # Todo
 - create NSGs
 - (optional) create NAT gateway for explicit outbound traffic of VMs: [Default outbound access in Azure](https://learn.microsoft.com/en-us/azure/virtual-network/ip-services/default-outbound-access)

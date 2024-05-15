@@ -10,7 +10,7 @@ variable "fme_engine_image_id" {
 
 variable "engine_type" {
   type = string
-  description = "The type of FME Server Engine. Possible values are STANDARD and DYNAMIC"
+  description = "The type of FME Flow Engine. Possible values are STANDARD and DYNAMIC"
 }
 
 variable "engine_name" {
@@ -25,7 +25,7 @@ variable "node_managed" {
 
 variable "sg_id" {
   type        = string
-  description = "Security group id for FME Server deployment"
+  description = "Security group id for FME Flow deployment"
 }
 
 variable "iam_instance_profile" {
@@ -35,12 +35,12 @@ variable "iam_instance_profile" {
 
 variable "rds_secrets_arn" {
   type        = string
-  description = "Secret id for FME Server backend database"
+  description = "Secret id for FME Flow backend database"
 }
 
 variable "fsx_secrets_arn" {
   type        = string
-  description = "Secret id for FME Server storage"
+  description = "Secret id for FME Flow storage"
 }
 
 variable "ssm_document_name" {

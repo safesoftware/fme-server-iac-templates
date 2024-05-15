@@ -10,7 +10,7 @@ variable "fme_core_image_id" {
 
 variable "sg_id" {
   type        = string
-  description = "Security group id for FME Server deployment"
+  description = "Security group id for FME Flow deployment"
 }
 
 variable "iam_instance_profile" {
@@ -20,12 +20,12 @@ variable "iam_instance_profile" {
 
 variable "rds_secrets_arn" {
   type        = string
-  description = "Secret id for FME Server backend database"
+  description = "Secret id for FME Flow backend database"
 }
 
 variable "fsx_secrets_arn" {
   type        = string
-  description = "Secret id for FME Server storage"
+  description = "Secret id for FME Flow storage"
 }
 
 variable "ssm_document_name" {
@@ -40,17 +40,17 @@ variable "alb_dns_name" {
 
 variable "core_target_group_arn" {
   type        = string
-  description = "The ARN of the FME Server core target group"
+  description = "The ARN of the FME Flow core target group"
 }
 
 variable "websocket_target_group_arn" {
   type        = string
-  description = "The ARN of the FME Server websocket target group"
+  description = "The ARN of the FME Flow websocket target group"
 }
 
 variable "engine_registration_target_group_arn" {
   type        = string
-  description = "The ARN of the FME Server engine registration target group"
+  description = "The ARN of the FME Flow engine registration target group"
 }
 
 variable "private_sn_az2_id" {

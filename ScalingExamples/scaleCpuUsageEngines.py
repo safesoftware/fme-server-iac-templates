@@ -1,18 +1,18 @@
-"""Scaling CPU-Usage (Dynamic) FME Server Engines
+"""Scaling CPU-Usage (Dynamic) FME Flow Engines
 
-This script allows the user scale CPU-Usage (Dynamic) FME Server Engines on
+This script allows the user scale CPU-Usage (Dynamic) FME Flow Engines on
 a single existing host based on the number of queued jobs for a defined
-FME Server Queue. The host to scale needs to be a manged node (Standard and)
+FME Flow Queue. The host to scale needs to be a manged node (Standard and)
 CPU-Usage engines can be managed via the Web UI.
 
 The constants are retrieved form environment variables:
 
-JOB_THRESHOLD   Threshold to scale the FME Server Engine either in or out 
-QUEUE           Name of the FME Server Queue
-FME_SERVER      FME Server URL
-FME_TOKEN       FME Server token
+JOB_THRESHOLD   Threshold to scale the FME Flow Engine either in or out 
+QUEUE           Name of the FME Flow Queue
+FME_SERVER      FME Flow URL
+FME_TOKEN       FME Flow token
 
-This uses the FMEServerAPI.py as wrapper for the FME Server REST API
+This uses the FMEServerAPI.py as wrapper for the FME Flow REST API
 Required modules:
 os
 """
@@ -29,7 +29,7 @@ fme_client = FMEServer(FME_SERVER, FME_TOKEN)
 
 def getQueuedJobs() -> int:
     """
-    Returns the number of queued FME Server jobs in the specified queue
+    Returns the number of queued FME Flow jobs in the specified queue
     """
     queuedJobs = fme_client.get("/fmeapiv4/jobs?&status=queued")
     queuedJobsCount = 0
@@ -40,7 +40,7 @@ def getQueuedJobs() -> int:
 
 def getEngineHosts() -> str:
     """
-    Returns a list of FME Server engine hosts for a specific queue
+    Returns a list of FME Flow engine hosts for a specific queue
     """
     engines = fme_client.get(
         "/fmerest/v3/transformations/engines?queue=" + QUEUE)

@@ -1,5 +1,5 @@
-# FME Server database module
-This module creates a PostgreSQL backend database and its virtual network rule for a distributed FME Server deployment in Azure.
+# FME Flow database module
+This module creates a PostgreSQL backend database and its virtual network rule for a distributed FME Flow deployment in Azure.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

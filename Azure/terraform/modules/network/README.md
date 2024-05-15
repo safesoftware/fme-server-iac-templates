@@ -1,5 +1,5 @@
-# FME Server network module
-This module creates the requires network resources for a distributed FME Server deployment in Azure.
+# FME Flow network module
+This module creates the requires network resources for a distributed FME Flow deployment in Azure.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

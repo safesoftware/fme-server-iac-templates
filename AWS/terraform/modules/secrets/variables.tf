@@ -1,6 +1,6 @@
 variable "fsx_dns_name" {
   type        = string
-  description = "Security group id for FME Server deployment"
+  description = "Security group id for FME Flow deployment"
 }
 
 variable "db_dns_name" {

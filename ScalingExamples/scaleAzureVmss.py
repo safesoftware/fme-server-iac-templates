@@ -1,20 +1,20 @@
-"""Scaling CPU-Usage (Dynamic) FME Server Engines (Azure)
+"""Scaling CPU-Usage (Dynamic) FME Flow Engines (Azure)
 
-This script allows the user scale CPU-Usage (Dynamic) FME Server Engines with
+This script allows the user scale CPU-Usage (Dynamic) FME Flow Engines with
 Azure Virtual Machine Scale Sets (VMSS) based on the number of queued jobs for
-a defined FME Server Queue.
+a defined FME Flow Queue.
 
 The constants are retrieved form environment variables:
 
 RG_NAME         Name of the Azure Resource Group
 VMSS_NAME       Name of the Virtual Machnine Scale Set
-JOB_THRESHOLD   Threshold to scale the FME Server Engine either in or out 
-QUEUE           Name of the FME Server Queue
+JOB_THRESHOLD   Threshold to scale the FME Flow Engine either in or out 
+QUEUE           Name of the FME Flow Queue
 SUBSCRIPTION_ID Azure Subscription ID
-FME_SERVER      FME Server URL
-FME_TOKEN       FME Server token
+FME_SERVER      FME Flow URL
+FME_TOKEN       FME Flow token
 
-This uses the FMEServerAPI.py as wrapper for the FME Server REST API
+This uses the FMEServerAPI.py as wrapper for the FME Flow REST API
 Required modules:
 os
 azure-identity
@@ -69,7 +69,7 @@ def deactivateScaleInProtection(instance_id: str) -> bool:
 def getInstanceId(hostname: str) -> str:
     """
     Retrieves an instance ID of the VMSS that matches the hostname of
-    FME Server Engines 
+    FME Flow Engines 
     """
     vms = compute_client.virtual_machine_scale_set_vms.list(
         RG_NAME, VMSS_NAME)
@@ -115,7 +115,7 @@ def updateScaleSetCapacity(action: str, min_cap: int = 0) -> bool:
 
 def getQueuedJobs() -> int:
     """
-    Returns the number of queued FME Server jobs in the specified queue
+    Returns the number of queued FME Flow jobs in the specified queue
     """
     queuedJobs = fme_client.get("/fmeapiv4/jobs?&status=queued")
     queuedJobsCount = 0

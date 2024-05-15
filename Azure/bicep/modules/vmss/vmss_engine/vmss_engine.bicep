@@ -8,7 +8,7 @@ param vmSizeEngine string
 @maxLength(61)
 param vmssName string
 
-@description('The type of FME Server Engine. Possible values are STANDARD and DYNAMIC')
+@description('The type of FME Flow Engine. Possible values are STANDARD and DYNAMIC')
 @allowed([
   'STANDARD'
   'DYNAMIC'
@@ -116,7 +116,7 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
             properties: {
               publisher: 'Microsoft.Compute'
               protectedSettings: {
-                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname ${postgresFqdn} -engineregistrationhost ${engineRegistrationHost} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccount.id, '2019-04-01').keys[0].value} ${engineTypeConfig}>C:\\confd-log.txt 2>&1'
+                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeflow_confd_engine.ps1 -databasehostname ${postgresFqdn} -engineregistrationhost ${engineRegistrationHost} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccount.id, '2019-04-01').keys[0].value} ${engineTypeConfig}>C:\\confd-log.txt 2>&1'
               }
               typeHandlerVersion: '1.8'
               autoUpgradeMinorVersion: true

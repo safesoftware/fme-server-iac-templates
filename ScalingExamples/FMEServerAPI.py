@@ -3,7 +3,7 @@ import json
 
 class FMEServer:
     """
-    A simple wrapper for the FME Server REST API setting a default
+    A simple wrapper for the FME Flow REST API setting a default
     headers including the FME Token, handling pagination for GET
     requests and returning results for GET and status codes for POST,
     PUT and DELETE requests.
@@ -11,9 +11,9 @@ class FMEServer:
     Attributes
     ----------
     server : str
-        FME Server hostname
+        FME Flow hostname
     token : str
-        FME Server token
+        FME Flow token
     protocol : str
         HTTP or HTTPS protocol to be used for the API requests
         (Default http://)
@@ -23,20 +23,20 @@ class FMEServer:
     Methods
     -------
     get(path, limit)
-        Sends a GET requests to the FME Server REST API and returns
+        Sends a GET requests to the FME Flow REST API and returns
         the results. The limit parameter set the number of results
         returned by request.
     
     post(path, body)
-        Sends a POST requests to the FME Server REST API and returns
+        Sends a POST requests to the FME Flow REST API and returns
         the status code.
 
     put(path, body)
-        Sends a POST requests to the FME Server REST API and returns
+        Sends a POST requests to the FME Flow REST API and returns
         the status code.
 
     delete(path)
-        Sends a POST requests to the FME Server REST API and returns
+        Sends a POST requests to the FME Flow REST API and returns
         the status code.
     """
     def __init__(self, server:str, token:str, protocol:str = "http://"):

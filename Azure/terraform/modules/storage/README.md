@@ -1,5 +1,5 @@
-# FME Server storage module
-This module creates the required storage account and fileshare for a distributed FME Server deployment in Azure.
+# FME Flow storage module
+This module creates the required storage account and fileshare for a distributed FME Flow deployment in Azure.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

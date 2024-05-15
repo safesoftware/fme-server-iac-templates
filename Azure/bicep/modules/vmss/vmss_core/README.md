@@ -1,5 +1,5 @@
-# FME Server Core VMSS module
-This module creates the virtual machine scale set for the FME Core of a distributed FME Server deployment in Azure.
+# FME Flow Core VMSS module
+This module creates the virtual machine scale set for the FME Core of a distributed FME Flow deployment in Azure.
 ## Parameters
 |Parameter|Description|
 |---|---|

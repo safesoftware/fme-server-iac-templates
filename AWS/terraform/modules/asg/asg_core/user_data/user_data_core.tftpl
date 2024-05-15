@@ -14,11 +14,11 @@ $storageAccountName = $fsx_secrets.storageAccountName
 $storageAccountKey = $fsx_secrets.ad_admin_pw
 
 
-# Create task to initialize FME Server
+# Create task to initialize FME Flow
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_aws.ps1 -databasehostname $databasehostname -databasePassword $databasePassword -databaseUsername $databaseUsername -externalhostname $externalhostname -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
 $trigger = New-ScheduledTaskTrigger -AtStartup
 $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
-$definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
+$definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Flow core"
 Register-ScheduledTask -TaskName "coreInit" -InputObject $definition
 
 # Add instance to a file share domain

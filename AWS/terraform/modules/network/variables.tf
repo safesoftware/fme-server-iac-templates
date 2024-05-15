@@ -10,7 +10,7 @@ variable "sn_name" {
 
 variable "public_access" {
   type        = string
-  description = "CDIR range from which the FME Server Web UI and Websocket will be accessible"
+  description = "CDIR range from which the FME Flow Web UI and Websocket will be accessible"
 }
 
 variable "vpc_cidr" {

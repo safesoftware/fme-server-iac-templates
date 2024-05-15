@@ -9,7 +9,7 @@ param(
  [string] $storageAccountKey
 )
 
-#Encrypt DB Password for FME Server
+#Encrypt DB Password for FME Flow
 $databasePasswordEncrypted = (& 'C:\Program Files\FMEServer\Clients\utilities\encryptConfigSetting.ps1' DB_PASSWORD $databasePassword | Select-Object -Last 1).substring(12) 
 
 $private_ip = Invoke-RestMethod -Uri "http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/privateIpAddress?api-version=2017-08-01&format=text"  -Headers @{"Metadata"="true"}
@@ -117,9 +117,9 @@ $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount
 $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Mount Azure files at startup"
 Register-ScheduledTask -TaskName "AzureMountFiles" -InputObject $definition
 
-Set-Service -Name "FME Server Core" -StartupType "Automatic"
+Set-Service -Name "FME Flow Core" -StartupType "Automatic"
 Set-Service -Name "FMEServerAppServer" -StartupType "Automatic"
-Start-Service -Name "FME Server Core"
+Start-Service -Name "FME Flow Core"
 Start-Service -Name "FMEServerAppServer"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False

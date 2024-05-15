@@ -1,6 +1,6 @@
 output "fsx_dns_name" {
   value       = aws_fsx_windows_file_system.fme_server.dns_name
-  description = "Security group id for FME Server deployment"
+  description = "Security group id for FME Flow deployment"
 }
 
 output "ssm_document_name" {

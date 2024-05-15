@@ -71,7 +71,7 @@ build {
   sources = ["source.amazon-ebs.fme_core"]
   
   provisioner "file" {
-    source = "../../config/powershell/config_fmeserver_confd.ps1"
+    source = "../../config/powershell/config_fmeflow_confd.ps1"
     destination = "C:\\config_fmeserver_confd_aws.ps1"
   }
 
@@ -92,8 +92,8 @@ build {
   sources = ["source.amazon-ebs.fme_engine"]
   
   provisioner "file" {
-    source = "../../config/powershell/config_fmeserver_confd_engine.ps1"
-    destination = "C:\\config_fmeserver_confd_engine_aws.ps1"
+    source = "../../config/powershell/config_fmeflow_confd_engine.ps1"
+    destination = "C:\\config_fmeflow_confd_engine_aws.ps1"
   }
 
   provisioner "powershell" {

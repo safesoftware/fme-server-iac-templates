@@ -20,7 +20,7 @@ variable "vmss_name" {
 
 variable "engine_type" {
   type = string
-  description = "The type of FME Server Engine. Possible values are STANDARD and DYNAMIC"
+  description = "The type of FME Flow Engine. Possible values are STANDARD and DYNAMIC"
 }
 
 variable "instance_count_engine" {
@@ -57,12 +57,12 @@ variable "lb_private_ip_address" {
 
 variable "storage_name" {
   type        = string
-  description = "FME Server backend storage account name"
+  description = "FME Flow backend storage account name"
 }
 
 variable "storage_key" {
   type        = string
-  description = "FME Server backend storage account key"
+  description = "FME Flow backend storage account key"
   sensitive   = true
 }
 

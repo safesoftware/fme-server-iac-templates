@@ -7,7 +7,7 @@ param(
  [string] $storageAccountKey
 )
 
-#Encrypt DB Password for FME Server
+#Encrypt DB Password for FME Flow
 $databasePasswordEncrypted = (& 'C:\Program Files\FMEServer\Clients\utilities\encryptConfigSetting.ps1' DB_PASSWORD $databasePassword | Select-Object -Last 1).substring(12)
 
 $private_ip = Invoke-RestMethod -Uri "http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/privateIpAddress?api-version=2017-08-01&format=text"  -Headers @{"Metadata"="true"}
@@ -74,7 +74,7 @@ Register-ScheduledTask -TaskName "AzureMountFiles" -InputObject $definition
 #Start only one engine per host
 Set-Content -Path "C:\Program Files\FMEServer\Server\processMonitorConfigEngines.txt" -Value (get-content -Path "C:\Program Files\FMEServer\Server\processMonitorConfigEngines.txt" | Select-String -Pattern '_Engine2=!' -NotMatch)
 
-Set-Service -Name "FME Server Engines" -StartupType "Automatic"
-Start-Service -Name "FME Server Engines"
+Set-Service -Name "FME Flow Engines" -StartupType "Automatic"
+Start-Service -Name "FME Flow Engines"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False

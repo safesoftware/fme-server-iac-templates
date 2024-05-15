@@ -14,7 +14,7 @@ try {
     $hostShort,$rest = $databaseHostname -split '\.',2
     # update variables for Azure
     $databaseUsername = "$databaseUsername@$hostShort" 
-    $fmeDatabaseUsername = "fmeserver@$hostShort"
+    $fmeDatabaseUsername = "fmeflow@$hostShort"
     $storageUserName = "Azure\$storageAccountName"
     $storageAccountName = "$storageAccountName.file.core.windows.net"
     $storageAccountPath = "$storageAccountName\fmeserverdata"
@@ -24,7 +24,7 @@ catch {
     # if that doesn't work we must be on AWS
     $private_ip = Invoke-RestMethod -Uri "http://169.254.169.254/latest/meta-data/local-ipv4"  -Headers @{"Metadata"="true"}
     # update variables for AWS
-    $fmeDatabaseUsername = "fmeserver"
+    $fmeDatabaseUsername = "fmeflow"
     $storageUserName = "Admin"
     $storageAccountPath = "$storageAccountName\share"
     $aws = $true
@@ -44,9 +44,9 @@ Add-Content "$modified_values" "redishosts: `"${private_ip}`""
 Add-Content "$modified_values" "servletport: `"8080`""
 Add-Content "$modified_values" "pgsqlhostname: `"${databasehostname}`""
 Add-Content "$modified_values" "pgsqlport: `"5432`""
-Add-Content "$modified_values" "pgsqlpassword: `"fmeserver`""
-Add-Content "$modified_values" "pgsqlpasswordescaped: `"fmeserver`""
-Add-Content "$modified_values" "pgsqlconnectionstring: `"jdbc:postgresql://${databasehostname}:5432/fmeserver`""
+Add-Content "$modified_values" "pgsqlpassword: `"fmeflow`""
+Add-Content "$modified_values" "pgsqlpasswordescaped: `"fmeflow`""
+Add-Content "$modified_values" "pgsqlconnectionstring: `"jdbc:postgresql://${databasehostname}:5432/fmeflow`""
 Add-Content "$modified_values" "externalport: `"80`""
 Add-Content "$modified_values" "logprefix: `"${private_ip}_`""
 Add-Content "$modified_values" "postgresrootpassword: `"postgres`""
@@ -55,7 +55,7 @@ Add-Content "$modified_values" "enableregistrationresponsetransactionhost: `"tru
 New-Item -Path "C:\" -Name "REDISDIR" -ItemType "directory"
 
 # replace blanked out values to ensure confd runs correctly
-((Get-Content -path "$default_values" -Raw) -replace '<<DATABASE_PASSWORD>>','"fmeserver"') | Set-Content -Path "$default_values"
+((Get-Content -path "$default_values" -Raw) -replace '<<DATABASE_PASSWORD>>','"fmeflow"') | Set-Content -Path "$default_values"
 ((Get-Content -path "$default_values" -Raw) -replace '<<POSTGRES_ROOT_PASSWORD>>','"postgres"') | Set-Content -Path "$default_values"
 
 $ErrorActionPreference = 'SilentlyContinue'
@@ -65,18 +65,18 @@ Pop-Location
 
 # add ssl mode to jdbc connection string and set username to include hostname
 (Get-Content "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt") `
-    -replace '5432/fmeserver', '5432/fmeserver?sslmode=require' `
-    -replace "DB_USERNAME=fmeserver","DB_USERNAME=$fmeDatabaseUsername" |
+    -replace '5432/fmeflow', '5432/fmeflow?sslmode=require' `
+    -replace "DB_USERNAME=fmeflow","DB_USERNAME=$fmeDatabaseUsername" |
   Out-File "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt.updated"
 Move-Item -Path "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt.updated" -Destination "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt" -Force
 ((Get-Content "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt") -join "`n") + "`n" | Set-Content -NoNewline "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt"
 
-(Get-Content "C:\Program Files\FMEFlow\Server\fmeServerWebApplicationConfig.txt") `
-    -replace '5432/fmeserver', '5432/fmeserver?sslmode=require' `
-    -replace 'DB_USERNAME=fmeserver',"DB_USERNAME=$fmeDatabaseUsername" |
-  Out-File "C:\Program Files\FMEFlow\Server\fmeServerWebApplicationConfig.txt.updated"
-Move-Item -Path "C:\Program Files\FMEFlow\Server\fmeServerWebApplicationConfig.txt.updated" -Destination "C:\Program Files\FMEFlow\Server\fmeServerWebApplicationConfig.txt" -Force
-((Get-Content "C:\Program Files\FMEFlow\Server\fmeServerWebApplicationConfig.txt") -join "`n") + "`n" | Set-Content -NoNewline "C:\Program Files\FMEFlow\Server\fmeServerWebApplicationConfig.txt"
+(Get-Content "C:\Program Files\FMEFlow\Server\fmeFlowWebApplicationConfig.txt") `
+    -replace '5432/fmeflow', '5432/fmeflow?sslmode=require' `
+    -replace 'DB_USERNAME=fmeflow',"DB_USERNAME=$fmeDatabaseUsername" |
+  Out-File "C:\Program Files\FMEFlow\Server\fmeFlowWebApplicationConfig.txt.updated"
+Move-Item -Path "C:\Program Files\FMEFlow\Server\fmeFlowWebApplicationConfig.txt.updated" -Destination "C:\Program Files\FMEFlow\Server\fmeFlowWebApplicationConfig.txt" -Force
+((Get-Content "C:\Program Files\FMEFlow\Server\fmeFlowWebApplicationConfig.txt") -join "`n") + "`n" | Set-Content -NoNewline "C:\Program Files\FMEFlow\Server\fmeFlowWebApplicationConfig.txt"
 
 # connect to the azure file share
 $connectTestResult = Test-NetConnection -ComputerName $storageAccountName -Port 445
@@ -106,8 +106,8 @@ do {
     $databaseReady = $?
     Write-Host $databaseReady
 } until ($databaseReady)
-$env:PGPASSWORD = "fmeserver"
-$schemaExists = & "C:\Program Files\FMEFlow\Utilities\pgsql\bin\psql.exe" -h ${databasehostname} -d fmeserver -p 5432 -c "SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name = 'fme_config_props')" -w -t -U $fmeDatabaseUsername 2>&1
+$env:PGPASSWORD = "fmeflow"
+$schemaExists = & "C:\Program Files\FMEFlow\Utilities\pgsql\bin\psql.exe" -h ${databasehostname} -d fmeflow -p 5432 -c "SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name = 'fme_config_props')" -w -t -U $fmeDatabaseUsername 2>&1
 if($schemaExists -like "*t*") {
     Write-Host "The schema already exists"
 }
@@ -117,8 +117,8 @@ else {
     & "C:\Program Files\FMEFlow\Utilities\pgsql\bin\psql.exe" -d postgres -h $databasehostname -U $databaseUsername -p 5432 -f "C:\Program Files\FMEFlow\Server\database\postgresql\postgresql_createUser.sql" >"C:\Program Files\FMEFlow\resources\logs\installation\CreateUser.log" 2>&1
     & "C:\Program Files\FMEFlow\Utilities\pgsql\bin\psql.exe" -d postgres -h $databasehostname -U $databaseUsername -p 5432 -f "C:\Program Files\FMEFlow\Server\database\postgresql\postgresql_createDB.sql" >"C:\Program Files\FMEFlow\resources\logs\installation\CreateDatabase.log" 2>&1
 
-    $env:PGPASSWORD = "fmeserver"
-    & "C:\Program Files\FMEFlow\Utilities\pgsql\bin\psql.exe" -d fmeserver -h $databasehostname -U $fmeDatabaseUsername -p 5432 -f "C:\Program Files\FMEFlow\Server\database\postgresql\postgresql_createSchema.sql" >"C:\Program Files\FMEFlow\resources\logs\installation\CreateSchema.log" 2>&1
+    $env:PGPASSWORD = "fmeflow"
+    & "C:\Program Files\FMEFlow\Utilities\pgsql\bin\psql.exe" -d fmeflow -h $databasehostname -U $fmeDatabaseUsername -p 5432 -f "C:\Program Files\FMEFlow\Server\database\postgresql\postgresql_createSchema.sql" >"C:\Program Files\FMEFlow\resources\logs\installation\CreateSchema.log" 2>&1
 }
 
 # create a script with the account name and password written into it to use at startup
@@ -135,10 +135,10 @@ $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount
 $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Mount Azure files at startup"
 Register-ScheduledTask -TaskName "AzureMountFiles" -InputObject $definition
 
-Set-Service -Name "FME Server Core" -StartupType "Automatic"
-Set-Service -Name "FMEServerAppServer" -StartupType "Automatic"
-Start-Service -Name "FME Server Core"
-Start-Service -Name "FMEServerAppServer"
+Set-Service -Name "FME Flow Core" -StartupType "Automatic"
+Set-Service -Name "FMEFlowAppServer" -StartupType "Automatic"
+Start-Service -Name "FME Flow Core"
+Start-Service -Name "FMEFlowAppServer"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
