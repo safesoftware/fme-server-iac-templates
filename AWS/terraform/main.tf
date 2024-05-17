@@ -9,7 +9,7 @@ terraform {
 }
 
 provider "aws" {
-  profile = "default"
+  profile = "baradmin"
   region  = var.region
   default_tags {
     tags = {
@@ -98,6 +98,9 @@ module "asg_core" {
   engine_registration_target_group_arn = module.nlb.engine_registration_target_group_arn
   private_sn_az2_id                    = module.network.private_sn_az2_id
   private_sn_az1_id                    = module.network.private_sn_az1_id
+  depends_on = [
+    module.secrets
+  ]
 }
 
 module "asg_standard_engine" {
