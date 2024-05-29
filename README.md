@@ -11,3 +11,13 @@ Once the VM images are created they can be used as source images for the deploym
 
 ### Scaling Examples
 The scaling examples showcase a proof of concept to scale CPU-Usage (Dynamic) FME Flow Engines based on queued jobs in Azure and AWS with python. These examples can be a starting point for an Azure Function and AWS Lambda implementation supporting different scaling scenarios.
+
+### Previous versions of FME Flow
+Over time as changes are made to FME Flow, these scripts and templates need to be updated. To deploy older versions of FME Flow, please use the scripts templates in the different branches. See this table below for which branch to use for each version of FME Flow:
+
+| FME Flow Version | Git Branch |
+| --------------- | --------------- |
+| 2024.0+ | [main](https://github.com/safesoftware/fme-server-iac-templates/tree/main)  |
+| 2023.X | [2023](https://github.com/safesoftware/fme-server-iac-templates/tree/2023)  |
+| 2022.X | [2022](https://github.com/safesoftware/fme-server-iac-templates/tree/2022)  |
+
