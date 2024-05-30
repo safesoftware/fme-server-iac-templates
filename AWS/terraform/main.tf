@@ -9,7 +9,7 @@ terraform {
 }
 
 provider "aws" {
-  profile = "baradmin"
+  profile = "default"
   region  = var.region
   default_tags {
     tags = {
