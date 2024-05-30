@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Template to deploy a distributed FME Server in AWS
+Description: Template to deploy a distributed FME Flow in AWS
 
 Parameters:
   Owner:
@@ -8,7 +8,7 @@ Parameters:
 
   PublicAccess:
     Type: String
-    Description: CDIR range from which the FME Server Web UI and Websocket will be accessible
+    Description: CDIR range from which the FME Flow Web UI and Websocket will be accessible
 
   VpcName:
     Type: String
@@ -62,7 +62,7 @@ Parameters:
 
   AdName:
     Type: String
-    Default: cf-fmeserver.safe
+    Default: cf-fmeflow.safe
     Description: Name of the Active Directory service
 
   AlbName:
@@ -297,8 +297,8 @@ Resources:
   Sg:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: FME Server security group 
-      GroupDescription: Allows communication between FME Server components
+      GroupName: FME Flow security group 
+      GroupDescription: Allows communication between FME Flow components
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - Description: Web UI from local IP
@@ -346,7 +346,7 @@ Resources:
         - Key: Owner
           Value: !Ref Owner
         - Key: Name
-          Value: FME Server security group
+          Value: FME Flow security group
 
   SelfRefSGIngress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -390,7 +390,7 @@ Resources:
         - Key: Owner
           Value: !Ref Owner
         - Key: Name
-          Value: FME Server backend database
+          Value: FME Flow backend database
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
   
@@ -434,7 +434,7 @@ Resources:
   SsmDocument: 
     Type: AWS::SSM::Document
     Properties:
-      Name: fmeserverDomainConfigTest
+      Name: fmeflowDomainConfigTest
       DocumentFormat: YAML
       DocumentType: Command
       Content:
@@ -483,7 +483,7 @@ Resources:
   CoreTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties: 
-      Name: fmeserver-core
+      Name: fmeflow-core
       Port: 8080
       Protocol: HTTP
       VpcId: !Ref VPC
@@ -494,7 +494,7 @@ Resources:
   WsTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties: 
-      Name: fmeserver-ws
+      Name: fmeflow-ws
       Port: 7078
       Protocol: HTTP
       VpcId: !Ref VPC
@@ -547,7 +547,7 @@ Resources:
   RdsSecret:  
     Type: AWS::SecretsManager::Secret
     Properties: 
-      Name: fmeserverRDSSecret
+      Name: fmeflowRDSSecret
       GenerateSecretString:
         SecretStringTemplate: !Sub '{"username":"${DbAdminUser}"}'
         GenerateStringKey: "password"
@@ -566,7 +566,7 @@ Resources:
   FsxSecret:  
     Type: AWS::SecretsManager::Secret
     Properties: 
-      Name: fmeserverFSXSecret12082022
+      Name: fmeflowFSXSecret12082022
       GenerateSecretString:
         SecretStringTemplate: '{"username":"Admin"}'
         GenerateStringKey: "password"
@@ -713,11 +713,11 @@ Resources:
               $storageAccountName = "${WindowsFileSystem.DNSName}"
               $storageAccountKey = $fsx_secrets.password
               
-              # Create task to initialize FME Server
-              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_aws.ps1 -databasehostname $databasehostname -databasePassword $databasePassword -databaseUsername $databaseUsername -externalhostname $externalhostname -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
+              # Create task to initialize FME Flow
+              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeflow_confd_aws.ps1 -databasehostname $databasehostname -databasePassword $databasePassword -databaseUsername $databaseUsername -externalhostname $externalhostname -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey >C:\\confd-log.txt 2>&1"
               $trigger = New-ScheduledTaskTrigger -AtStartup
               $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
-              $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
+              $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Flow core"
               Register-ScheduledTask -TaskName "coreInit" -InputObject $definition
               
               # Add instance to a file share domain
@@ -761,11 +761,11 @@ Resources:
               $engineType = "STANDARD"
               $nodeManaged = "true"
               
-              # Create task to initialize FME Server
-              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine_aws.ps1 -databasehostname $databasehostname -engineregistrationhost $engineregistrationhost -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey -engineType $engineType -nodeManaged $nodeManaged >C:\\confd-log.txt 2>&1"
+              # Create task to initialize FME Flow
+              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeflow_confd_engine_aws.ps1 -databasehostname $databasehostname -engineregistrationhost $engineregistrationhost -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey -engineType $engineType -nodeManaged $nodeManaged >C:\\confd-log.txt 2>&1"
               $trigger = New-ScheduledTaskTrigger -AtStartup
               $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
-              $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
+              $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Flow core"
               Register-ScheduledTask -TaskName "engineInit" -InputObject $definition
               
               # Add instance to a file share domain
@@ -809,11 +809,11 @@ Resources:
               $engineType = "DYNAMIC"
               $nodeManaged = "false"
               
-              # Create task to initialize FME Server
-              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine_aws.ps1 -databasehostname $databasehostname -engineregistrationhost $engineregistrationhost -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey -engineType $engineType -nodeManaged $nodeManaged >C:\\confd-log.txt 2>&1"
+              # Create task to initialize FME Flow
+              $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Unrestricted -File C:\\config_fmeflow_confd_engine_aws.ps1 -databasehostname $databasehostname -engineregistrationhost $engineregistrationhost -storageAccountName $storageAccountName -storageAccountKey $storageAccountKey -engineType $engineType -nodeManaged $nodeManaged >C:\\confd-log.txt 2>&1"
               $trigger = New-ScheduledTaskTrigger -AtStartup
               $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount -RunLevel Highest
-              $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Server core"
+              $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Initialize FME Flow core"
               Register-ScheduledTask -TaskName "engineInit" -InputObject $definition
               
               # Add instance to a file share domain
@@ -887,5 +887,5 @@ Resources:
           PropagateAtLaunch: True
 Outputs:
   FMESeverFQDN:
-    Description: The FQDN of the FME Server
+    Description: The FQDN of the FME Flow
     Value: !GetAtt Alb.DNSName

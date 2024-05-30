@@ -17,7 +17,7 @@ locals {
   default_tags = { owner = var.owner }
 }
 
-resource "azurerm_resource_group" "fme_server" {
+resource "azurerm_resource_group" "fme_flow" {
   name     = var.rg_name
   location = var.location
 
@@ -27,8 +27,8 @@ resource "azurerm_resource_group" "fme_server" {
 module "network" {
   source            = "./modules/network"
   owner             = var.owner
-  rg_name           = azurerm_resource_group.fme_server.name
-  location          = azurerm_resource_group.fme_server.location
+  rg_name           = azurerm_resource_group.fme_flow.name
+  location          = azurerm_resource_group.fme_flow.location
   vnet_name         = var.vnet_name
   be_snet_name      = var.be_snet_name
   agw_snet_name     = var.agw_snet_name
@@ -39,8 +39,8 @@ module "network" {
 module "storage" {
   source     = "./modules/storage"
   owner      = var.owner
-  rg_name    = azurerm_resource_group.fme_server.name
-  location   = azurerm_resource_group.fme_server.location
+  rg_name    = azurerm_resource_group.fme_flow.name
+  location   = azurerm_resource_group.fme_flow.location
   be_snet_id = module.network.be_snet_id
   build_agent_public_ip = var.build_agent_public_ip
 }
@@ -49,8 +49,8 @@ module "database" {
   source        = "./modules/database/pgsql"
 # source        = "./modules/database/sql_server"
   owner         = var.owner
-  rg_name       = azurerm_resource_group.fme_server.name
-  location      = azurerm_resource_group.fme_server.location
+  rg_name       = azurerm_resource_group.fme_flow.name
+  location      = azurerm_resource_group.fme_flow.location
   be_snet_id    = module.network.be_snet_id
   db_admin_user = var.db_admin_user
   db_admin_pw   = var.db_admin_pw
@@ -59,8 +59,8 @@ module "database" {
 module "load_balancer" {
   source     = "./modules/lb-services/lb"
   owner      = var.owner
-  rg_name    = azurerm_resource_group.fme_server.name
-  location   = azurerm_resource_group.fme_server.location
+  rg_name    = azurerm_resource_group.fme_flow.name
+  location   = azurerm_resource_group.fme_flow.location
   lb_name    = var.lb_name
   be_snet_id = module.network.be_snet_id
 }
@@ -68,8 +68,8 @@ module "load_balancer" {
 module "application_gateway" {
   source      = "./modules/lb-services/agw"
   owner       = var.owner
-  rg_name     = azurerm_resource_group.fme_server.name
-  location    = azurerm_resource_group.fme_server.location
+  rg_name     = azurerm_resource_group.fme_flow.name
+  location    = azurerm_resource_group.fme_flow.location
   agw_name    = var.agw_name
   agw_snet_id = module.network.agw_snet_id
   pip_id      = module.network.pip_id
@@ -81,8 +81,8 @@ module "vmss_core" {
 # db_user                      = var.db_user
 # db_pw                        = var.db_pw
   owner                        = var.owner
-  rg_name                      = azurerm_resource_group.fme_server.name
-  location                     = azurerm_resource_group.fme_server.location
+  rg_name                      = azurerm_resource_group.fme_flow.name
+  location                     = azurerm_resource_group.fme_flow.location
   instance_count_core          = var.instance_count_core
   be_snet_id                   = module.network.be_snet_id
   lb_be_address_pool_id        = module.load_balancer.be_address_pool_id
@@ -105,8 +105,8 @@ module "vmss_standard_engine" {
   vmss_name             = "standard"
   engine_type           = "STANDARD" 
   owner                 = var.owner
-  rg_name               = azurerm_resource_group.fme_server.name
-  location              = azurerm_resource_group.fme_server.location
+  rg_name               = azurerm_resource_group.fme_flow.name
+  location              = azurerm_resource_group.fme_flow.location
   instance_count_engine = var.instance_count_engine
   be_snet_id            = module.network.be_snet_id
   db_fqdn               = module.database.fqdn
@@ -130,8 +130,8 @@ module "vmss_standard_engine" {
 #   vmss_name             = "cpuUsage"
 #   engine_type           = "DYNAMIC" 
 #   owner                 = var.owner
-#   rg_name               = azurerm_resource_group.fme_server.name
-#   location              = azurerm_resource_group.fme_server.location
+#   rg_name               = azurerm_resource_group.fme_flow.name
+#   location              = azurerm_resource_group.fme_flow.location
 #   instance_count_engine = var.instance_count_engine
 #   be_snet_id            = module.network.be_snet_id
 #   db_fqdn               = module.database.fqdn

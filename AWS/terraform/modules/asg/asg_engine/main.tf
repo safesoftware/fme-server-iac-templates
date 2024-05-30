@@ -11,7 +11,7 @@ locals {
   }
 }
 
-resource "aws_launch_template" "fme_server_engine" {
+resource "aws_launch_template" "fme_flow_engine" {
   name                   = var.engine_name
   image_id               = var.fme_engine_image_id
   instance_type          = "t3.large"
@@ -40,7 +40,7 @@ resource "aws_autoscaling_group" "fme_sever_engine" {
   min_size            = 1
   vpc_zone_identifier = [var.private_sn_az1_id, var.private_sn_az2_id]
   launch_template {
-    id      = aws_launch_template.fme_server_engine.id
+    id      = aws_launch_template.fme_flow_engine.id
     version = "$Latest"
   }
 }

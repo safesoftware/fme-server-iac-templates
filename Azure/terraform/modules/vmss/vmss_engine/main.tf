@@ -3,7 +3,7 @@ locals {
   engine_type = var.engine_type == "STANDARD" ? "" : "-engineType DYNAMIC -nodeManaged false"
 }
 
-resource "azurerm_windows_virtual_machine_scale_set" "fme_server_engine" {
+resource "azurerm_windows_virtual_machine_scale_set" "fme_flow_engine" {
   name                = var.vmss_name
   resource_group_name = var.rg_name
   location            = var.location
@@ -33,12 +33,12 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_engine" {
   source_image_reference {
     publisher = "safesoftwareinc"
     offer     = "fme-engine"
-    sku       = "fme-engine-2022-0-0-2-windows-byol"
+    sku       = "fme-engine-2024-0-2-1-windows-byol"
     version   = "latest"
   }
 
   plan {
-    name      = "fme-engine-2022-0-0-2-windows-byol"
+    name      = "fme-engine-2024-0-2-1-windows-byol"
     publisher = "safesoftwareinc"
     product   = "fme-engine"
   }
@@ -49,7 +49,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_engine" {
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8" 
     protected_settings = jsonencode({
-      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s %s >C:\\confd-log.txt 2>&1", var.db_fqdn, var.lb_private_ip_address, var.storage_name, var.storage_key, local.engine_type)
+      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeflow_confd_engine.ps1 -databasehostname %s -engineregistrationhost %s -storageAccountName %s -storageAccountKey %s %s >C:\\confd-log.txt 2>&1", var.db_fqdn, var.lb_private_ip_address, var.storage_name, var.storage_key, local.engine_type)
     })
   }
 

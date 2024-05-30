@@ -1,5 +1,5 @@
-# FME Server network module
-This module creates the required file share service and the Active Directory service for a distributed FME Server deployment in AWS.
+# FME Flow network module
+This module creates the required file share service and the Active Directory service for a distributed FME Flow deployment in AWS.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -19,9 +19,9 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_directory_service_directory.fme_server](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/directory_service_directory) | resource |
-| [aws_fsx_windows_file_system.fme_server](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/fsx_windows_file_system) | resource |
-| [aws_ssm_document.fme_server_ad](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_document) | resource |
+| [aws_directory_service_directory.fme_flow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/directory_service_directory) | resource |
+| [aws_fsx_windows_file_system.fme_flow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/fsx_windows_file_system) | resource |
+| [aws_ssm_document.fme_flow_ad](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_document) | resource |
 
 ## Inputs
 
@@ -31,13 +31,13 @@ No modules.
 | <a name="input_ad_name"></a> [ad\_name](#input\_ad\_name) | Name of the Active Directory service | `string` | n/a | yes |
 | <a name="input_private_sn_az1_id"></a> [private\_sn\_az1\_id](#input\_private\_sn\_az1\_id) | Private subnet id in the first availability zone | `string` | n/a | yes |
 | <a name="input_private_sn_az2_id"></a> [private\_sn\_az2\_id](#input\_private\_sn\_az2\_id) | Private subnet id in the second availability zone | `string` | n/a | yes |
-| <a name="input_sg_id"></a> [sg\_id](#input\_sg\_id) | Security group id for FME Server deployment | `string` | n/a | yes |
+| <a name="input_sg_id"></a> [sg\_id](#input\_sg\_id) | Security group id for FME Flow deployment | `string` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC id for FME Sever deployment | `string` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_fsx_dns_name"></a> [fsx\_dns\_name](#output\_fsx\_dns\_name) | Security group id for FME Server deployment |
+| <a name="output_fsx_dns_name"></a> [fsx\_dns\_name](#output\_fsx\_dns\_name) | Security group id for FME Flow deployment |
 | <a name="output_ssm_document_name"></a> [ssm\_document\_name](#output\_ssm\_document\_name) | Name of the SSM document used to join instances to the Active Directory |
 <!-- END_TF_DOCS --> 

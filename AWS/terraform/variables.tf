@@ -1,11 +1,11 @@
 variable "owner" {
   type        = string
-  description = "Default value for onwer tag"
+  description = "Default value for owner tag"
 }
 
 variable "public_access" {
   type        = string
-  description = "CDIR range from which the FME Server Web UI and Websocket will be accessible"
+  description = "CDIR range from which the FME Flow Web UI and Websocket will be accessible"
 }
 
 variable "region" {
@@ -79,12 +79,12 @@ variable "fme_core_image_id" {
 
 variable "fme_engine_image_id" {
   type        = string
-  description = "Id of the FME Sever core image. The AMI needs to be available in the region used for the deployment"
+  description = "Id of the FME Sever engine image. The AMI needs to be available in the region used for the deployment"
 }
 
 variable "ad_name" {
   type        = string
-  default     = "tf-fmeserver.safe"
+  default     = "tf-fmeflow.safe"
   description = "Name of the Active Directory service"
 }
 

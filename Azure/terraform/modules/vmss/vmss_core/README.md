@@ -1,5 +1,5 @@
-# FME Server Core VMSS module
-This module creates the virtual machine scale set for the FME Core of a distributed FME Server deployment in Azure.
+# FME Flow Core VMSS module
+This module creates the virtual machine scale set for the FME Core of a distributed FME Flow deployment in Azure.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -19,7 +19,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_windows_virtual_machine_scale_set.fme_server_core](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine_scale_set) | resource |
+| [azurerm_windows_virtual_machine_scale_set.fme_flow_core](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine_scale_set) | resource |
 
 ## Inputs
 
@@ -36,8 +36,8 @@ No modules.
 | <a name="input_location"></a> [location](#input\_location) | Location of resources | `string` | n/a | yes |
 | <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | n/a | yes |
 | <a name="input_rg_name"></a> [rg\_name](#input\_rg\_name) | Resource group name | `string` | n/a | yes |
-| <a name="input_storage_key"></a> [storage\_key](#input\_storage\_key) | FME Server backend storage account key | `string` | n/a | yes |
-| <a name="input_storage_name"></a> [storage\_name](#input\_storage\_name) | FME Server backend storage account name | `string` | n/a | yes |
+| <a name="input_storage_key"></a> [storage\_key](#input\_storage\_key) | FME Flow backend storage account key | `string` | n/a | yes |
+| <a name="input_storage_name"></a> [storage\_name](#input\_storage\_name) | FME Flow backend storage account name | `string` | n/a | yes |
 | <a name="input_vm_admin_pw"></a> [vm\_admin\_pw](#input\_vm\_admin\_pw) | Specifies the windows virual machine admin pw. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
 | <a name="input_vm_admin_user"></a> [vm\_admin\_user](#input\_vm\_admin\_user) | Specifies the windows virual machine admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE. | `string` | n/a | yes |
 

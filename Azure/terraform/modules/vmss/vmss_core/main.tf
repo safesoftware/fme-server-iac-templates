@@ -2,7 +2,7 @@ locals {
   default_tags = { owner = var.owner }
 }
 
-resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
+resource "azurerm_windows_virtual_machine_scale_set" "fme_flow_core" {
   name                = "core"
   resource_group_name = var.rg_name
   location            = var.location
@@ -35,12 +35,12 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
     
     publisher = "safesoftwareinc"
     offer     = "fme-core"
-    sku       = "fme-core-2022-0-0-2-windows-byol"
+    sku       = "fme-core-2024-0-2-1-windows-byol"
     version   = "latest"
   }
 
   plan {
-    name      = "fme-core-2022-0-0-2-windows-byol"
+    name      = "fme-core-2024-0-2-1-windows-byol"
     publisher = "safesoftwareinc"
     product   = "fme-core"
   }
@@ -51,7 +51,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8"
     protected_settings = jsonencode({
-      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", var.db_fqdn, var.db_admin_pw, var.db_admin_user, var.fqdn, var.storage_name, var.storage_key)
+      "commandToExecute" = format("powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeflow_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", var.db_fqdn, var.db_admin_pw, var.db_admin_user, var.fqdn, var.storage_name, var.storage_key)
     })
   }
 

@@ -1,5 +1,5 @@
-# FME Server database module
-This module creates a Azure SQL Server backend database and its virtual network rule for a distributed FME Server deployment in Azure.
+# FME Flow database module
+This module creates a Azure SQL Server backend database and its virtual network rule for a distributed FME Flow deployment in Azure.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -20,9 +20,9 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_mssql_database.fme_server_dist](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) | resource |
-| [azurerm_mssql_server.fme_server_dist](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
-| [azurerm_mssql_virtual_network_rule.fme_server_dist](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_virtual_network_rule) | resource |
+| [azurerm_mssql_database.fme_flow_dist](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) | resource |
+| [azurerm_mssql_server.fme_flow_dist](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
+| [azurerm_mssql_virtual_network_rule.fme_flow_dist](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_virtual_network_rule) | resource |
 | [random_string.db_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 
 ## Inputs

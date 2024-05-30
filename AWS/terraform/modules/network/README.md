@@ -1,5 +1,5 @@
-# FME Server network module
-This module creates the required network services for a distributed FME Server deployment in AWS.
+# FME Flow network module
+This module creates the required network services for a distributed FME Flow deployment in AWS.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -20,25 +20,25 @@ No modules.
 | Name | Type |
 |------|------|
 | [aws_db_subnet_group.rds_subnet_roup](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/db_subnet_group) | resource |
-| [aws_default_route_table.fmeserver_default_rt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/default_route_table) | resource |
-| [aws_eip.fme_server_nat](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
-| [aws_internet_gateway.fme_server](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
-| [aws_nat_gateway.fme_server](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway) | resource |
-| [aws_route_table.fmeserver_public_rt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
+| [aws_default_route_table.fmeflow_default_rt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/default_route_table) | resource |
+| [aws_eip.fme_flow_nat](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip) | resource |
+| [aws_internet_gateway.fme_flow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway) | resource |
+| [aws_nat_gateway.fme_flow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/nat_gateway) | resource |
+| [aws_route_table.fmeflow_public_rt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table) | resource |
 | [aws_route_table_association.private_subnet_az1](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_route_table_association.private_subnet_az2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_route_table_association.public_subnet_az1](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
 | [aws_route_table_association.public_subnet_az2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route_table_association) | resource |
-| [aws_security_group.fmeserver](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_security_group.fmeflow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_subnet.private_subnet_az1](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.private_subnet_az2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.public_subnet_az1](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
 | [aws_subnet.public_subnet_az2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet) | resource |
-| [aws_vpc.fme_server](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
+| [aws_vpc.fme_flow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc) | resource |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 | [aws_subnet.private_subnet_az1](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
 | [aws_subnet.private_subnet_az2](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
-| [aws_vpc.fme_server](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
+| [aws_vpc.fme_flow](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
 
 ## Inputs
 
@@ -49,7 +49,7 @@ No modules.
 | <a name="input_nat_name"></a> [nat\_name](#input\_nat\_name) | NAT gateway name | `string` | n/a | yes |
 | <a name="input_private_sn1_cidr"></a> [private\_sn1\_cidr](#input\_private\_sn1\_cidr) | CIDR range for private subnet in the first availability zone | `string` | n/a | yes |
 | <a name="input_private_sn2_cidr"></a> [private\_sn2\_cidr](#input\_private\_sn2\_cidr) | CIDR range for private subnet in the second availability zone | `string` | n/a | yes |
-| <a name="input_public_access"></a> [public\_access](#input\_public\_access) | CDIR range from which the FME Server Web UI and Websocket will be accessible | `string` | n/a | yes |
+| <a name="input_public_access"></a> [public\_access](#input\_public\_access) | CDIR range from which the FME Flow Web UI and Websocket will be accessible | `string` | n/a | yes |
 | <a name="input_public_sn1_cidr"></a> [public\_sn1\_cidr](#input\_public\_sn1\_cidr) | CIDR range for public subnet in the first availability zone | `string` | n/a | yes |
 | <a name="input_public_sn2_cidr"></a> [public\_sn2\_cidr](#input\_public\_sn2\_cidr) | CIDR range for public subnet in the second availability zone | `string` | n/a | yes |
 | <a name="input_sn_name"></a> [sn\_name](#input\_sn\_name) | Subnet name prefix | `string` | n/a | yes |
@@ -65,6 +65,6 @@ No modules.
 | <a name="output_public_sn_az1_id"></a> [public\_sn\_az1\_id](#output\_public\_sn\_az1\_id) | Public subnet id in the first availability zone |
 | <a name="output_public_sn_az2_id"></a> [public\_sn\_az2\_id](#output\_public\_sn\_az2\_id) | Public subnet id in the second availability zone |
 | <a name="output_rds_sn_group_name"></a> [rds\_sn\_group\_name](#output\_rds\_sn\_group\_name) | Name of subnet group for RDS |
-| <a name="output_sg_id"></a> [sg\_id](#output\_sg\_id) | Security group id for FME Server deployment |
+| <a name="output_sg_id"></a> [sg\_id](#output\_sg\_id) | Security group id for FME Flow deployment |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | VPC id for FME Sever deployment |
 <!-- END_TF_DOCS --> 

@@ -8,8 +8,8 @@ resource "random_string" "db_name" {
   special = false
 }
 
-resource "azurerm_postgresql_server" "fme_server" {
-  name                         = format("fmeserver-psql-%s", random_string.db_name.result)
+resource "azurerm_postgresql_server" "fme_flow" {
+  name                         = format("fmeflow-psql-%s", random_string.db_name.result)
   resource_group_name          = var.rg_name
   location                     = var.location
   administrator_login          = var.db_admin_user
@@ -22,10 +22,10 @@ resource "azurerm_postgresql_server" "fme_server" {
   tags = local.default_tags
 }
 
-resource "azurerm_postgresql_virtual_network_rule" "fme_server" {
+resource "azurerm_postgresql_virtual_network_rule" "fme_flow" {
   name                                 = "postgresql-vnet-rule"
   resource_group_name                  = var.rg_name
-  server_name                          = azurerm_postgresql_server.fme_server.name
+  server_name                          = azurerm_postgresql_server.fme_flow.name
   subnet_id                            = var.be_snet_id
   ignore_missing_vnet_service_endpoint = true
 }

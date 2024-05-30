@@ -1,5 +1,5 @@
-# FME Server network module
-This module creates the network load balancer for a distributed FME Server deployment in AWS.
+# FME Flow network module
+This module creates the network load balancer for a distributed FME Flow deployment in AWS.
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -19,9 +19,9 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_lb.fme_server_nlb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
-| [aws_lb_listener.fme_server_engine-registration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
-| [aws_lb_target_group.fme_server_engine-registration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
+| [aws_lb.fme_flow_nlb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
+| [aws_lb_listener.fme_flow_engine-registration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener) | resource |
+| [aws_lb_target_group.fme_flow_engine-registration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) | resource |
 
 ## Inputs
 
@@ -36,6 +36,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_engine_registration_target_group_arn"></a> [engine\_registration\_target\_group\_arn](#output\_engine\_registration\_target\_group\_arn) | The ARN of the FME Server engine registration target group |
+| <a name="output_engine_registration_target_group_arn"></a> [engine\_registration\_target\_group\_arn](#output\_engine\_registration\_target\_group\_arn) | The ARN of the FME Flow engine registration target group |
 | <a name="output_nlb_dns_name"></a> [nlb\_dns\_name](#output\_nlb\_dns\_name) | Public dns name of the network load balancer |
 <!-- END_TF_DOCS --> 

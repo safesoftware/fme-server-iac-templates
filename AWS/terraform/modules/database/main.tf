@@ -1,4 +1,4 @@
-resource "aws_db_instance" "fme_server" {
+resource "aws_db_instance" "fme_flow" {
   allocated_storage      = 20
   instance_class         = "db.t3.small"
   engine                 = "postgres"
@@ -11,6 +11,6 @@ resource "aws_db_instance" "fme_server" {
   vpc_security_group_ids = [var.sg_id]
   skip_final_snapshot    = true
   tags = {
-    "Name" = "FME Server backend database"
+    "Name" = "FME Flow backend database"
   }
 }

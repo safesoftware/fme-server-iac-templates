@@ -1,3 +1,12 @@
+packer {
+  required_plugins {
+    amazon = {
+      version = ">= 1.3.2"
+      source  = "github.com/hashicorp/amazon"
+    }
+  }
+}
+
 variable "region" {
   type    = string
 }
@@ -71,12 +80,12 @@ build {
   sources = ["source.amazon-ebs.fme_core"]
   
   provisioner "file" {
-    source = "../../config/powershell/config_fmeserver_confd.ps1"
-    destination = "C:\\config_fmeserver_confd_aws.ps1"
+    source = "../../config/powershell/config_fmeflow_confd.ps1"
+    destination = "C:\\config_fmeflow_confd_aws.ps1"
   }
 
   provisioner "powershell" {
-    script = "../../config/powershell/install-server-core.ps1"
+    script = "../../config/powershell/install-flow-core.ps1"
     environment_vars = ["INSTALLER_URL=${var.installer_url}"]
   }
 
@@ -92,12 +101,12 @@ build {
   sources = ["source.amazon-ebs.fme_engine"]
   
   provisioner "file" {
-    source = "../../config/powershell/config_fmeserver_confd_engine.ps1"
-    destination = "C:\\config_fmeserver_confd_engine_aws.ps1"
+    source = "../../config/powershell/config_fmeflow_confd_engine.ps1"
+    destination = "C:\\config_fmeflow_confd_engine_aws.ps1"
   }
 
   provisioner "powershell" {
-    script = "../../config/powershell/install-server-engine.ps1"
+    script = "../../config/powershell/install-flow-engine.ps1"
     environment_vars = ["INSTALLER_URL=${var.installer_url}"]
   }
 

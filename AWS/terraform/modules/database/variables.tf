@@ -17,6 +17,6 @@ variable "rds_sn_group_name" {
 
 variable "sg_id" {
   type        = string
-  description = "Security group id for FME Server deployment"
+  description = "Security group id for FME Flow deployment"
 
 }

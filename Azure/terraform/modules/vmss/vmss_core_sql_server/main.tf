@@ -2,7 +2,7 @@ locals {
   default_tags = { owner = var.owner }
 }
 
-resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
+resource "azurerm_windows_virtual_machine_scale_set" "fme_flow_core" {
   name                = "core"
   resource_group_name = var.rg_name
   location            = var.location
@@ -42,7 +42,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
     product   = "fme-core"
   }
 
-  custom_data = filebase64("./modules/database/sql_server/scripts/config_fmeserver_sql_confd.ps1")
+  custom_data = filebase64("./modules/database/sql_server/scripts/config_fmeflow_sql_confd.ps1")
 
   extension {
     name                 = "core-script"
@@ -50,7 +50,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_server_core" {
     type                 = "CustomScriptExtension"
     type_handler_version = "1.8"
     protected_settings = jsonencode({
-      "commandToExecute" = format("powershell Copy-Item -Path C:\\AzureData\\CustomData.bin -Destination C:\\config_fmeserver_sql_confd.ps1; powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_sql_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -adminPassword %s -adminUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", var.db_fqdn, var.db_pw, var.db_user, var.db_admin_pw, var.db_admin_user, var.fqdn, var.storage_name, var.storage_key)
+      "commandToExecute" = format("powershell Copy-Item -Path C:\\AzureData\\CustomData.bin -Destination C:\\config_fmeflow_sql_confd.ps1; powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeflow_sql_confd.ps1 -databasehostname %s -databasePassword %s -databaseUsername %s -adminPassword %s -adminUsername %s -externalhostname %s -storageAccountName %s -storageAccountKey %s >C:\\confd-log.txt 2>&1", var.db_fqdn, var.db_pw, var.db_user, var.db_admin_pw, var.db_admin_user, var.fqdn, var.storage_name, var.storage_key)
     })
   }
 

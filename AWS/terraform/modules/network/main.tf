@@ -1,7 +1,7 @@
 data "aws_region" "current" {}
 
-data "aws_vpc" "fme_server" {
-  id = aws_vpc.fme_server.id
+data "aws_vpc" "fme_flow" {
+  id = aws_vpc.fme_flow.id
 }
 
 data "aws_subnet" "private_subnet_az1" {
@@ -12,7 +12,7 @@ data "aws_subnet" "private_subnet_az2" {
   id = aws_subnet.private_subnet_az2.id
 }
 
-resource "aws_vpc" "fme_server" {
+resource "aws_vpc" "fme_flow" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
@@ -22,7 +22,7 @@ resource "aws_vpc" "fme_server" {
 }
 
 resource "aws_subnet" "public_subnet_az1" {
-  vpc_id            = aws_vpc.fme_server.id
+  vpc_id            = aws_vpc.fme_flow.id
   cidr_block        = var.public_sn1_cidr
   availability_zone = format("%sa", data.aws_region.current.name)
   tags = {
@@ -31,7 +31,7 @@ resource "aws_subnet" "public_subnet_az1" {
 }
 
 resource "aws_subnet" "public_subnet_az2" {
-  vpc_id            = aws_vpc.fme_server.id
+  vpc_id            = aws_vpc.fme_flow.id
   cidr_block        = var.public_sn2_cidr
   availability_zone = format("%sb", data.aws_region.current.name)
   tags = {
@@ -40,7 +40,7 @@ resource "aws_subnet" "public_subnet_az2" {
 }
 
 resource "aws_subnet" "private_subnet_az1" {
-  vpc_id            = aws_vpc.fme_server.id
+  vpc_id            = aws_vpc.fme_flow.id
   cidr_block        = var.private_sn1_cidr
   availability_zone = format("%sa", data.aws_region.current.name)
   tags = {
@@ -49,7 +49,7 @@ resource "aws_subnet" "private_subnet_az1" {
 }
 
 resource "aws_subnet" "private_subnet_az2" {
-  vpc_id            = aws_vpc.fme_server.id
+  vpc_id            = aws_vpc.fme_flow.id
   cidr_block        = var.private_sn2_cidr
   availability_zone = format("%sb", data.aws_region.current.name)
   tags = {
@@ -57,13 +57,13 @@ resource "aws_subnet" "private_subnet_az2" {
   }
 }
 
-resource "aws_internet_gateway" "fme_server" {
-  vpc_id = aws_vpc.fme_server.id
+resource "aws_internet_gateway" "fme_flow" {
+  vpc_id = aws_vpc.fme_flow.id
   tags = {
     "Name" = var.igw_name
   }
 }
-resource "aws_eip" "fme_server_nat" {
+resource "aws_eip" "fme_flow_nat" {
   vpc              = true
   public_ipv4_pool = "amazon"
   tags = {
@@ -71,20 +71,20 @@ resource "aws_eip" "fme_server_nat" {
   }
 }
 
-resource "aws_nat_gateway" "fme_server" {
+resource "aws_nat_gateway" "fme_flow" {
   subnet_id     = aws_subnet.public_subnet_az1.id
-  allocation_id = aws_eip.fme_server_nat.id
+  allocation_id = aws_eip.fme_flow_nat.id
   tags = {
     "Name" = var.nat_name
   }
 }
 
-resource "aws_default_route_table" "fmeserver_default_rt" {
-  default_route_table_id = aws_vpc.fme_server.default_route_table_id
+resource "aws_default_route_table" "fmeflow_default_rt" {
+  default_route_table_id = aws_vpc.fme_flow.default_route_table_id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.fme_server.id
+    nat_gateway_id = aws_nat_gateway.fme_flow.id
   }
   tags = {
     "Name" = "Private subnets route table"
@@ -93,20 +93,20 @@ resource "aws_default_route_table" "fmeserver_default_rt" {
 
 resource "aws_route_table_association" "private_subnet_az1" {
   subnet_id      = aws_subnet.private_subnet_az1.id
-  route_table_id = aws_default_route_table.fmeserver_default_rt.id
+  route_table_id = aws_default_route_table.fmeflow_default_rt.id
 }
 
 resource "aws_route_table_association" "private_subnet_az2" {
   subnet_id      = aws_subnet.private_subnet_az2.id
-  route_table_id = aws_default_route_table.fmeserver_default_rt.id
+  route_table_id = aws_default_route_table.fmeflow_default_rt.id
 }
 
-resource "aws_route_table" "fmeserver_public_rt" {
-  vpc_id = aws_vpc.fme_server.id
+resource "aws_route_table" "fmeflow_public_rt" {
+  vpc_id = aws_vpc.fme_flow.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.fme_server.id
+    gateway_id = aws_internet_gateway.fme_flow.id
   }
   tags = {
     "Name" = "Public subnets route table"
@@ -115,12 +115,12 @@ resource "aws_route_table" "fmeserver_public_rt" {
 
 resource "aws_route_table_association" "public_subnet_az1" {
   subnet_id      = aws_subnet.public_subnet_az1.id
-  route_table_id = aws_route_table.fmeserver_public_rt.id
+  route_table_id = aws_route_table.fmeflow_public_rt.id
 }
 
 resource "aws_route_table_association" "public_subnet_az2" {
   subnet_id      = aws_subnet.public_subnet_az2.id
-  route_table_id = aws_route_table.fmeserver_public_rt.id
+  route_table_id = aws_route_table.fmeflow_public_rt.id
 }
 
 resource "aws_db_subnet_group" "rds_subnet_roup" {
@@ -131,10 +131,10 @@ resource "aws_db_subnet_group" "rds_subnet_roup" {
   }
 }
 
-resource "aws_security_group" "fmeserver" {
-  vpc_id      = aws_vpc.fme_server.id
-  name        = "FME Server security group"
-  description = "Allows communication between FME Server components"
+resource "aws_security_group" "fmeflow" {
+  vpc_id      = aws_vpc.fme_flow.id
+  name        = "FME Flow security group"
+  description = "Allows communication between FME Flow components"
 
   ingress = [
     {
@@ -176,7 +176,7 @@ resource "aws_security_group" "fmeserver" {
       protocol         = "tcp"
       from_port        = 80
       to_port          = 80
-      cidr_blocks      = [format("%s/32", aws_eip.fme_server_nat.public_ip)]
+      cidr_blocks      = [format("%s/32", aws_eip.fme_flow_nat.public_ip)]
       ipv6_cidr_blocks = []
       prefix_list_ids  = []
       security_groups  = []
@@ -187,7 +187,7 @@ resource "aws_security_group" "fmeserver" {
       protocol         = "tcp"
       from_port        = 8080
       to_port          = 8080
-      cidr_blocks      = [data.aws_vpc.fme_server.cidr_block]
+      cidr_blocks      = [data.aws_vpc.fme_flow.cidr_block]
       ipv6_cidr_blocks = []
       prefix_list_ids  = []
       security_groups  = []
@@ -232,6 +232,6 @@ resource "aws_security_group" "fmeserver" {
   ]
 
   tags = {
-    "Name" = "FME Server security group"
+    "Name" = "FME Flow security group"
   }
 }

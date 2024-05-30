@@ -1,18 +1,18 @@
-"""Scaling CPU-Usage (Dynamic) FME Server Engines (AWS)
+"""Scaling CPU-Usage (Dynamic) FME Flow Engines (AWS)
 
-This script allows the user scale CPU-Usage (Dynamic) FME Server Engines with
+This script allows the user scale CPU-Usage (Dynamic) FME Flow Engines with
 AWS ec2 Auto Scaling Groups (asg) based on the number of queued jobs for
-a defined FME Server Queue.
+a defined FME Flow Queue.
 
 The constants are retrieved form environment variables:
 
 ASG_NAME        Name of the ec2 Auto Scaling Group
-JOB_THRESHOLD   Threshold to scale the FME Server Engine either in or out 
-QUEUE           Name of the FME Server Queue
-FME_SERVER      FME Server URL
-FME_TOKEN       FME Server token
+JOB_THRESHOLD   Threshold to scale the FME Flow Engine either in or out 
+QUEUE           Name of the FME Flow Queue
+FME_SERVER      FME Flow URL
+FME_TOKEN       FME Flow token
 
-This uses the FMEServerAPI.py as wrapper for the FME Server REST API
+This uses the FMEServerAPI.py as wrapper for the FME Flow REST API
 Required modules:
 os
 boto3
@@ -59,7 +59,7 @@ def deactivateScaleInProtection(instance_id: str) -> bool:
 def getInstanceId(hostname: str) -> str:
     """
     Retrieves an instance ID of the VMSS that matches the hostname of
-    FME Server Engines 
+    FME Flow Engines 
     """
     asg = aws_autoscaling_client.describe_auto_scaling_groups(
         AutoScalingGroupNames=[ASG_NAME])
@@ -107,7 +107,7 @@ def updateScaleSetCapacity(action: str, min_cap: int = 1) -> bool:
 
 def getQueuedJobs() -> int:
     """
-    Returns the number of queued FME Server jobs in the specified queue
+    Returns the number of queued FME Flow jobs in the specified queue
     """
     queuedJobs = fme_client.get("/fmeapiv4/jobs?&status=queued")
     queuedJobsCount = 0

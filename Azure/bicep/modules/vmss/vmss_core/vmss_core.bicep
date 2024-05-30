@@ -136,7 +136,7 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
             properties: {
               publisher: 'Microsoft.Compute'
               protectedSettings: {
-                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeserver_confd.ps1 -databasehostname ${postgresFqdn} -databasePassword ${postgresqlAdministratorLoginPassword} -databaseUsername ${postgresqlAdministratorLogin} -externalhostname ${publicIpFqdn} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccount.id, '2019-04-01').keys[0].value} >C:\\confd-log.txt 2>&1'
+                commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File C:\\config_fmeflow_confd.ps1 -databasehostname ${postgresFqdn} -databasePassword ${postgresqlAdministratorLoginPassword} -databaseUsername ${postgresqlAdministratorLogin} -externalhostname ${publicIpFqdn} -storageAccountName ${storageAccountName} -storageAccountKey ${listKeys(storageAccount.id, '2019-04-01').keys[0].value} >C:\\confd-log.txt 2>&1'
               }
               typeHandlerVersion: '1.8'
               autoUpgradeMinorVersion: true

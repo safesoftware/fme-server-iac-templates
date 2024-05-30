@@ -69,12 +69,12 @@ variable "fqdn" {
 
 variable "storage_name" {
   type        = string
-  description = "FME Server backend storage account name"
+  description = "FME Flow backend storage account name"
 }
 
 variable "storage_key" {
   type        = string
-  description = "FME Server backend storage account key"
+  description = "FME Flow backend storage account key"
   sensitive   = true
 }
 

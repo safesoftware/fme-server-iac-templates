@@ -1,4 +1,4 @@
-resource "aws_lb" "fme_server_alb" {
+resource "aws_lb" "fme_flow_alb" {
   name               = var.alb_name
   internal           = false
   load_balancer_type = "application"
@@ -6,8 +6,8 @@ resource "aws_lb" "fme_server_alb" {
   subnets            = [var.public_sn_az1_id, var.public_sn_az2_id]
 }
 
-resource "aws_lb_target_group" "fme_server_core" {
-  name     = "fmeserver-core"
+resource "aws_lb_target_group" "fme_flow_core" {
+  name     = "fmeflow-core"
   port     = 8080
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -18,8 +18,8 @@ resource "aws_lb_target_group" "fme_server_core" {
   }
 }
 
-resource "aws_lb_target_group" "fme_server_ws" {
-  name     = "fmeserver-ws"
+resource "aws_lb_target_group" "fme_flow_ws" {
+  name     = "fmeflow-ws"
   port     = 7078
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -30,24 +30,24 @@ resource "aws_lb_target_group" "fme_server_ws" {
   }
 }
 
-resource "aws_lb_listener" "fme_server_core" {
-  load_balancer_arn = aws_lb.fme_server_alb.arn
+resource "aws_lb_listener" "fme_flow_core" {
+  load_balancer_arn = aws_lb.fme_flow_alb.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.fme_server_core.arn
+    target_group_arn = aws_lb_target_group.fme_flow_core.arn
   }
 }
 
-resource "aws_lb_listener" "fme_server_ws" {
-  load_balancer_arn = aws_lb.fme_server_alb.arn
+resource "aws_lb_listener" "fme_flow_ws" {
+  load_balancer_arn = aws_lb.fme_flow_alb.arn
   port              = "7078"
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.fme_server_ws.arn
+    target_group_arn = aws_lb_target_group.fme_flow_ws.arn
   }
 }

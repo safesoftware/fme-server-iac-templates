@@ -1,10 +1,10 @@
 output "sg_id" {
-  value       = aws_security_group.fmeserver.id
-  description = "Security group id for FME Server deployment"
+  value       = aws_security_group.fmeflow.id
+  description = "Security group id for FME Flow deployment"
 }
 
 output "vpc_id" {
-  value       = aws_vpc.fme_server.id
+  value       = aws_vpc.fme_flow.id
   description = "VPC id for FME Sever deployment"
 }
 
