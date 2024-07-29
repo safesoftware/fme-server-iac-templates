@@ -94,5 +94,10 @@ No resources.
 |------|-------------|
 | <a name="output_alb_dns_name"></a> [alb\_dns\_name](#output\_alb\_dns\_name) | Public dns name of the application load balancer |
 <!-- END_TF_DOCS --> 
+
+## Architecture Diagram
+See below for an architecture diagram of the deployment in AWS. There are some details not shown on the diagram, such as the VPC, subnets and secrets. This diagram also shows only one scaling group for FME Engines, though the deployment actually has two separate scaling groups for engines: One for standard engines and one for CPU engines. Otherwise those scaling groups are identical.
+![image](../AWSArchitectureDiagram.png)
+
  # To do
  - create separate NSGs for RDS and FSX

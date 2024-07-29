@@ -46,6 +46,9 @@ To delete the FME Flow deployment remove the resource group: ```az group delete 
 |`engineRegistrationLoadBalancerName`|Name of the resource group for the existing virtual network'|'fmeflow-engineregistration'|
 |`adminUsername`|Admin username on all VMs.||
 |`adminPassword`|Admin password on all VMs.||
+## Architecture Diagram
+See below for an architecture diagram of the deployment in Azure. There are some details not shown on the diagram, such as the virtual networks and secrets. This diagram also shows only one scaling group for FME Engines, though the deployment actually has two separate scaling groups for engines: One for standard engines and one for CPU engines. Otherwise those scaling groups are identical.
+![image](../AzureArchitectureDiagram.png)
 # Todo
 - create NSGs
 - (optional) create NAT gateway for explicit outbound traffic of VMs: [Default outbound access in Azure](https://learn.microsoft.com/en-us/azure/virtual-network/ip-services/default-outbound-access)
