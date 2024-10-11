@@ -30,8 +30,8 @@ resource "azurerm_public_ip" "fme_flow" {
   name                    = var.pip_name
   resource_group_name     = var.rg_name
   location                = var.location
-  allocation_method       = "Dynamic"
-  sku                     = "Basic"
+  allocation_method       = "Static"
+  sku                     = "Standard"
   domain_name_label       = var.domain_name_label
   idle_timeout_in_minutes = 30
 

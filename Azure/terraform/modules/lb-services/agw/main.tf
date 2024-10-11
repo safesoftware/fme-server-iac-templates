@@ -19,8 +19,8 @@ resource "azurerm_application_gateway" "fme_flow" {
   location            = var.location
 
   sku {
-    name     = "Standard_Medium"
-    tier     = "Standard"
+    name     = "Standard_v2"
+    tier     = "Standard_v2"
     capacity = 1
   }
 
@@ -104,6 +104,7 @@ resource "azurerm_application_gateway" "fme_flow" {
     http_listener_name         = local.http_listener_name
     backend_address_pool_name  = local.backend_address_pool_name
     backend_http_settings_name = local.http_setting_name
+    priority = 1
   }
 
   request_routing_rule {
@@ -112,6 +113,7 @@ resource "azurerm_application_gateway" "fme_flow" {
     http_listener_name         = local.ws_listener_name
     backend_address_pool_name  = local.backend_address_pool_name
     backend_http_settings_name = local.ws_setting_name
+    priority = 2
   }
 
   tags = local.default_tags
