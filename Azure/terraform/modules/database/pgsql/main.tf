@@ -15,7 +15,7 @@ resource "azurerm_postgresql_server" "fme_flow" {
   administrator_login          = var.db_admin_user
   administrator_login_password = var.db_admin_pw
   sku_name                     = "GP_Gen5_2"
-  version                      = "10"
+  version                      = "11"
   storage_mb                   = 51200
   ssl_enforcement_enabled      = true
 

@@ -28,7 +28,7 @@ resource postgresServer 'Microsoft.DBforPostgreSQL/servers@2017-12-01' = {
     family: 'Gen5'
   }
   properties: {
-    version: '10'
+    version: '11'
     createMode: 'Default'
     administratorLogin: postgresqlAdministratorLogin
     administratorLoginPassword: postgresqlAdministratorLoginPassword
