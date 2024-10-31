@@ -28,20 +28,6 @@ param publicIpName string
 @description('DNS of the public ip address for the VM')
 param publicIpDns string
 
-@description('Allocation method for the public ip address')
-@allowed([
-  'Dynamic'
-  'Static'
-])
-param publicIpAllocationMethod string
-
-@description('Name of the resource group for the public ip address')
-@allowed([
-  'Basic'
-  'Standard'
-])
-param publicIpSku string
-
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: virtualNetworkName
   location: location
@@ -83,10 +69,10 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2021-03-01' = {
   name: publicIpName
   location: location
   sku: {
-    name: publicIpSku
+    name: 'Standard'
   }
   properties: {
-    publicIPAllocationMethod: publicIpAllocationMethod
+    publicIPAllocationMethod: 'Static'
     dnsSettings: {
       domainNameLabel: toLower(publicIpDns)
     }

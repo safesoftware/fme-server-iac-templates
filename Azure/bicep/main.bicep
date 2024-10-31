@@ -49,20 +49,6 @@ param publicIpName string = 'fmeflow-pip'
 @description('DNS of the public ip address for the VM')
 param publicIpDns string = 'fmeflow-${uniqueString(resourceGroup().id)}'
 
-@description('Allocation method for the public ip address')
-@allowed([
-  'Dynamic'
-  'Static'
-])
-param publicIpAllocationMethod string = 'Dynamic'
-
-@description('Name of the resource group for the public ip address')
-@allowed([
-  'Basic'
-  'Standard'
-])
-param publicIpSku string = 'Basic'
-
 @description('Name of the resource group for the existing virtual network')
 param applicationGatewayName string = 'fmeflow-appgateway'
 
@@ -88,10 +74,8 @@ module network 'modules/network/network.bicep' = {
   params: {
     addressPrefixes: addressPrefixes
     location: location
-    publicIpAllocationMethod: publicIpAllocationMethod
     publicIpDns: publicIpDns
     publicIpName: publicIpName
-    publicIpSku: publicIpSku
     subnetAGName: subnetAGName
     subnetAGPrefix: subnetAGPrefix
     subnetName: subnetName
