@@ -40,8 +40,6 @@ To delete the FME Flow deployment remove the resource group: ```az group delete 
 |`publicIpNewOrExisting`|Determines whether or not a new public ip should be provisioned.|'new'|
 |`publicIpName`|Name of the public ip address|'fmeflow-pip'|
 |`publicIpDns`|DNS of the public ip address for the VM|'fmeflow-{uniqueString}'|
-|`publicIpAllocationMethod`|'Allocation method for the public ip address')|'Dynamic'|
-|`publicIpSku`|Name of the resource group for the public ip address|'Basic'|
 |`applicationGatewayName`|Name of the resource group for the existing virtual network|'fmeflow-appgateway'|
 |`engineRegistrationLoadBalancerName`|Name of the resource group for the existing virtual network'|'fmeflow-engineregistration'|
 |`adminUsername`|Admin username on all VMs.||

@@ -20,8 +20,8 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-08-01' =
   location: location
   properties: {
     sku: {
-      name: 'Standard_Medium'
-      tier: 'Standard'
+      name: 'Standard_v2'
+      tier: 'Standard_v2'
       capacity: 1
     }
     gatewayIPConfigurations: [
@@ -140,6 +140,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-08-01' =
         name: 'httpRoutingRule'
         properties: {
           ruleType: 'Basic'
+          priority: 1
           httpListener: {
             id: resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, 'httpListener')
           }
@@ -155,6 +156,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-08-01' =
         name: 'websocketRoutingRule'
         properties: {
           ruleType: 'Basic'
+          priority: 2
           httpListener: {
             id: resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, 'websocketListener')
           }
