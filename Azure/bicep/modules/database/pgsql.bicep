@@ -5,7 +5,10 @@ param location string
 param tags object
 
 @description('Backend Subnet ID.')
-param subnetId string
+param subnetPGSQLId string
+
+@description('ID of the DNS Zone')
+param dnsZoneID string
 
 @description('Name of the Postgresql server')
 param postgresServerName string
@@ -17,39 +20,36 @@ param postgresqlAdministratorLogin string
 @secure()
 param postgresqlAdministratorLoginPassword string
 
-resource postgresServer 'Microsoft.DBforPostgreSQL/servers@2017-12-01' = {
+@description('Azure database for PostgreSQL storage Size ')
+param storageSizeGB int
+
+resource postgresServer 'Microsoft.DBforPostgreSQL/flexibleServers@2022-12-01' = {
   location: location
   name: postgresServerName
   sku: {
-    name: 'GP_Gen5_2'
+    name: 'Standard_D2s_V3'
     tier: 'GeneralPurpose'
-    capacity: 2
-    size: '51200'
-    family: 'Gen5'
   }
   properties: {
-    version: '11'
+    version: '16'
     createMode: 'Default'
     administratorLogin: postgresqlAdministratorLogin
     administratorLoginPassword: postgresqlAdministratorLoginPassword
-  }
-  resource postgresServerVNetRule 'virtualNetworkRules' = {
-    name: 'postgres-vnet-rule'
-    properties: {
-      virtualNetworkSubnetId: subnetId
-      ignoreMissingVnetServiceEndpoint: true
+    storage: {
+      storageSizeGB: storageSizeGB
     }
+    backup: {
+      backupRetentionDays: 7
+      geoRedundantBackup: 'disabled'
+    }
+    network: {
+      delegatedSubnetResourceId: subnetPGSQLId
+      privateDnsZoneArmResourceId: dnsZoneID
+    }
+   }
+  tags: tags
   }
 
-  resource postgresDatabase 'databases' = {
-    name: 'postgres'
-    properties: {
-      charset: 'utf8'
-      collation: 'English_United States.1252'
-    }
-  }
-  tags: tags
-}
 
 @description('Fully qualified domain name of the PostgreSQL Server.')
 output postgresFqdn string = postgresServer.properties.fullyQualifiedDomainName

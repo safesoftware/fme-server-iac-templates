@@ -13,6 +13,9 @@ param subnetName string
 @description('Name of the application gateway subnet.')
 param subnetAGName string
 
+@description('Name of the subnet for the PGSQL database')
+param subnetPGSQLName string
+
 @description('Address prefix of the virtual network')
 param addressPrefixes array
 
@@ -22,11 +25,17 @@ param subnetPrefix string
 @description('Subnet prefix of the Application Gateway subnet')
 param subnetAGPrefix string
 
+@description('Subnet prefix of the PGSQL database subnet')
+param subnetPGSQLPrefix string
+
 @description('Name of the public ip address')
 param publicIpName string
 
 @description('DNS of the public ip address for the VM')
 param publicIpDns string
+
+@description('Fully Qualified DNS Private Zone')
+param dnsZoneFqdn string
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: virtualNetworkName
@@ -60,6 +69,22 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
           privateLinkServiceNetworkPolicies: 'Enabled'
         }
       }
+      {
+        name: subnetPGSQLName
+          properties: {
+          addressPrefix: subnetPGSQLPrefix
+          delegations: [
+            {
+              name: 'dlg-Microsoft.DBforPostgreSQL-flexibleServers'
+              properties: {
+              serviceName: 'Microsoft.DBforPostgreSQL/flexibleServers'
+            }
+          }
+        ]
+        privateEndpointNetworkPolicies: 'Enabled'
+        privateLinkServiceNetworkPolicies: 'Enabled'
+       }
+      }
     ]
   }
   tags: tags
@@ -81,13 +106,34 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2021-03-01' = {
   tags: tags
 }
 
+resource dnszone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+  name: dnsZoneFqdn
+  location: 'global'
+}
+
+resource vnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+  name: virtualNetwork.name
+  parent: dnszone
+  location: 'global'
+  properties: {
+    registrationEnabled: false
+    virtualNetwork: {
+      id: virtualNetwork.id
+    }
+  }
+}
+
 @description('Virtual network ID.')
 output virtualNetworkId string = virtualNetwork.id
 @description('Backend subnet ID.')
 output subnetId string = '${ virtualNetwork.id }/subnets/${ subnetName }'
 @description('Applciation gateway subnet ID.')
 output subnetAGId string = '${ virtualNetwork.id }/subnets/${ subnetAGName }'
+@description('Database subnet ID.')
+output subnetPGSQLId string = '${ virtualNetwork.id }/subnets/${ subnetPGSQLName }'
 @description('Public IP ID.')
 output publicIpId string = publicIp.id
 @description('Fully qulified domain name of public IP.')
 output publicIpFqdn string = publicIp.properties.dnsSettings.fqdn
+@description('ID of the DNS Zone.')
+output dnsZoneID string = dnszone.id
