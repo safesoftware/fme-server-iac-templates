@@ -28,14 +28,66 @@ param subnetAGPrefix string
 @description('Subnet prefix of the PGSQL database subnet')
 param subnetPGSQLPrefix string
 
+@description('Name of the NAT gateway')
+param natGatewayName string
+
 @description('Name of the public ip address')
 param publicIpName string
+
+@description('Name of the NAT gateway public IP')
+param publicIpNATName string
 
 @description('DNS of the public ip address for the VM')
 param publicIpDns string
 
 @description('Fully Qualified DNS Private Zone')
 param dnsZoneFqdn string
+
+resource publicIp 'Microsoft.Network/publicIPAddresses@2021-03-01' = {
+  name: publicIpName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    dnsSettings: {
+      domainNameLabel: toLower(publicIpDns)
+    }
+    idleTimeoutInMinutes: 30
+  }
+  tags: tags
+}
+
+resource publicIpNAT 'Microsoft.Network/publicIPAddresses@2021-03-01' = {
+  name: publicIpNATName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    idleTimeoutInMinutes: 30
+  }
+  tags: tags
+}
+
+resource natgateway 'Microsoft.Network/natGateways@2021-05-01' = {
+  name: natGatewayName
+  location: location
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    idleTimeoutInMinutes: 10
+    publicIpAddresses: [
+      {
+        id: publicIpNAT.id
+      }
+    ]
+  }
+}
+
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: virtualNetworkName
@@ -49,6 +101,9 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
         name: subnetName
         properties: {
           addressPrefix: subnetPrefix
+          natGateway: {
+            id: natgateway.id
+          }
           serviceEndpoints: [
             {
               service: 'Microsoft.Storage'
@@ -90,21 +145,6 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   tags: tags
 }
 
-resource publicIp 'Microsoft.Network/publicIPAddresses@2021-03-01' = {
-  name: publicIpName
-  location: location
-  sku: {
-    name: 'Standard'
-  }
-  properties: {
-    publicIPAllocationMethod: 'Static'
-    dnsSettings: {
-      domainNameLabel: toLower(publicIpDns)
-    }
-    idleTimeoutInMinutes: 30
-  }
-  tags: tags
-}
 
 resource dnszone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: dnsZoneFqdn

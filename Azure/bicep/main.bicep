@@ -49,8 +49,14 @@ param subnetPGSQLName string = 'PGSQLsubnet'
 @description('Subnet prefix of the PGSQL database subnet')
 param subnetPGSQLPrefix string = '10.0.2.0/28'
 
+@description('Name of the NAT gateway')
+param natGatewayName string = 'fmeflow-nat'
+
 @description('Name of the public ip address')
 param publicIpName string = 'fmeflow-pip'
+
+@description('Name of the NAT gateway public IP')
+param publicIpNATName string = 'fmeflow-nat-pip'
 
 @description('DNS of the public ip address for the VM')
 param publicIpDns string = 'fmeflow-${uniqueString(resourceGroup().id)}'
@@ -91,12 +97,14 @@ module network 'modules/network/network.bicep' = {
     location: location
     publicIpDns: publicIpDns
     publicIpName: publicIpName
+    publicIpNATName: publicIpNATName
     subnetAGName: subnetAGName
     subnetAGPrefix: subnetAGPrefix
     subnetName: subnetName
     subnetPrefix: subnetPrefix
     subnetPGSQLName: subnetPGSQLName
     subnetPGSQLPrefix: subnetPGSQLPrefix
+    natGatewayName: natGatewayName
     dnsZoneFqdn: dnsZoneFqdn
     tags: tags
     virtualNetworkName: virtualNetworkName
