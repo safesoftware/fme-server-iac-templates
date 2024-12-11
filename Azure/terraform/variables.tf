@@ -45,10 +45,28 @@ variable "agw_snet_name" {
   description = "Application gateway virtual network subnet name"
 }
 
+variable "pgsql_snet_name" {
+  type        = string
+  default     = "fme-flow-pgsql-snet"
+  description = "Application gateway virtual network subnet name"
+}
+
+variable "nat_gateway_name" {
+  type        = string
+  default     = "fmeflow-nat"
+  description = "Name of the nat gateway"
+}
+
 variable "pip_name" {
   type        = string
   default     = "fme-flow-pip"
   description = "Public ip name"
+}
+
+variable "publicip_nat_name" {
+  type        = string
+  default     = "fmeflow-nat-pip"
+  description = "name of the public ip address for the nat gateway"
 }
 
 variable "domain_name_label" {
@@ -108,4 +126,10 @@ variable "db_pw" {
 variable "build_agent_public_ip" {
   type = string
   description = "Public IP of the build agent or machine that is running terraform deployment to be whitelisted in the storage account. This is a workaround for the following known issue: https://github.com/hashicorp/terraform-provider-azurerm/issues/2977"
+}
+
+variable "dns_zone_name" {
+  type        = string
+  default     = "fmeflow-pgsql-dns-zone"
+  description = "Name of the private DNS Zone used by the pgsql database"
 }

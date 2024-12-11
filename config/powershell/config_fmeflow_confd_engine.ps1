@@ -13,7 +13,6 @@ try {
     # get the first part of the database hostname to use with the username
     $hostShort,$rest = $databaseHostname -split '\.',2
     # update variables for Azure
-    $fmeDatabaseUsername = "fmeflow@$hostShort"
     $storageUserName = "Azure\$storageAccountName"
     $storageAccountName = "$storageAccountName.file.core.windows.net"
     $storageAccountPath = "$storageAccountName\fmeflowdata"
@@ -23,11 +22,11 @@ catch {
     # if that doesn't work we must be on AWS
     $private_ip = Invoke-RestMethod -Uri "http://169.254.169.254/latest/meta-data/local-ipv4"  -Headers @{"Metadata"="true"}
     # update variables for AWS
-    $fmeDatabaseUsername = "fmeflow"
     $storageUserName = "Admin"
     $storageAccountPath = "$storageAccountName\share"
     $aws = $true
 }
+$fmeDatabaseUsername = "fmeflow"
 $default_values = "C:\Program Files\FMEFlow\Config\values.yml"
 $modified_values = "C:\Program Files\FMEFlow\Config\values-modified.yml"
 

@@ -11,6 +11,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_flow_engine" {
   instances           = var.instance_count_engine
   admin_password      = var.vm_admin_pw
   admin_username      = var.vm_admin_user
+  overprovision       = "false"
 
   os_disk {
     storage_account_type = "Premium_LRS"
@@ -33,12 +34,12 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_flow_engine" {
   source_image_reference {
     publisher = "safesoftwareinc"
     offer     = "fme-engine"
-    sku       = "fme-engine-2024-1-2-1-windows-byol"
+    sku       = "fme-engine-2024-2-windows-byol"
     version   = "latest"
   }
 
   plan {
-    name      = "fme-engine-2024-1-2-1-windows-byol"
+    name      = "fme-engine-2024-2-windows-byol"
     publisher = "safesoftwareinc"
     product   = "fme-engine"
   }
