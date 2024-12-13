@@ -50,7 +50,8 @@ No providers.
 |------|--------|---------|
 | <a name="module_alb"></a> [alb](#module\_alb) | ./modules/lb-services/alb/ | n/a |
 | <a name="module_asg_core"></a> [asg\_core](#module\_asg\_core) | ./modules/asg/asg_core/ | n/a |
-| <a name="module_asg_engine"></a> [asg\_engine](#module\_asg\_engine) | ./modules/asg/asg_engine/ | n/a |
+| <a name="module_asg_cpuusage_engine"></a> [asg\_cpuusage\_engine](#module\_asg\_cpuusage\_engine) | ./modules/asg/asg_engine/ | n/a |
+| <a name="module_asg_standard_engine"></a> [asg\_standard\_engine](#module\_asg\_standard\_engine) | ./modules/asg/asg_engine/ | n/a |
 | <a name="module_database"></a> [database](#module\_database) | ./modules/database/ | n/a |
 | <a name="module_iam"></a> [iam](#module\_iam) | ./modules/iam/ | n/a |
 | <a name="module_network"></a> [network](#module\_network) | ./modules/network/ | n/a |
@@ -73,11 +74,11 @@ No resources.
 | <a name="input_db_admin_user"></a> [db\_admin\_user](#input\_db\_admin\_user) | Backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [AWS Secrets Manager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret). DO NOT HARDCODE. | `string` | n/a | yes |
 | <a name="input_eip_name"></a> [eip\_name](#input\_eip\_name) | Elastic IP name | `string` | `"tf-eip-name"` | no |
 | <a name="input_fme_core_image_id"></a> [fme\_core\_image\_id](#input\_fme\_core\_image\_id) | Id of the FME Sever core image. The AMI needs to be available in the region used for the deployment | `string` | n/a | yes |
-| <a name="input_fme_engine_image_id"></a> [fme\_engine\_image\_id](#input\_fme\_engine\_image\_id) | Id of the FME Sever core image. The AMI needs to be available in the region used for the deployment | `string` | n/a | yes |
+| <a name="input_fme_engine_image_id"></a> [fme\_engine\_image\_id](#input\_fme\_engine\_image\_id) | Id of the FME Sever engine image. The AMI needs to be available in the region used for the deployment | `string` | n/a | yes |
 | <a name="input_igw_name"></a> [igw\_name](#input\_igw\_name) | Internet gateway name | `string` | `"tf-internet-gw"` | no |
 | <a name="input_nat_name"></a> [nat\_name](#input\_nat\_name) | NAT gateway name | `string` | `"tf-nat-gw"` | no |
 | <a name="input_nlb_name"></a> [nlb\_name](#input\_nlb\_name) | Name of the network load balancer | `string` | `"tf-network-lb"` | no |
-| <a name="input_owner"></a> [owner](#input\_owner) | Default value for onwer tag | `string` | n/a | yes |
+| <a name="input_owner"></a> [owner](#input\_owner) | Default value for owner tag | `string` | n/a | yes |
 | <a name="input_private_sn1_cidr"></a> [private\_sn1\_cidr](#input\_private\_sn1\_cidr) | CIDR range for private subnet in the first availability zone | `string` | `"10.0.128.0/20"` | no |
 | <a name="input_private_sn2_cidr"></a> [private\_sn2\_cidr](#input\_private\_sn2\_cidr) | CIDR range for private subnet in the second availability zone | `string` | `"10.0.144.0/20"` | no |
 | <a name="input_public_access"></a> [public\_access](#input\_public\_access) | CDIR range from which the FME Flow Web UI and Websocket will be accessible | `string` | n/a | yes |

@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.9.0"
+      version = "~> 4.12.0"
     }
   }
 
@@ -32,8 +32,12 @@ module "network" {
   vnet_name         = var.vnet_name
   be_snet_name      = var.be_snet_name
   agw_snet_name     = var.agw_snet_name
+  pgsql_snet_name   = var.pgsql_snet_name
+  nat_gateway_name  = var.nat_gateway_name
   pip_name          = var.pip_name
+  publicip_nat_name = var.publicip_nat_name
   domain_name_label = var.domain_name_label
+  dns_zone_name     = var.dns_zone_name
 }
 
 module "storage" {
@@ -51,9 +55,10 @@ module "database" {
   owner         = var.owner
   rg_name       = azurerm_resource_group.fme_flow.name
   location      = azurerm_resource_group.fme_flow.location
-  be_snet_id    = module.network.be_snet_id
+  pgsql_snet_id = module.network.pgsql_snet_id
   db_admin_user = var.db_admin_user
   db_admin_pw   = var.db_admin_pw
+  dns_zone_id   = module.network.dns_zone_id
 }
 
 module "load_balancer" {

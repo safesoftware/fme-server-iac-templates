@@ -13,9 +13,12 @@ param engineRegistrationLoadBalancerName string
 var engineRegistrationloadBalancerFrontEndName = 'engineRegistrationFrontend'
 var engineRegistrationloadBalancerBackEndName = 'engineRegistrationBackend'
 
-resource engineRegistrationLoadBalancer 'Microsoft.Network/loadBalancers@2021-03-01' = {
+resource engineRegistrationLoadBalancer 'Microsoft.Network/loadBalancers@2023-09-01' = {
   name: engineRegistrationLoadBalancerName
   location: location
+  sku: {
+    name: 'Standard'
+  }
   properties: {
     frontendIPConfigurations: [
       {

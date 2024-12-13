@@ -43,8 +43,20 @@ param subnetAGName string = 'AGSubnet'
 @description('Subnet prefix of the Application Gateway subnet')
 param subnetAGPrefix string = '10.0.1.0/24'
 
+@description('Name of the subnet for the PGSQL database')
+param subnetPGSQLName string = 'PGSQLsubnet'
+
+@description('Subnet prefix of the PGSQL database subnet')
+param subnetPGSQLPrefix string = '10.0.2.0/28'
+
+@description('Name of the NAT gateway')
+param natGatewayName string = 'fmeflow-nat'
+
 @description('Name of the public ip address')
 param publicIpName string = 'fmeflow-pip'
+
+@description('Name of the NAT gateway public IP')
+param publicIpNATName string = 'fmeflow-nat-pip'
 
 @description('DNS of the public ip address for the VM')
 param publicIpDns string = 'fmeflow-${uniqueString(resourceGroup().id)}'
@@ -62,6 +74,15 @@ param adminUsername string
 @secure()
 param adminPassword string
 
+@description('Name of the private DNS Zone used by the pgsql database')
+param dnsZoneName string = 'fmeflow-pgsql-dns-zone'
+
+@description('Fully Qualified DNS Private Zone')
+param dnsZoneFqdn string = '${dnsZoneName}.postgres.database.azure.com'
+
+@description('Azure database for PostgreSQL storage Size ')
+param storageSizeGB int = 32
+
 var vmssNameCore = 'core'
 var postgresqlAdministratorLogin = 'postgres'
 var postgresqlAdministratorLoginPassword = 'P${uniqueString(resourceGroup().id, deployment().name, 'ad909260-dc63-4102-983f-4f82af7a6840')}x!'
@@ -76,10 +97,15 @@ module network 'modules/network/network.bicep' = {
     location: location
     publicIpDns: publicIpDns
     publicIpName: publicIpName
+    publicIpNATName: publicIpNATName
     subnetAGName: subnetAGName
     subnetAGPrefix: subnetAGPrefix
     subnetName: subnetName
     subnetPrefix: subnetPrefix
+    subnetPGSQLName: subnetPGSQLName
+    subnetPGSQLPrefix: subnetPGSQLPrefix
+    natGatewayName: natGatewayName
+    dnsZoneFqdn: dnsZoneFqdn
     tags: tags
     virtualNetworkName: virtualNetworkName
   }
@@ -113,7 +139,9 @@ module pgsql 'modules/database/pgsql.bicep' = {
     postgresqlAdministratorLogin: postgresqlAdministratorLogin
     postgresqlAdministratorLoginPassword: postgresqlAdministratorLoginPassword 
     postgresServerName: postgresServerName 
-    subnetId:network.outputs.subnetId 
+    subnetPGSQLId:network.outputs.subnetPGSQLId 
+    dnsZoneID: network.outputs.dnsZoneID
+    storageSizeGB: storageSizeGB
     tags: tags
   }
 }

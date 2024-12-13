@@ -13,6 +13,11 @@ output "agw_snet_id" {
   description = "Application gateway virtual network subnet id"
 }
 
+output "pgsql_snet_id" {
+  value       = azurerm_subnet.fme_flow_pgsql.id
+  description = "pgsql virtual network subnet id"
+}
+
 output "pip_id" {
   value       = azurerm_public_ip.fme_flow.id
   description = "Public ip id"
@@ -21,4 +26,9 @@ output "pip_id" {
 output "fqdn" {
   value       = azurerm_public_ip.fme_flow.fqdn
   description = "Fully qualified domain name of the A DNS record associated with the public IP."
+}
+
+output "dns_zone_id" {
+  value       = azurerm_private_dns_zone.dns_zone.id
+  description = "ID of the DNS Zone."
 }

@@ -25,7 +25,12 @@ variable "db_admin_pw" {
   sensitive   = true
 }
 
-variable "be_snet_id" {
+variable "pgsql_snet_id" {
   type        = string
   description = "Backend virtual network subnet id"
+}
+
+variable "dns_zone_id" {
+  type        = string
+  description = "DNS Zone id"
 }
