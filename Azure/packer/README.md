@@ -12,7 +12,7 @@
 |`tags`|At minimum it is recommended to set a Owner and fme_build tag, but additional tags can also be added via the tags variable.|`-var 'tags={Owner="QA",fme_build="22627"}'`|
 ### Create the Windows Images
 1. Open a command line in the packer directory (directory with .pkr.hcl files)
-2. Run `packer init`
+2. Run `packer init fme_flow_az.pkr.hcl`
 3. Validate the script with set variables:
 ```
 packer validate \

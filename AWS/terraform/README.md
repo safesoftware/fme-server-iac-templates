@@ -8,6 +8,7 @@ These terraform scripts deploy a distributed FME Flow running on windows ec2 ins
 To deploy FME Flow (Distributed deployment, Windows) on AWS from a local machine, the AWS CLI and terraform need to be installed, configured and terraform needs to be authenticated to AWS. Follow this documentation depending on your scenario:
 1. [Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 2. [Install AWS CLI](https://aws.amazon.com/cli/)
+3. [Create FME AMIs with Packer](https://github.com/safesoftware/fme-server-iac-templates/tree/main/AWS/packer)
 
 
 ### Apply the deployment
@@ -81,7 +82,7 @@ No resources.
 | <a name="input_owner"></a> [owner](#input\_owner) | Default value for owner tag | `string` | n/a | yes |
 | <a name="input_private_sn1_cidr"></a> [private\_sn1\_cidr](#input\_private\_sn1\_cidr) | CIDR range for private subnet in the first availability zone | `string` | `"10.0.128.0/20"` | no |
 | <a name="input_private_sn2_cidr"></a> [private\_sn2\_cidr](#input\_private\_sn2\_cidr) | CIDR range for private subnet in the second availability zone | `string` | `"10.0.144.0/20"` | no |
-| <a name="input_public_access"></a> [public\_access](#input\_public\_access) | CDIR range from which the FME Flow Web UI and Websocket will be accessible | `string` | n/a | yes |
+| <a name="input_public_access"></a> [public\_access](#input\_public\_access) | CIDR range from which the FME Flow Web UI and Websocket will be accessible | `string` | n/a | yes |
 | <a name="input_public_sn1_cidr"></a> [public\_sn1\_cidr](#input\_public\_sn1\_cidr) | CIDR range for public subnet in the first availability zone | `string` | `"10.0.0.0/20"` | no |
 | <a name="input_public_sn2_cidr"></a> [public\_sn2\_cidr](#input\_public\_sn2\_cidr) | CIDR range for public subnet in the second availability zone | `string` | `"10.0.16.0/20"` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS region in which FME Sever will be deployed | `string` | n/a | yes |
