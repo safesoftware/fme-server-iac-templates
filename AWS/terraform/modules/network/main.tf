@@ -64,7 +64,7 @@ resource "aws_internet_gateway" "fme_flow" {
   }
 }
 resource "aws_eip" "fme_flow_nat" {
-  vpc              = true
+  domain           = "vpc"
   public_ipv4_pool = "amazon"
   tags = {
     "Name" = var.eip_name

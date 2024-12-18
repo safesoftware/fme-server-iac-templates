@@ -8,7 +8,7 @@ To deploy FME Flow (Distributed deployment, Windows) on Microsoft Azure from a l
 Once all prerequisites are installed you confirmed the Bicep scripts can be deployed via the following steps
 1. Create a resource group in your Azure subscription for the deployment in your preferred location: ```az group create -l <location> -n <resource-group-name>```
 2. Review the parameters. Most of the parameters have default values assigned, but can be changed in the `main.bicep` file. You will be prompted for any variable that does not have a default value.
-3. Run ```az deployment group create --resource-group <resource-group-name> --template-file main.bicep``` from the directory that that holds the `main.bicep` file and provide any variables you are prompted for. This will take about 10 - 20 minutes.
+3. Run ```az deployment group create --resource-group <resource-group-name> --template-file main.bicep``` from the directory that that holds the `main.bicep` file and provide any variables you are prompted for. This will take at least 10 - 20 minutes.
 ### Test FME Flow
 Once the deployment is complete it is time to test FME Flow. The public URL for the new FME Flow can be found in the overview of the Application Gateway resource. Follow these steps to test FME Flow:
 1. [Log on to the Web User Interface](https://docs.safe.com/fme/html/FME_Server_Documentation/AdminGuide/Log-on-Get-Started-2-Tier.htm)

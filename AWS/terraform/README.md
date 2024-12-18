@@ -8,6 +8,7 @@ These terraform scripts deploy a distributed FME Flow running on windows ec2 ins
 To deploy FME Flow (Distributed deployment, Windows) on AWS from a local machine, the AWS CLI and terraform need to be installed, configured and terraform needs to be authenticated to AWS. Follow this documentation depending on your scenario:
 1. [Install Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 2. [Install AWS CLI](https://aws.amazon.com/cli/)
+3. [Create FME AMIs with Packer](https://github.com/safesoftware/fme-server-iac-templates/tree/main/AWS/packer)
 
 
 ### Apply the deployment
@@ -16,7 +17,7 @@ Once all prerequisites are installed you confirmed that terraform successfully a
 
 1. Review the `variables.tf` file. This file contains all variables for the deployment. Most of the variables have default values assigned, but can be changed in the `.tf` file or overridden by using the `-var` flag with the `terraform apply` command. You will be prompted for any variable that does not have a default after running the `terraform apply` command.
 2. Run `terrafom apply` in your console from the directory that that holds the `main.tf` and `variables.tf` file and provide any variables you are prompted for.
-3. Review the deployment plan. If the terraform script and the provided variables are validated successfully the deployment plan will be output in the console for you to review. Additionally you will be prompted wether you want to go ahead with the deployment. If everything looks ok, go ahead with `yes`. The deployment will now provision and configure all necessary AWS services and start up FME Flow. This will take about 10 - 20 minutes.
+3. Review the deployment plan. If the terraform script and the provided variables are validated successfully the deployment plan will be output in the console for you to review. Additionally you will be prompted wether you want to go ahead with the deployment. If everything looks ok, go ahead with `yes`. The deployment will now provision and configure all necessary AWS services and start up FME Flow. This will take at least 10 - 20 minutes.
 4. In this quickstart example the terraform statefile `terraform.tfsate` will be created on on your local machine, so you can review the current state of your deployment and test the deployment. For any productive deployments it is highly recommended to not store the state file locally but in a remote location. This makes sure you can collaborate on the state and any sensitive data contained in the state file will only be accessible to authorized users. To use S3 as a backend for your statefile follow this documentation: [S3 terraform backend](https://www.terraform.io/language/settings/backends/s3)
 
 ### Test FME Flow
@@ -38,7 +39,7 @@ To remove the FME Flow deployment run `terrform destroy` in your console and con
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.22.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.32.0 |
 
 ## Providers
 
@@ -81,7 +82,7 @@ No resources.
 | <a name="input_owner"></a> [owner](#input\_owner) | Default value for owner tag | `string` | n/a | yes |
 | <a name="input_private_sn1_cidr"></a> [private\_sn1\_cidr](#input\_private\_sn1\_cidr) | CIDR range for private subnet in the first availability zone | `string` | `"10.0.128.0/20"` | no |
 | <a name="input_private_sn2_cidr"></a> [private\_sn2\_cidr](#input\_private\_sn2\_cidr) | CIDR range for private subnet in the second availability zone | `string` | `"10.0.144.0/20"` | no |
-| <a name="input_public_access"></a> [public\_access](#input\_public\_access) | CDIR range from which the FME Flow Web UI and Websocket will be accessible | `string` | n/a | yes |
+| <a name="input_public_access"></a> [public\_access](#input\_public\_access) | CIDR range from which the FME Flow Web UI and Websocket will be accessible | `string` | n/a | yes |
 | <a name="input_public_sn1_cidr"></a> [public\_sn1\_cidr](#input\_public\_sn1\_cidr) | CIDR range for public subnet in the first availability zone | `string` | `"10.0.0.0/20"` | no |
 | <a name="input_public_sn2_cidr"></a> [public\_sn2\_cidr](#input\_public\_sn2\_cidr) | CIDR range for public subnet in the second availability zone | `string` | `"10.0.16.0/20"` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS region in which FME Sever will be deployed | `string` | n/a | yes |

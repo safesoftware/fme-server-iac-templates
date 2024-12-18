@@ -45,6 +45,11 @@ source "amazon-ebs" "fme_core" {
     delete_on_termination = true
   }
 
+  aws_polling {
+    delay_seconds = 60
+    max_attempts  = 75
+ }
+
   tags            = "${var.tags}"
   run_tags        = "${var.tags}"
   run_volume_tags = "${var.tags}"
@@ -116,4 +121,3 @@ build {
     ]
   }
 }
-
