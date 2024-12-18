@@ -7,8 +7,18 @@ Write-Host "Installing FME Flow..."
 Start-Process C:\fme-flow.exe -Wait -ArgumentList "-s", "-dC:\FME", "-sp""COREHOSTNAME=localhost SERVLETPORT=8080 DEPLOYMENTNAME=localhost EXTERNALHOSTNAME=localhost NODENAME=localhost FMESERVERSHAREDDATA=C:\Data DATABASETYPE=PostgreSQL INSTALLTYPE=Distributed ADDLOCAL=FMEEngine /qn /norestart"""
 Start-Sleep -s 60
 
+try {
+    Get-Service -Name "FME Flow Engines" -ErrorAction Stop;
+} catch {
+    Write-Error "Failed to stop Service. Error: $_"
+    Exit 1
+}
+
 Stop-Service -Name "FME Flow Engines"
 Set-Service -Name "FME Flow Engines" -StartupType "Manual"
+
+Write-Error "Failed to stop Service. Error: $_"
+
 
 Remove-Item -path "C:\fme-flow.exe"
 Remove-Item -Recurse -Force "C:\FME\"
