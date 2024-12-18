@@ -39,7 +39,7 @@ To remove the FME Flow deployment run `terrform destroy` in your console and con
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.22.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.32.0 |
 
 ## Providers
 
