@@ -17,9 +17,6 @@ try {
 Stop-Service -Name "FME Flow Engines"
 Set-Service -Name "FME Flow Engines" -StartupType "Manual"
 
-Write-Error "Failed to stop Service. Error: $_"
-
-
 Remove-Item -path "C:\fme-flow.exe"
 Remove-Item -Recurse -Force "C:\FME\"
 
