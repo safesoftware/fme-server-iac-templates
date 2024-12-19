@@ -13,7 +13,7 @@
 |`source_ami`|Set the source AMI for the building process. Microsoft Windows Server 2022 Base is recommended for FME Flow Core and Engine. Make sure the AMI is available in the AWS region. A helpful command that will return the latest Windows Server 2022 Base is:<br> `aws ssm get-parameters --names /aws/service/ami-windows-latest/Windows_Server-2022-English-Full-Base --region <region>`| `-var 'source_ami=ami-0174b6693aaeab3f6'`|
 ### Create the AMIs
 1. Open a command line in the packer directory (directory with .pkr.hcl files)
-2. Run `packer init`
+2. Run `packer init fme_flow_aws.pkr.hcl`
 3. Validate the script with set variables:
 ```
 packer validate \
