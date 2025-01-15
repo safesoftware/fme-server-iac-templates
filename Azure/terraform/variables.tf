@@ -133,3 +133,9 @@ variable "dns_zone_name" {
   default     = "fmeflow-pgsql-dns-zone"
   description = "Name of the private DNS Zone used by the pgsql database"
 }
+
+variable "availability_zone" {
+  type        = string
+  default     = "1" 
+  description = "Availability zone for the pgsql database"
+}

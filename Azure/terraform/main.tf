@@ -50,15 +50,16 @@ module "storage" {
 }
 
 module "database" {
-  source        = "./modules/database/pgsql"
-# source        = "./modules/database/sql_server"
-  owner         = var.owner
-  rg_name       = azurerm_resource_group.fme_flow.name
-  location      = azurerm_resource_group.fme_flow.location
-  pgsql_snet_id = module.network.pgsql_snet_id
-  db_admin_user = var.db_admin_user
-  db_admin_pw   = var.db_admin_pw
-  dns_zone_id   = module.network.dns_zone_id
+  source            = "./modules/database/pgsql"
+# source            = "./modules/database/sql_server"
+  owner             = var.owner
+  rg_name           = azurerm_resource_group.fme_flow.name
+  location          = azurerm_resource_group.fme_flow.location
+  availability_zone = var.availability_zone
+  pgsql_snet_id     = module.network.pgsql_snet_id
+  db_admin_user     = var.db_admin_user
+  db_admin_pw       = var.db_admin_pw
+  dns_zone_id       = module.network.dns_zone_id
 }
 
 module "load_balancer" {
