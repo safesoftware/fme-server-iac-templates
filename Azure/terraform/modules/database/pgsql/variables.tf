@@ -34,3 +34,8 @@ variable "dns_zone_id" {
   type        = string
   description = "DNS Zone id"
 }
+
+variable "availability_zone" {
+  type = string
+  description = "Availability zone for the pgsql database"
+}

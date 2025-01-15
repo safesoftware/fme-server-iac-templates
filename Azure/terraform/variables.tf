@@ -5,7 +5,7 @@ variable "owner" {
 
 variable "rg_name" {
   type        = string
-  default     = "terraform-rg"
+  default     = "QA"
   description = "Resource group name"
 }
 
@@ -132,4 +132,10 @@ variable "dns_zone_name" {
   type        = string
   default     = "fmeflow-pgsql-dns-zone"
   description = "Name of the private DNS Zone used by the pgsql database"
+}
+
+variable "availability_zone" {
+  type        = string
+  default     = "1" 
+  description = "Availability zone for the pgsql database"
 }

@@ -15,6 +15,7 @@ resource "azurerm_postgresql_flexible_server" "fme_flow" {
   create_mode                   = "Default"
   resource_group_name           = var.rg_name
   location                      = var.location
+  zone                          = var.availability_zone
   delegated_subnet_id           = var.pgsql_snet_id
   private_dns_zone_id           = var.dns_zone_id
   public_network_access_enabled = false
