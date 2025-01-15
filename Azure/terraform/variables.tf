@@ -5,7 +5,7 @@ variable "owner" {
 
 variable "rg_name" {
   type        = string
-  default     = "QA"
+  default     = "terraform-rg"
   description = "Resource group name"
 }
 
