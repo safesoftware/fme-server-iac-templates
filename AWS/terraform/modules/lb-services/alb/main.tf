@@ -12,8 +12,10 @@ resource "aws_lb_target_group" "fme_flow_core" {
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 
-  health_check {
-    path    = "/"
+    health_check {
+    path = "/fmeapiv4/healthcheck/liveness"
+    protocol = "HTTP"
+    port = "80"
     matcher = "200"
   }
 }
@@ -25,9 +27,10 @@ resource "aws_lb_target_group" "fme_flow_ws" {
   vpc_id   = var.vpc_id
 
   health_check {
-    path    = "/"
+    path = "/"
     matcher = "200-400"
   }
+
 }
 
 resource "aws_lb_listener" "fme_flow_core" {

@@ -12,7 +12,7 @@ resource "aws_lb_target_group" "fme_flow_engine-registration" {
   vpc_id   = var.vpc_id
 
   health_check {
-    path = "/fmerest/v3/healthcheck"
+    path = "/fmeapiv4/healthcheck/liveness"
     port = "8080"
   }
 }

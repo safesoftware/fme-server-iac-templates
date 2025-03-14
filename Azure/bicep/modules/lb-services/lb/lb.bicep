@@ -12,6 +12,7 @@ param engineRegistrationLoadBalancerName string
 
 var engineRegistrationloadBalancerFrontEndName = 'engineRegistrationFrontend'
 var engineRegistrationloadBalancerBackEndName = 'engineRegistrationBackend'
+var fmeflow_health_check = 'loadBalancerHealthProbe'
 
 resource engineRegistrationLoadBalancer 'Microsoft.Network/loadBalancers@2023-09-01' = {
   name: engineRegistrationLoadBalancerName
@@ -51,6 +52,19 @@ resource engineRegistrationLoadBalancer 'Microsoft.Network/loadBalancers@2023-09
           backendPort: 7070
           enableFloatingIP: false
           idleTimeoutInMinutes: 30
+          probe: {
+            id: resourceId('Microsoft.Network/loadBalancers/probes', engineRegistrationLoadBalancerName, fmeflow_health_check)
+          }
+        }
+      }
+    ]
+    probes: [
+      {
+        name: fmeflow_health_check
+        properties: {
+          protocol: 'Http'
+          port: 8080
+          requestPath: '/fmeapiv4/healthcheck/liveness'
         }
       }
     ]

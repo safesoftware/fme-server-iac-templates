@@ -12,8 +12,15 @@ resource "azurerm_lb" "fme_flow" {
     private_ip_address_allocation = "Dynamic"
     subnet_id                     = var.be_snet_id
   }
-
   tags = local.default_tags
+}
+
+resource "azurerm_lb_probe" "fme_flow" {
+  loadbalancer_id = azurerm_lb.fme_flow.id
+  name            = "lb_healthcheck"
+  port            = 8080
+  protocol        = "Http"
+  request_path    = "/fmeapiv4/healthcheck/liveness"
 }
 
 resource "azurerm_lb_backend_address_pool" "fme_flow" {

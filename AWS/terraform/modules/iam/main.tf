@@ -17,9 +17,15 @@ resource "aws_iam_role" "fme_flow" {
       },
     ]
   })
+      tags = {
+    "Description" = "IAM role for ec2 instances to join a AD"
+    }
+}
   # This is policy makes sure the new ec2 instances can be join to the active directory. For more info check out this blog: https://aws.amazon.com/blogs/security/how-to-configure-your-ec2-instances-to-automatically-join-a-microsoft-active-directory-domain/
-  inline_policy {
+  resource "aws_iam_role_policy" "fme_flow_ec2_join" {
     name = "AmazonEC2RoleforSSM-ASGDomainJoin"
+    role = aws_iam_role.fme_flow.name
+
 
     policy = jsonencode({
       "Version" : "2012-10-17",
@@ -120,8 +126,9 @@ resource "aws_iam_role" "fme_flow" {
   }
 
   # This policy give the ec2 instances access to the scecrets for the RDS database and the FSx fileshare which is access via the AD admin account.
-  inline_policy {
+  resource "aws_iam_role_policy" "fme_flow_ec2_access" {
     name = "AmazonEC2RoleforSecretManager"
+    role = aws_iam_role.fme_flow.name
 
     policy = jsonencode({
       "Version" : "2012-10-17",
@@ -138,10 +145,6 @@ resource "aws_iam_role" "fme_flow" {
         }
       ]
     })
-
   }
 
-  tags = {
-    "Description" = "IAM role for ec2 instances to join a AD"
-  }
-}
+
