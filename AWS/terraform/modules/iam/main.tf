@@ -17,9 +17,9 @@ resource "aws_iam_role" "fme_flow" {
       },
     ]
   })
-      tags = {
+  tags = {
     "Description" = "IAM role for ec2 instances to join a AD"
-    }
+  }
 }
   # This is policy makes sure the new ec2 instances can be join to the active directory. For more info check out this blog: https://aws.amazon.com/blogs/security/how-to-configure-your-ec2-instances-to-automatically-join-a-microsoft-active-directory-domain/
   resource "aws_iam_role_policy" "fme_flow_ec2_join" {

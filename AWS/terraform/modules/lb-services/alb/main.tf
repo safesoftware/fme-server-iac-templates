@@ -12,7 +12,7 @@ resource "aws_lb_target_group" "fme_flow_core" {
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 
-    health_check {
+  health_check {
     path = "/fmeapiv4/healthcheck/liveness"
     protocol = "HTTP"
     port = "80"
