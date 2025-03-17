@@ -98,6 +98,7 @@ module "asg_core" {
   engine_registration_target_group_arn = module.nlb.engine_registration_target_group_arn
   private_sn_az2_id                    = module.network.private_sn_az2_id
   private_sn_az1_id                    = module.network.private_sn_az1_id
+  owner                                = var.owner
   depends_on = [
     module.secrets
   ]
@@ -118,6 +119,7 @@ module "asg_standard_engine" {
   engine_type          = "STANDARD"
   node_managed         = "true"
   engine_name          = "standard"
+  owner                = var.owner
   depends_on = [
     module.asg_core
   ]
@@ -138,6 +140,7 @@ module "asg_cpuusage_engine" {
   engine_type          = "DYNAMIC"
   node_managed         = "false"
   engine_name          = "cpuUsage"
+  owner                = var.owner
   depends_on = [
     module.asg_core
   ]
