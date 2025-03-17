@@ -41,5 +41,10 @@ resource "aws_autoscaling_group" "fme_sever_core" {
     id      = aws_launch_template.fme_flow_core.id
     version = "$Latest"
   }
+  tag {
+  key                 = "Owner"
+  value               = var.owner
+  propagate_at_launch = true
+  }
 }
 

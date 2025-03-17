@@ -62,3 +62,8 @@ variable "private_sn_az1_id" {
   type        = string
   description = "Private subnet id in the first availability zone"
 }
+
+variable "owner" {
+  type        = string
+  description = "Resource owner for tagging purposes"
+}
