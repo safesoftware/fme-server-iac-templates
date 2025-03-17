@@ -140,7 +140,7 @@ module "asg_cpuusage_engine" {
   engine_type          = "DYNAMIC"
   node_managed         = "false"
   engine_name          = "cpuUsage"
-    owner              = var.owner
+  owner                = var.owner
   depends_on = [
     module.asg_core
   ]

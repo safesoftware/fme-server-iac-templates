@@ -42,9 +42,9 @@ resource "aws_autoscaling_group" "fme_sever_core" {
     version = "$Latest"
   }
   tag {
-  key                 = "Owner"
-  value               = var.owner
-  propagate_at_launch = true
+    key                 = "Owner"
+    value               = var.owner
+    propagate_at_launch = true
   }
 }
 
