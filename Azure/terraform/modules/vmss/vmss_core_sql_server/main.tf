@@ -32,12 +32,12 @@ resource "azurerm_windows_virtual_machine_scale_set" "fme_flow_core" {
   source_image_reference {
     publisher = "safesoftwareinc"
     offer     = "fme-core"
-    sku       = "fme-core-2024-1-3-windows-byol"
+    sku       = "fme-core-2025-0-windows-byol"
     version   = "latest"
   }
 
   plan {
-    name      = "fme-core-2024-1-3-windows-byol"
+    name      = "fme-core-2025-0-windows-byol"
     publisher = "safesoftwareinc"
     product   = "fme-core"
   }
