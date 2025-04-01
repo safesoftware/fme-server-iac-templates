@@ -18,6 +18,9 @@ resource "aws_fsx_windows_file_system" "fme_flow" {
   preferred_subnet_id = var.private_sn_az1_id
   throughput_capacity = 32
   deployment_type     = "MULTI_AZ_1"
+  timeouts {
+    create = "60m"
+  }
 }
 
 locals {
