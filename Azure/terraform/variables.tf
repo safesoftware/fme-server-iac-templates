@@ -101,8 +101,12 @@ variable "vm_admin_pw" {
 
 variable "db_admin_user" {
   type        = string
-  description = "Specifies the backend database admin username. This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE."
+  description = "Specifies the backend database admin username. Cannot be `FMEFLOW` or `POSTGRES` (case insensitive). This variable should be retrieved from an [environment variable](https://www.terraform.io/cli/config/environment-variables#tf_var_name) or a secure secret store like [Azure Key Vault](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/key_vault). DO NOT HARDCODE."
   sensitive   = true
+  validation {
+    condition     = !(lower(var.db_admin_user) == "fmeflow" || lower(var.db_admin_user) == "postgres")
+    error_message = "The db_admin_user variable cannot be 'FMEFLOW' or 'POSTGRES' (case-insensitive)."
+  }
 }
 
 variable "db_admin_pw" {
