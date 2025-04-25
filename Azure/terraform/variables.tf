@@ -105,7 +105,7 @@ variable "db_admin_user" {
   sensitive   = true
   validation {
     condition     = !(lower(var.db_admin_user) == "fmeflow" || lower(var.db_admin_user) == "postgres")
-    error_message = "The service_name cannot be 'FMEFLOW' or 'POSTGRES' (case-insensitive)."
+    error_message = "The db_admin_user variable cannot be 'FMEFLOW' or 'POSTGRES' (case-insensitive)."
   }
 }
 
