@@ -98,7 +98,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2021-08-01' =
         properties: {
           port: 7078
           protocol: 'Http'
-          cookieBasedAffinity: 'Disabled'
+          cookieBasedAffinity: 'Enabled'
           pickHostNameFromBackendAddress: true
           requestTimeout: 86400
           probe: {

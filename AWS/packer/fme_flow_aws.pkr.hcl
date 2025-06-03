@@ -29,7 +29,7 @@ locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
 # build blocks. A build block runs provisioner and post-processors on a
 # source.
 source "amazon-ebs" "fme_core" {
-  ami_name              = "fme-core-2024-win-${local.timestamp}"
+  ami_name              = "fme-core-2025-win-${local.timestamp}"
   communicator          = "winrm"
   instance_type         = "m5.large"
   region                = "${var.region}"
@@ -57,7 +57,7 @@ source "amazon-ebs" "fme_core" {
 }
 
 source "amazon-ebs" "fme_engine" {
-  ami_name       = "fme-engine-2024-win-${local.timestamp}"
+  ami_name       = "fme-engine-2025-win-${local.timestamp}"
   communicator   = "winrm"
   instance_type  = "m5.large"
   region         = "${var.region}"
@@ -81,7 +81,7 @@ source "amazon-ebs" "fme_engine" {
 
 # a build block invokes sources and runs provisioning steps on them.
 build {
-  name    = "fme-core-2024"
+  name    = "fme-core-2025"
   sources = ["source.amazon-ebs.fme_core"]
   
   provisioner "file" {
@@ -102,7 +102,7 @@ build {
 }
 
 build {
-  name    = "fme-engine-2024"
+  name    = "fme-engine-2025"
   sources = ["source.amazon-ebs.fme_engine"]
   
   provisioner "file" {

@@ -78,7 +78,7 @@ resource "azurerm_application_gateway" "fme_flow" {
     port                                = 7078
     protocol                            = "Http"
     request_timeout                     = 86400
-    cookie_based_affinity               = "Disabled"
+    cookie_based_affinity               = "Enabled"
     pick_host_name_from_backend_address = true
     probe_name                          = "websocketProbe"
 
