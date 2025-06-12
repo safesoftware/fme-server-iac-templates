@@ -13,21 +13,14 @@
 ### Create the Windows Images
 1. Open a command line in the packer directory (directory with .pkr.hcl files)
 2. Run `packer init fme_flow_az.pkr.hcl`
+4. Open the `variables.pkrvars.hcl` file and update the placeholder text for the `resource_group`, FME `installer_url` and `tags` variables with the values for your deployment. 
 3. Validate the script with set variables:
 ```
-packer validate \
--var 'resource_group=<RESOURCE_GROUP_NAME>'
--var 'installer_url=<INSTALLER_URL>' \
--var 'tags={Owner="<OWNER>",fme_build="<FME_BUILD>"}' \
-fme_flow_az.pkr.hcl
+packer validate -var-file="variables.pkrvars.hcl" fme_flow_az.pkr.hcl
 ```
 4. Build the images:
 ```
-packer build \
--var 'resource_group=<RESOURCE_GROUP_NAME>'
--var 'installer_url=<INSTALLER_URL>' \
--var 'tags={Owner="<OWNER>",fme_build="<FME_BUILD>"}' \
-fme_flow_az.pkr.hcl
+packer build -var-file="variables.pkrvars.hcl" fme_flow_az.pkr.hcl
 ```
 ### Modifying the Windows Images
 To modify the Windows Images by installing additional 3rd party software or adding file packer provisioners, similar as used in this example for FME Flow, should be used. For more details please review this [documentation](https://www.packer.io/docs/provisioners).
