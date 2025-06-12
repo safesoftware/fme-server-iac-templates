@@ -110,12 +110,22 @@ if($schemaExists -like "*t*") {
 }
 else {
     $env:PGPASSWORD = $databasePassword
+    $psqlPath = '"C:\Program Files\FMEFlow\Utilities\pgsql\bin\psql.exe"'
+    # Create User
+    $createUserCmd = "$psqlPath -d postgres -h $databasehostname -U $databaseUsername -p 5432 -f `"C:\Program Files\FMEFlow\Server\database\postgresql\postgresql_createUser.sql`" > `"C:\Program Files\FMEFlow\resources\logs\installation\CreateUser.log`" 2>&1"
+    cmd.exe /c $createUserCmd
 
-    & "C:\Program Files\FMEFlow\Utilities\pgsql\bin\psql.exe" -d postgres -h $databasehostname -U $databaseUsername -p 5432 -f "C:\Program Files\FMEFlow\Server\database\postgresql\postgresql_createUser.sql" >"C:\Program Files\FMEFlow\resources\logs\installation\CreateUser.log" 2>&1
-    & "C:\Program Files\FMEFlow\Utilities\pgsql\bin\psql.exe" -d postgres -h $databasehostname -U $databaseUsername -p 5432 -f "C:\Program Files\FMEFlow\Server\database\postgresql\postgresql_createDB.sql" >"C:\Program Files\FMEFlow\resources\logs\installation\CreateDatabase.log" 2>&1
+    # Create Database
+    $createDBCmd = "$psqlPath -d postgres -h $databasehostname -U $databaseUsername -p 5432 -f `"C:\Program Files\FMEFlow\Server\database\postgresql\postgresql_createDB.sql`" > `"C:\Program Files\FMEFlow\resources\logs\installation\CreateDatabase.log`" 2>&1"
+    cmd.exe /c $createDBCmd
 
+    # Switch password for fmeflow DB
     $env:PGPASSWORD = "fmeflow"
-    & "C:\Program Files\FMEFlow\Utilities\pgsql\bin\psql.exe" -d fmeflow -h $databasehostname -U $fmeDatabaseUsername -p 5432 -f "C:\Program Files\FMEFlow\Server\database\postgresql\postgresql_createSchema.sql" >"C:\Program Files\FMEFlow\resources\logs\installation\CreateSchema.log" 2>&1
+
+    # Create Schema
+    $createSchemaCmd = "$psqlPath -d fmeflow -h $databasehostname -U $fmeDatabaseUsername -p 5432 -f `"C:\Program Files\FMEFlow\Server\database\postgresql\postgresql_createSchema.sql`" > `"C:\Program Files\FMEFlow\resources\logs\installation\CreateSchema.log`" 2>&1"
+    cmd.exe /c $createSchemaCmd
+    
 }
 
 # create a script with the account name and password written into it to use at startup
