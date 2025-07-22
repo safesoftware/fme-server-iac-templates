@@ -91,7 +91,7 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
           publisher: 'safesoftwareinc'
           offer: 'fme-core'
           sku: 'fme-core-2025-1-windows-byol'
-          version: '1.0.0'
+          version: 'latest'
         }
       }
       osProfile: {
