@@ -71,7 +71,7 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
   }
   plan: {
     publisher: 'safesoftwareinc'
-    name: 'fme-core-2025-2-windows-byol'
+    name: 'fme-core-2026-1-windows-byol'
     product: 'fme-core'
   }
   properties: {
@@ -90,7 +90,7 @@ resource vmssNameCore_resource 'Microsoft.Compute/virtualMachineScaleSets@2021-0
           // id: fmeCoreImage.id
           publisher: 'safesoftwareinc'
           offer: 'fme-core'
-          sku: 'fme-core-2025-2-windows-byol'
+          sku: 'fme-core-2026-1-windows-byol'
           version: 'latest'
         }
       }
