@@ -80,7 +80,7 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
           // id: fmeEngineImage.id
           publisher: 'safesoftwareinc'
           offer: 'fme-engine'
-          sku: 'fme-engine-2026-1-windows-byol'
+          sku: 'fme-engine-2026-2-windows-byol'
           version: 'latest'
         }
       }
