@@ -61,7 +61,7 @@ resource vmssNameEngine_resource 'Microsoft.Compute/virtualMachineScaleSets@2021
   }
   plan: {
     publisher: 'safesoftwareinc'
-    name: 'fme-engine-2026-1-windows-byol'
+    name: 'fme-engine-2026-2-windows-byol'
     product: 'fme-engine'
   }
   properties: {
