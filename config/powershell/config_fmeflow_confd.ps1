@@ -56,8 +56,25 @@ New-Item -Path "C:\" -Name "REDISDIR" -ItemType "directory"
 ((Get-Content -path "$default_values" -Raw) -replace '<<POSTGRES_ROOT_PASSWORD>>','"postgres"') | Set-Content -Path "$default_values"
 
 $ErrorActionPreference = 'SilentlyContinue'
+
+# determine the installed FME version to select the correct confd command syntax
+$fmeVersion = $null
+$versionInfoPath = "C:\Program Files\FMEFlow\VersionInfo.txt"
+if (Test-Path -Path $versionInfoPath) {
+    $versionLine = Get-Content -Path $versionInfoPath | Where-Object { $_ -match '^VERSION\s*=' } | Select-Object -First 1
+    if ($versionLine) {
+        $fmeVersion = [version](($versionLine -split '=', 2)[1].Trim())
+    }
+}
+
 Push-Location -Path "C:\Program Files\FMEFlow\Config\confd"
-& "C:\Program Files\FMEFlow\Config\confd\confd.exe" -confdir "C:\Program Files\FMEFlow\Config\confd" -backend file -file "$default_values" -file "$modified_values" -onetime
+if ($fmeVersion -and $fmeVersion -lt [version]"2026.2.0.0") {
+    # FME 2026.1.x or lower uses the legacy confd argument syntax
+    & "C:\Program Files\FMEFlow\Config\confd\confd.exe" -confdir "C:\Program Files\FMEFlow\Config\confd" -backend file -file "$default_values" -file "$modified_values" -onetime
+} else {
+    # FME 2026.2.0.0 and higher (and the default when the version is unknown)
+    & "C:\Program Files\FMEFlow\Config\confd\confd.exe" file --confdir "C:\Program Files\FMEFlow\Config\confd"  --file "$default_values" --file "$modified_values" --onetime
+}
 Pop-Location
 
 # add ssl mode to jdbc connection string and set username to include hostname
@@ -75,6 +92,26 @@ Move-Item -Path "C:\Program Files\FMEFlow\Server\fmeDatabaseConfig.txt.updated" 
 Move-Item -Path "C:\Program Files\FMEFlow\Server\fmeFlowWebApplicationConfig.txt.updated" -Destination "C:\Program Files\FMEFlow\Server\fmeFlowWebApplicationConfig.txt" -Force
 ((Get-Content "C:\Program Files\FMEFlow\Server\fmeFlowWebApplicationConfig.txt") -join "`n") + "`n" | Set-Content -NoNewline "C:\Program Files\FMEFlow\Server\fmeFlowWebApplicationConfig.txt"
 
+# Build the list of accounts allowed to use the global mapping. FME Flow 2026.2 and
+# higher run their services under per-service virtual accounts (NT SERVICE\<service
+# name>) instead of LocalSystem, so those accounts have to be granted access here or
+# the services cannot reach Z:. Only the services this image installs are listed - the
+# FME Flow Database service is left out because it only touches the local PGDATA, and
+# the fault-tolerant deployment uses an external PostgreSQL Flexible Server anyway.
+# Names that do not resolve are skipped: a single unresolvable name fails the whole
+# New-SmbGlobalMapping call, and older installers still run everything as LocalSystem.
+$fullAccess = @("NT AUTHORITY\SYSTEM", "NT AUTHORITY\NetworkService")
+foreach ($account in @("NT SERVICE\FME Flow Core", "NT SERVICE\FMEFlowAppServer")) {
+    try {
+        [void] (New-Object System.Security.Principal.NTAccount($account)).Translate([System.Security.Principal.SecurityIdentifier])
+        $fullAccess += $account
+    } catch {
+        Write-Host "WARNING: $account did not resolve and was skipped - if FME Flow runs under it, it will not be able to reach Z:"
+    }
+}
+Write-Host "Granting access to the Z: mapping for: $($fullAccess -join ', ')"
+$fullAccessLiteral = "@(" + (($fullAccess | ForEach-Object { "`"$_`"" }) -join ", ") + ")"
+
 # connect to the azure file share
 $connectTestResult = Test-NetConnection -ComputerName $storageAccountName -Port 445
 if ($connectTestResult.TcpTestSucceeded) {
@@ -84,10 +121,18 @@ if ($connectTestResult.TcpTestSucceeded) {
     $cred = New-Object System.Management.Automation.PSCredential -ArgumentList ($username, $password)
 
     # Mount the drive
-    New-SmbGlobalMapping -RemotePath "\\$storageAccountPath" -Credential $cred -LocalPath Z: -FullAccess @("NT AUTHORITY\SYSTEM", "NT AUTHORITY\NetworkService") -Persistent $True
+    New-SmbGlobalMapping -RemotePath "\\$storageAccountPath" -Credential $cred -LocalPath Z: -FullAccess $fullAccess -Persistent $True
 
 } else {
     Write-Error -Message "Unable to reach the Azure storage account via port 445. Check to make sure your organization or ISP is not blocking port 445, or use Azure P2S VPN, Azure S2S VPN, or Express Route to tunnel SMB traffic over a different port."
+}
+
+# Errors are being swallowed from here on, so check the mount explicitly - otherwise a
+# failure to mount only shows up later as FME Flow pointing at a share that isn't there.
+if (Test-Path -Path 'Z:\') {
+    Write-Host "Azure file share mounted at Z:"
+} else {
+    Write-Host "ERROR: Z: is not available after New-SmbGlobalMapping. FME Flow will not be able to reach the shared data directory."
 }
 
 if ( !(Test-Path -Path 'Z:\fmeflowdata\localization' -PathType Container) ) {
@@ -128,12 +173,44 @@ else {
     
 }
 
-# create a script with the account name and password written into it to use at startup
-Write-Output "`$username = `"$storageUserName`"" | Out-File -FilePath "C:\startup.ps1"
-Write-Output "`$password = ConvertTo-SecureString `"$storageAccountKey`" -AsPlainText -Force" | Out-File -FilePath "C:\startup.ps1" -Append
-Write-Output "`$cred = New-Object System.Management.Automation.PSCredential -ArgumentList (`$username, `$password)" | Out-File -FilePath "C:\startup.ps1" -Append
-Write-Output "New-SmbGlobalMapping -RemotePath `"\\$storageAccountPath`" -Credential `$cred -LocalPath Z: -FullAccess @(`"NT AUTHORITY\SYSTEM`", `"NT AUTHORITY\NetworkService`") -Persistent `$True" | Out-File -FilePath "C:\startup.ps1" -Append
-Write-Output "Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False" | Out-File -FilePath "C:\startup.ps1" -Append
+# create a script with the account name and password written into it to use at startup.
+# It also starts the FME Flow services once Z: is confirmed available - see the comment
+# on the Set-Service calls below for why the service control manager no longer does it.
+$startupScript = @"
+`$username = "$storageUserName"
+`$password = ConvertTo-SecureString "$storageAccountKey" -AsPlainText -Force
+`$cred = New-Object System.Management.Automation.PSCredential -ArgumentList (`$username, `$password)
+`$fullAccess = $fullAccessLiteral
+
+# The mapping is persistent, so SMB may have already restored it by the time this runs.
+# New-SmbGlobalMapping fails when the drive letter is taken, so only map what is missing.
+function Mount-FMEFlowShare {
+    if (-not (Get-SmbGlobalMapping -LocalPath 'Z:' -ErrorAction SilentlyContinue)) {
+        New-SmbGlobalMapping -RemotePath "\\$storageAccountPath" -Credential `$cred -LocalPath Z: -FullAccess `$fullAccess -Persistent `$True -ErrorAction SilentlyContinue
+    }
+}
+
+Mount-FMEFlowShare
+
+# Wait for the share before starting FME Flow, retrying in case networking was not ready
+# yet. Bounded so an unreachable share fails the task instead of hanging it forever.
+`$deadline = (Get-Date).AddMinutes(10)
+while (-not (Test-Path -Path 'Z:\fmeflowdata') -and (Get-Date) -lt `$deadline) {
+    Start-Sleep -Seconds 5
+    Mount-FMEFlowShare
+}
+
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+if (-not (Test-Path -Path 'Z:\fmeflowdata')) {
+    Write-Output "ERROR: Z:\fmeflowdata is not available - not starting FME Flow."
+    exit 1
+}
+
+Start-Service -Name "FME Flow Core"
+Start-Service -Name "FMEFlowAppServer"
+"@
+Set-Content -Path "C:\startup.ps1" -Value $startupScript
 
 # create a scheduled task to run the above script at startup
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-File "C:\startup.ps1"'
@@ -142,8 +219,13 @@ $principal = New-ScheduledTaskPrincipal -UserId SYSTEM -LogonType ServiceAccount
 $definition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Description "Mount Azure files at startup"
 Register-ScheduledTask -TaskName "AzureMountFiles" -InputObject $definition
 
-Set-Service -Name "FME Flow Core" -StartupType "Automatic"
-Set-Service -Name "FMEFlowAppServer" -StartupType "Automatic"
+# Keep the services on Manual. At boot the AzureMountFiles task and the service control
+# manager have no ordering between them, so an Automatic service can start before Z: is
+# mounted and come up pointed at a shared data directory that isn't there. C:\startup.ps1
+# starts them instead, once it has confirmed the share. Starting them here is safe - the
+# mount above has already happened.
+Set-Service -Name "FME Flow Core" -StartupType "Manual"
+Set-Service -Name "FMEFlowAppServer" -StartupType "Manual"
 Start-Service -Name "FME Flow Core"
 Start-Service -Name "FMEFlowAppServer"
 
